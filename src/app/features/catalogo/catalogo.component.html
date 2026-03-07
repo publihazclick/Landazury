@@ -1,0 +1,139 @@
+<div class="min-h-screen bg-gray-50">
+
+  <!-- Header -->
+  <div class="bg-white border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <h1 class="text-2xl font-extrabold text-gray-900">Catálogo de productos</h1>
+      <p class="text-gray-500 mt-1">Descubre productos con alto potencial de venta</p>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Filtros -->
+    <div class="flex flex-col sm:flex-row gap-3 mb-8">
+      <div class="relative flex-1">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input [(ngModel)]="busqueda" (keyup.enter)="onBuscar()" type="text"
+               placeholder="Buscar productos..."
+               class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm bg-white" />
+      </div>
+      <select [(ngModel)]="categoriaSeleccionada" (change)="onCategoriaChange()"
+              class="px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm bg-white min-w-40">
+        <option value="">Todas las categorías</option>
+        @for (cat of categorias(); track cat.id) {
+          <option [value]="cat.id">{{ cat.nombre }}</option>
+        }
+      </select>
+      <button (click)="onBuscar()"
+              class="px-5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl text-sm transition-colors">
+        Buscar
+      </button>
+    </div>
+
+    <!-- Estado de carga -->
+    @if (cargando()) {
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        @for (i of [1,2,3,4,5,6,7,8]; track i) {
+          <div class="bg-white rounded-2xl overflow-hidden border border-gray-100 animate-pulse">
+            <div class="h-48 bg-gray-200"></div>
+            <div class="p-4 space-y-3">
+              <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div class="h-3 bg-gray-200 rounded w-full"></div>
+              <div class="h-3 bg-gray-200 rounded w-2/3"></div>
+              <div class="h-8 bg-gray-200 rounded w-full mt-2"></div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Error -->
+    @else if (error()) {
+      <div class="text-center py-16">
+        <p class="text-red-500 mb-4">{{ error() }}</p>
+        <button (click)="cargarProductos()" class="bg-violet-600 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-violet-700 transition-colors">
+          Reintentar
+        </button>
+      </div>
+    }
+
+    <!-- Sin resultados -->
+    @else if (productos().length === 0) {
+      <div class="text-center py-20">
+        <div class="text-5xl mb-4">📦</div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Sin productos disponibles</h3>
+        <p class="text-gray-500 text-sm">No encontramos productos con esos filtros. Prueba con otros criterios.</p>
+      </div>
+    }
+
+    <!-- Grid de productos -->
+    @else {
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        @for (producto of productos(); track producto.id) {
+          <div class="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow group">
+            <!-- Imagen -->
+            <div class="relative h-48 bg-gray-100 overflow-hidden">
+              @if (producto.imagenes && producto.imagenes.length) {
+                <img [src]="producto.imagenes[0]" [alt]="producto.nombre"
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+              } @else {
+                <div class="w-full h-full flex items-center justify-center text-4xl">🛍️</div>
+              }
+
+              <!-- Badge margen -->
+              @if (calcularMargen(producto) > 0) {
+                <span class="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                  +{{ calcularMargen(producto) }}% margen
+                </span>
+              }
+
+              <!-- Favorito -->
+              <button (click)="toggleFavorito(producto.id, $event)"
+                      class="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform">
+                <svg class="w-4 h-4 transition-colors"
+                     [class.text-red-500]="esFavorito(producto.id)"
+                     [class.text-gray-400]="!esFavorito(producto.id)"
+                     fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Info -->
+            <div class="p-4">
+              @if (producto.categoria) {
+                <span class="text-xs font-medium text-violet-600 bg-violet-50 px-2 py-0.5 rounded-full">
+                  {{ producto.categoria.nombre }}
+                </span>
+              }
+              <h3 class="font-semibold text-gray-900 mt-2 text-sm leading-snug line-clamp-2">
+                {{ producto.nombre }}
+              </h3>
+
+              <div class="mt-3 flex items-end justify-between">
+                <div>
+                  <p class="text-xs text-gray-400">Precio base</p>
+                  <p class="text-lg font-extrabold text-gray-900">
+                    {{ producto.precio_base | currency:'USD':'symbol':'1.2-2' }}
+                  </p>
+                  @if (producto.precio_sugerido) {
+                    <p class="text-xs text-green-600 font-medium">
+                      Venta: {{ producto.precio_sugerido | currency:'USD':'symbol':'1.2-2' }}
+                    </p>
+                  }
+                </div>
+              </div>
+
+              <button class="mt-4 w-full bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold py-2.5 rounded-xl transition-colors">
+                Ver detalles
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

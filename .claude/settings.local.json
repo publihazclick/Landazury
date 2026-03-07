@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Read(//c/Users/Victor/.claude/**)",
+      "Read(//c/Users/Victor/AppData/Roaming/Claude/**)",
+      "Bash(\"C:\\\\Users\\\\Victor\\\\Documents\\\\landazury\\\\.gitignore\":*)",
+      "Skill(supabase-schema-sync)",
+      "Bash(npx supabase:*)"
+    ]
+  }
+}
