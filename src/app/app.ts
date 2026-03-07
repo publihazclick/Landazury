@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject, signal, effect } from '@angular/core';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
 
 @Component({
@@ -7,10 +7,23 @@ import { NavbarComponent } from './shared/components/navbar/navbar.component';
   standalone: true,
   imports: [RouterOutlet, NavbarComponent],
   template: `
-    <app-navbar />
-    <main class="pt-20">
+    @if (mostrarNavbar()) {
+      <app-navbar />
+    }
+    <main [class]="mostrarNavbar() ? 'pt-20' : ''">
       <router-outlet />
     </main>
   `,
 })
-export class App {}
+export class App {
+  private readonly router = inject(Router);
+  readonly mostrarNavbar = signal(!this.router.url.startsWith('/auth/'));
+
+  constructor() {
+    this.router.events.subscribe((e) => {
+      if (e instanceof NavigationEnd) {
+        this.mostrarNavbar.set(!e.urlAfterRedirects.startsWith('/auth/'));
+      }
+    });
+  }
+}

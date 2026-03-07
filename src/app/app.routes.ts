@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, invitadoGuard } from './core/guards/auth.guard';
+import { authGuard, invitadoGuard, inventarioGuard, adminGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -38,10 +38,16 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
-    path: 'favoritos',
+    path: 'inventario',
     loadComponent: () =>
-      import('./features/catalogo/catalogo.component').then((m) => m.CatalogoComponent),
-    canActivate: [authGuard],
+      import('./features/inventario/inventario.component').then((m) => m.InventarioComponent),
+    canActivate: [inventarioGuard],
+  },
+  {
+    path: 'admin',
+    loadComponent: () =>
+      import('./features/admin/admin.component').then((m) => m.AdminComponent),
+    canActivate: [adminGuard],
   },
   { path: '**', redirectTo: '' },
 ];

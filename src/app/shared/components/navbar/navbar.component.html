@@ -2,28 +2,42 @@
   <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
 
     <!-- Logo -->
-    <a routerLink="/" class="flex items-center gap-3">
-      <span class="material-symbols-outlined text-4xl text-primary">database</span>
-      <span class="text-xl font-medium tracking-[0.2em] text-slate-100">LANDAZURY</span>
+    <a routerLink="/">
+      <img src="/logo.png" alt="Landazury Importaciones" class="h-24 w-auto object-contain"/>
     </a>
 
     <!-- Nav desktop -->
     @if (auth.estaAutenticado()) {
-      <nav class="hidden md:flex items-center gap-8">
+      <nav class="hidden md:flex items-center gap-6">
         <a routerLink="/catalogo" routerLinkActive="text-primary"
            class="text-sm font-medium text-slate-100 hover:text-primary transition-colors">Catálogo</a>
+
+        @if (auth.esInventario()) {
+          <a routerLink="/inventario" routerLinkActive="text-primary"
+             class="text-sm font-medium text-slate-100 hover:text-primary transition-colors">Inventario</a>
+        }
+        @if (auth.esAdmin()) {
+          <a routerLink="/admin" routerLinkActive="text-primary"
+             class="text-sm font-medium text-slate-100 hover:text-primary transition-colors">Admin</a>
+        }
+
         <a routerLink="/perfil" routerLinkActive="text-primary"
            class="text-sm font-medium text-slate-100 hover:text-primary transition-colors">Mi Perfil</a>
       </nav>
+
       <div class="hidden md:flex items-center gap-4">
+        @if (auth.perfil()) {
+          <span class="text-xs px-2.5 py-1 rounded-full font-semibold"
+            [class]="auth.esAdmin() ? 'bg-red-900/50 text-red-300' :
+                     auth.esInventario() ? 'bg-amber-900/50 text-amber-300' :
+                     'bg-slate-700 text-slate-300'">
+            {{ auth.perfil()?.rol }}
+          </span>
+        }
         <button (click)="auth.cerrarSesion()"
                 class="px-5 py-2 text-sm font-bold text-slate-100 hover:text-primary transition-colors">
           Salir
         </button>
-        <a routerLink="/catalogo"
-           class="bg-primary text-[#0F0F0F] px-6 py-2 rounded-lg text-sm font-bold hover:brightness-110 transition-all">
-          Ver Catálogo
-        </a>
       </div>
     } @else {
       <div class="hidden md:flex items-center gap-4">
@@ -59,6 +73,14 @@
       @if (auth.estaAutenticado()) {
         <a routerLink="/catalogo" (click)="toggleMenu()"
            class="block py-2 text-slate-300 hover:text-primary font-medium">Catálogo</a>
+        @if (auth.esInventario()) {
+          <a routerLink="/inventario" (click)="toggleMenu()"
+             class="block py-2 text-slate-300 hover:text-primary font-medium">Inventario</a>
+        }
+        @if (auth.esAdmin()) {
+          <a routerLink="/admin" (click)="toggleMenu()"
+             class="block py-2 text-slate-300 hover:text-primary font-medium">Admin</a>
+        }
         <a routerLink="/perfil" (click)="toggleMenu()"
            class="block py-2 text-slate-300 hover:text-primary font-medium">Mi Perfil</a>
         <button (click)="auth.cerrarSesion()"

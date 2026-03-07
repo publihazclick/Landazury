@@ -1,24 +1,13 @@
-<!-- Full screen dark background — mismo estilo que el hero -->
-<div class="-mt-20 min-h-screen flex items-center justify-center p-4 bg-background-dark relative overflow-hidden">
+<div class="min-h-screen flex items-center justify-center p-4 bg-background-dark">
 
-  <!-- Glow blobs -->
-  <div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full pointer-events-none"></div>
-  <div class="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full pointer-events-none"></div>
-  <div class="absolute inset-0 bg-grid-mesh pointer-events-none"></div>
+  <main class="w-full max-w-2xl px-4 py-12">
 
-  <main class="relative z-10 w-full max-w-2xl px-4 py-12">
-
-    <!-- Mismo card ultra-glass del hero -->
+    <!-- Card -->
     <div class="ultra-glass rounded-[2rem] p-10 md:p-16 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)]">
 
       <!-- Header -->
       <div class="text-center mb-10">
-        <div class="flex items-center justify-center gap-3 mb-6">
-          <div class="size-12 flex items-center justify-center bg-primary/10 rounded-2xl border border-primary/20">
-            <span class="material-symbols-outlined text-3xl text-primary">database</span>
-          </div>
-          <a routerLink="/" class="text-2xl font-black tracking-[0.2em] text-white uppercase">LANDAZURY</a>
-        </div>
+        <img src="/logo.png" alt="Landazury Importaciones" class="h-28 md:h-36 w-auto object-contain mx-auto mb-6"/>
         <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight leading-[1.1] mb-4 text-white">
           Únete a la red <span class="text-primary">élite</span> de dropshippers
         </h1>
@@ -140,18 +129,18 @@
           </button>
         </form>
 
-        <p class="text-center text-[10px] uppercase tracking-[0.2em] text-white/30 mt-6">
-          ¿Ya tienes cuenta?
-          <a routerLink="/auth/login" class="text-primary font-bold hover:underline underline-offset-4 ml-1">Inicia sesión</a>
-        </p>
+        <div class="mt-6 text-center space-y-3">
+          <a routerLink="/" class="inline-flex items-center justify-center gap-1.5 text-white/30 hover:text-primary transition-colors text-xs font-medium">
+            <span class="material-symbols-outlined text-base">arrow_back</span>
+            Regresar al inicio
+          </a>
+          <p class="text-[10px] uppercase tracking-[0.2em] text-white/30">
+            ¿Ya tienes cuenta?
+            <a routerLink="/auth/login" class="text-primary font-bold hover:underline underline-offset-4 ml-1">Inicia sesión</a>
+          </p>
+        </div>
       }
     </div>
 
-    <p class="mt-8 text-center text-slate-500 text-xs tracking-widest uppercase">
-      © 2024 LANDAZURY PLATFORM. PREMIUM DROPSHIPPING.
-    </p>
   </main>
-
-  <!-- Bottom gold line -->
-  <div class="fixed bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent pointer-events-none"></div>
 </div>

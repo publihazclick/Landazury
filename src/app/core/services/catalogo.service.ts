@@ -11,16 +11,27 @@ export class CatalogoService {
   async obtenerProductos(filtros?: { categoriaId?: string; busqueda?: string }) {
     let query = this.supabase.cliente
       .from('productos')
-      .select('*, categoria:categorias(*)')
+      .select('*, categoria:categorias(*), creativos(*)')
       .eq('disponible', true)
       .order('creado_en', { ascending: false });
 
-    if (filtros?.categoriaId) {
-      query = query.eq('categoria_id', filtros.categoriaId);
-    }
-    if (filtros?.busqueda) {
-      query = query.ilike('nombre', `%${filtros.busqueda}%`);
-    }
+    if (filtros?.categoriaId) query = query.eq('categoria_id', filtros.categoriaId);
+    if (filtros?.busqueda) query = query.ilike('nombre', `%${filtros.busqueda}%`);
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data as Producto[];
+  }
+
+  // Inventario/admin: obtiene todos incluso no disponibles
+  async obtenerTodosProductos(filtros?: { categoriaId?: string; busqueda?: string }) {
+    let query = this.supabase.cliente
+      .from('productos')
+      .select('*, categoria:categorias(*)')
+      .order('creado_en', { ascending: false });
+
+    if (filtros?.categoriaId) query = query.eq('categoria_id', filtros.categoriaId);
+    if (filtros?.busqueda) query = query.ilike('nombre', `%${filtros.busqueda}%`);
 
     const { data, error } = await query;
     if (error) throw error;
@@ -30,11 +41,31 @@ export class CatalogoService {
   async obtenerProducto(id: string) {
     const { data, error } = await this.supabase.cliente
       .from('productos')
-      .select('*, categoria:categorias(*)')
+      .select('*, categoria:categorias(*), creativos(*)')
       .eq('id', id)
       .single();
     if (error) throw error;
     return data as Producto;
+  }
+
+  async crearProducto(producto: Omit<Producto, 'id' | 'creado_en' | 'categoria' | 'creativos'>) {
+    const { data, error } = await this.supabase.cliente
+      .from('productos')
+      .insert(producto)
+      .select()
+      .single();
+    if (error) throw error;
+    return data as Producto;
+  }
+
+  async actualizarProducto(id: string, cambios: Partial<Omit<Producto, 'id' | 'creado_en' | 'categoria' | 'creativos'>>) {
+    const { error } = await this.supabase.cliente.from('productos').update(cambios).eq('id', id);
+    if (error) throw error;
+  }
+
+  async eliminarProducto(id: string) {
+    const { error } = await this.supabase.cliente.from('productos').delete().eq('id', id);
+    if (error) throw error;
   }
 
   async obtenerCategorias() {

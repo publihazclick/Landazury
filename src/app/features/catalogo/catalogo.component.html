@@ -1,139 +1,374 @@
-<div class="min-h-screen bg-gray-50">
+<div class="relative flex min-h-screen flex-col bg-neutral-charcoal text-slate-100">
 
-  <!-- Header -->
-  <div class="bg-white border-b border-gray-100">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 class="text-2xl font-extrabold text-gray-900">Catálogo de productos</h1>
-      <p class="text-gray-500 mt-1">Descubre productos con alto potencial de venta</p>
-    </div>
-  </div>
+  <div class="flex flex-1 w-full max-w-7xl mx-auto">
 
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Sidebar -->
+    <aside class="hidden xl:flex flex-col w-72 border-r border-neutral-border p-6 gap-8 overflow-y-auto sticky top-20 h-[calc(100vh-5rem)]">
 
-    <!-- Filtros -->
-    <div class="flex flex-col sm:flex-row gap-3 mb-8">
-      <div class="relative flex-1">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-        </svg>
-        <input [(ngModel)]="busqueda" (keyup.enter)="onBuscar()" type="text"
-               placeholder="Buscar productos..."
-               class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm bg-white" />
+      <!-- Filtrar por activos -->
+      <div>
+        <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-4">Filtrar por Activos</h3>
+        <div class="flex flex-col gap-2">
+          <button (click)="filtroAsset.set('todos')"
+                  class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all text-sm font-semibold"
+                  [class]="filtroAsset() === 'todos'
+                    ? 'bg-primary/10 text-primary border border-primary/20'
+                    : 'text-slate-400 hover:bg-neutral-surface hover:text-slate-100'">
+            <span class="material-symbols-outlined">dashboard</span>
+            Todos los Productos
+          </button>
+          <button (click)="filtroAsset.set('video')"
+                  class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all text-sm font-semibold"
+                  [class]="filtroAsset() === 'video'
+                    ? 'bg-primary/10 text-primary border border-primary/20'
+                    : 'text-slate-400 hover:bg-neutral-surface hover:text-slate-100'">
+            <span class="material-symbols-outlined">play_circle</span>
+            Con Video Ads
+          </button>
+          <button (click)="filtroAsset.set('copy')"
+                  class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all text-sm font-semibold"
+                  [class]="filtroAsset() === 'copy'
+                    ? 'bg-primary/10 text-primary border border-primary/20'
+                    : 'text-slate-400 hover:bg-neutral-surface hover:text-slate-100'">
+            <span class="material-symbols-outlined">description</span>
+            Con Copy Viral
+          </button>
+          <button (click)="filtroAsset.set('imagen')"
+                  class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all text-sm font-semibold"
+                  [class]="filtroAsset() === 'imagen'
+                    ? 'bg-primary/10 text-primary border border-primary/20'
+                    : 'text-slate-400 hover:bg-neutral-surface hover:text-slate-100'">
+            <span class="material-symbols-outlined">photo_library</span>
+            Imágenes de Estudio
+          </button>
+          <button (click)="filtroAsset.set('ganador')"
+                  class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all text-sm font-semibold"
+                  [class]="filtroAsset() === 'ganador'
+                    ? 'bg-primary/10 text-primary border border-primary/20'
+                    : 'text-slate-400 hover:bg-neutral-surface hover:text-slate-100'">
+            <span class="material-symbols-outlined">verified</span>
+            Producto Ganador
+          </button>
+        </div>
       </div>
-      <select [(ngModel)]="categoriaSeleccionada" (change)="onCategoriaChange()"
-              class="px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm bg-white min-w-40">
-        <option value="">Todas las categorías</option>
-        @for (cat of categorias(); track cat.id) {
-          <option [value]="cat.id">{{ cat.nombre }}</option>
-        }
-      </select>
-      <button (click)="onBuscar()"
-              class="px-5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl text-sm transition-colors">
-        Buscar
-      </button>
-    </div>
 
-    <!-- Estado de carga -->
-    @if (cargando()) {
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        @for (i of [1,2,3,4,5,6,7,8]; track i) {
-          <div class="bg-white rounded-2xl overflow-hidden border border-gray-100 animate-pulse">
-            <div class="h-48 bg-gray-200"></div>
-            <div class="p-4 space-y-3">
-              <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-              <div class="h-3 bg-gray-200 rounded w-full"></div>
-              <div class="h-3 bg-gray-200 rounded w-2/3"></div>
-              <div class="h-8 bg-gray-200 rounded w-full mt-2"></div>
+      <!-- Categorías -->
+      @if (categorias().length > 0) {
+        <div>
+          <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-4">Categorías</h3>
+          <div class="flex flex-col gap-1">
+            <button (click)="categoriaSeleccionada = ''; onCategoriaChange()"
+                    class="text-sm font-medium px-4 py-1 text-left transition-colors"
+                    [class]="categoriaSeleccionada === '' ? 'text-primary' : 'text-slate-400 hover:text-primary'">
+              Todas
+            </button>
+            @for (cat of categorias(); track cat.id) {
+              <button (click)="categoriaSeleccionada = cat.id; onCategoriaChange()"
+                      class="text-sm font-medium px-4 py-1 text-left transition-colors"
+                      [class]="categoriaSeleccionada === cat.id ? 'text-primary' : 'text-slate-400 hover:text-primary'">
+                {{ cat.nombre }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Soporte -->
+      <div class="mt-auto bg-primary/5 rounded-2xl p-4 border border-primary/10">
+        <p class="text-primary text-xs font-bold mb-1 uppercase">Soporte Dropshipper</p>
+        <p class="text-slate-400 text-[11px] leading-relaxed mb-3">¿Necesitas un creativo personalizado para tu tienda?</p>
+        <button class="w-full py-2 bg-primary text-neutral-charcoal rounded-lg text-xs font-bold hover:brightness-110 transition-all">
+          Contactar Agencia
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="flex-1 p-4 md:p-8 min-w-0">
+
+      <!-- Header + búsqueda -->
+      <div class="mb-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div>
+            <h1 class="text-3xl font-extrabold text-slate-100 tracking-tight">Creative Assets Hub</h1>
+            <p class="text-slate-400 text-sm mt-1">Descarga materiales de alta conversión para tus campañas.</p>
+          </div>
+          <div class="flex gap-2">
+            <!-- Búsqueda desktop -->
+            <div class="hidden md:flex items-stretch rounded-lg bg-neutral-surface border border-neutral-border focus-within:border-primary transition-all">
+              <div class="text-slate-400 flex items-center justify-center pl-4">
+                <span class="material-symbols-outlined text-xl">search</span>
+              </div>
+              <input [(ngModel)]="busqueda" (keyup.enter)="onBuscar()"
+                     class="bg-transparent text-slate-100 focus:ring-0 outline-none placeholder:text-slate-500 py-2 px-3 text-sm w-52"
+                     placeholder="Buscar productos ganadores..."/>
+            </div>
+            <button (click)="onBuscar()"
+                    class="flex items-center gap-2 bg-neutral-surface border border-neutral-border px-4 py-2 rounded-lg text-sm text-slate-200 hover:bg-neutral-border transition-colors">
+              <span class="material-symbols-outlined text-[18px]">sort</span>
+              Ordenar
+            </button>
+          </div>
+        </div>
+
+        <!-- Búsqueda móvil -->
+        <div class="flex md:hidden items-stretch rounded-lg bg-neutral-surface border border-neutral-border focus-within:border-primary transition-all mb-4">
+          <div class="text-slate-400 flex items-center justify-center pl-4">
+            <span class="material-symbols-outlined text-xl">search</span>
+          </div>
+          <input [(ngModel)]="busqueda" (keyup.enter)="onBuscar()"
+                 class="w-full bg-transparent text-slate-100 focus:ring-0 outline-none placeholder:text-slate-500 py-3 px-3 text-sm"
+                 placeholder="Buscar productos..."/>
+        </div>
+
+        <!-- Filter chips -->
+        <div class="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+          <button (click)="filtroAsset.set('video')"
+                  class="flex items-center gap-2 px-4 py-1.5 rounded-full border text-xs font-semibold whitespace-nowrap transition-all"
+                  [class]="filtroAsset() === 'video'
+                    ? 'bg-primary/10 border-primary/50 text-primary'
+                    : 'bg-neutral-surface border-neutral-border text-slate-300 hover:border-primary/50'">
+            Video Ads
+          </button>
+          <button (click)="filtroAsset.set('todos')"
+                  class="flex items-center gap-2 px-4 py-1.5 rounded-full border text-xs font-semibold whitespace-nowrap transition-all"
+                  [class]="filtroAsset() === 'todos'
+                    ? 'bg-primary/10 border-primary/50 text-primary'
+                    : 'bg-neutral-surface border-neutral-border text-slate-300 hover:border-primary/50'">
+            Stock Disponible
+          </button>
+          <button (click)="filtroAsset.set('copy')"
+                  class="flex items-center gap-2 px-4 py-1.5 rounded-full border text-xs font-semibold whitespace-nowrap transition-all"
+                  [class]="filtroAsset() === 'copy'
+                    ? 'bg-primary/10 border-primary/50 text-primary'
+                    : 'bg-neutral-surface border-neutral-border text-slate-300 hover:border-primary/50'">
+            Ad Copies (IA)
+          </button>
+          <button (click)="filtroAsset.set('ganador')"
+                  class="flex items-center gap-2 px-4 py-1.5 rounded-full border text-xs font-semibold whitespace-nowrap transition-all"
+                  [class]="filtroAsset() === 'ganador'
+                    ? 'bg-primary/10 border-primary/50 text-primary'
+                    : 'bg-neutral-surface border-neutral-border text-slate-300 hover:border-primary/50'">
+            Precios de Mayoreo
+          </button>
+        </div>
+      </div>
+
+      <!-- Skeleton loading -->
+      @if (cargando()) {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          @for (i of [1,2,3,4,5,6]; track i) {
+            <div class="bg-neutral-surface border border-neutral-border rounded-2xl overflow-hidden animate-pulse">
+              <div class="aspect-[4/5] bg-neutral-border"></div>
+              <div class="p-4 space-y-3">
+                <div class="h-4 bg-neutral-border rounded w-3/4"></div>
+                <div class="h-3 bg-neutral-border rounded w-full"></div>
+                <div class="h-8 bg-neutral-border rounded w-full mt-2"></div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Error -->
+      @else if (error()) {
+        <div class="text-center py-20">
+          <span class="material-symbols-outlined text-5xl text-red-400 mb-4 block">error</span>
+          <p class="text-red-400 mb-6">{{ error() }}</p>
+          <button (click)="cargarProductos()"
+                  class="bg-primary text-neutral-charcoal px-6 py-2.5 rounded-xl text-sm font-bold hover:brightness-110 transition-all">
+            Reintentar
+          </button>
+        </div>
+      }
+
+      @else if (productosFiltrados().length === 0) {
+        <div class="text-center py-20">
+          <span class="material-symbols-outlined text-5xl text-slate-600 mb-4 block">inventory_2</span>
+          <h3 class="text-lg font-semibold text-slate-300 mb-2">Sin productos disponibles</h3>
+          <p class="text-slate-500 text-sm">No encontramos productos con esos filtros.</p>
+        </div>
+      }
+
+      @else {
+        <!-- Producto destacado -->
+        @if (productoDestacado()) {
+          <div class="mb-10 group relative overflow-hidden rounded-2xl border border-neutral-border bg-neutral-surface shadow-2xl">
+            <div class="grid md:grid-cols-2">
+              <div class="relative h-64 md:h-auto overflow-hidden">
+                @if (productoDestacado()!.imagenes.length) {
+                  <img [src]="productoDestacado()!.imagenes![0]"
+                       [alt]="productoDestacado()!.nombre"
+                       class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"/>
+                } @else {
+                  <div class="w-full h-full bg-neutral-border flex items-center justify-center">
+                    <span class="material-symbols-outlined text-6xl text-slate-600">inventory_2</span>
+                  </div>
+                }
+                @if (calcularMargen(productoDestacado()!) >= 40) {
+                  <div class="absolute top-4 left-4 bg-primary text-neutral-charcoal px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tight">
+                    Producto Ganador
+                  </div>
+                }
+              </div>
+              <div class="p-8 flex flex-col justify-center gap-4">
+                <div class="flex gap-2 items-center">
+                  <span class="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+                  <span class="text-green-400 text-[10px] font-bold uppercase">Trending Now</span>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-100">{{ productoDestacado()!.nombre }}</h2>
+                <p class="text-slate-400 text-sm leading-relaxed">{{ productoDestacado()!.descripcion }}</p>
+
+                @if (productoDestacado()!.creativos?.length) {
+                  <div class="flex flex-wrap gap-4">
+                    @for (c of productoDestacado()!.creativos!.slice(0, 3); track c.id) {
+                      <div class="flex items-center gap-2 text-slate-300">
+                        <span class="material-symbols-outlined text-primary text-xl">{{ iconoMaterial(c.tipo) }}</span>
+                        <span class="text-xs">{{ c.nombre }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+
+                <div class="flex items-center gap-4 mt-2">
+                  @if (productoDestacado()!.creativos?.length) {
+                    <button (click)="descargarCreativo(productoDestacado()!.creativos![0])"
+                            class="flex-1 bg-primary text-neutral-charcoal px-6 py-3 rounded-xl font-bold text-sm hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
+                      <span class="material-symbols-outlined text-xl">download</span>
+                      Descargar Todo el Pack
+                    </button>
+                  }
+                  <button (click)="toggleFavorito(productoDestacado()!.id, $event)"
+                          class="w-12 h-12 flex items-center justify-center rounded-xl border border-neutral-border transition-colors"
+                          [class]="esFavorito(productoDestacado()!.id) ? 'text-red-400 bg-red-500/10' : 'text-slate-300 hover:bg-neutral-border'">
+                    <span class="material-symbols-outlined">favorite</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         }
-      </div>
-    }
 
-    <!-- Error -->
-    @else if (error()) {
-      <div class="text-center py-16">
-        <p class="text-red-500 mb-4">{{ error() }}</p>
-        <button (click)="cargarProductos()" class="bg-violet-600 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-violet-700 transition-colors">
-          Reintentar
-        </button>
-      </div>
-    }
+        <!-- Grid de productos -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          @for (producto of productosFiltrados(); track producto.id) {
+            <div class="bg-neutral-surface border border-neutral-border rounded-2xl overflow-hidden group flex flex-col hover:border-primary/40 transition-all duration-300 shadow-lg">
 
-    <!-- Sin resultados -->
-    @else if (productos().length === 0) {
-      <div class="text-center py-20">
-        <div class="text-5xl mb-4">📦</div>
-        <h3 class="text-lg font-semibold text-gray-900 mb-2">Sin productos disponibles</h3>
-        <p class="text-gray-500 text-sm">No encontramos productos con esos filtros. Prueba con otros criterios.</p>
-      </div>
-    }
+              <!-- Imagen -->
+              <div class="relative aspect-[4/5] overflow-hidden">
+                @if (producto.imagenes.length) {
+                  <img [src]="producto.imagenes![0]" [alt]="producto.nombre"
+                       class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"/>
+                } @else {
+                  <div class="w-full h-full bg-neutral-border flex items-center justify-center">
+                    <span class="material-symbols-outlined text-5xl text-slate-600">inventory_2</span>
+                  </div>
+                }
+                <div class="absolute inset-0 bg-gradient-to-t from-neutral-charcoal/80 via-transparent to-transparent"></div>
 
-    <!-- Grid de productos -->
-    @else {
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        @for (producto of productos(); track producto.id) {
-          <div class="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow group">
-            <!-- Imagen -->
-            <div class="relative h-48 bg-gray-100 overflow-hidden">
-              @if (producto.imagenes && producto.imagenes.length) {
-                <img [src]="producto.imagenes[0]" [alt]="producto.nombre"
-                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-              } @else {
-                <div class="w-full h-full flex items-center justify-center text-4xl">🛍️</div>
-              }
+                <!-- Badges top -->
+                <div class="absolute top-3 left-3 flex flex-col gap-2">
+                  @if (calcularMargen(producto) >= 40) {
+                    <span class="bg-primary text-neutral-charcoal px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tight">
+                      Ganador
+                    </span>
+                  }
+                  @if (producto.creativos?.some(c => c.tipo === 'video')) {
+                    <span class="bg-neutral-charcoal/80 text-white backdrop-blur-sm px-2.5 py-0.5 rounded-full text-[9px] font-bold flex items-center gap-1">
+                      <span class="material-symbols-outlined text-[12px]">play_circle</span> Video Ad
+                    </span>
+                  }
+                </div>
 
-              <!-- Badge margen -->
-              @if (calcularMargen(producto) > 0) {
-                <span class="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                  +{{ calcularMargen(producto) }}% margen
-                </span>
-              }
+                <!-- Favorito -->
+                <button (click)="toggleFavorito(producto.id, $event)"
+                        class="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all bg-neutral-charcoal/70 backdrop-blur-sm hover:scale-110"
+                        [class]="esFavorito(producto.id) ? 'text-red-400' : 'text-slate-400'">
+                  <span class="material-symbols-outlined text-[18px]">favorite</span>
+                </button>
 
-              <!-- Favorito -->
-              <button (click)="toggleFavorito(producto.id, $event)"
-                      class="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform">
-                <svg class="w-4 h-4 transition-colors"
-                     [class.text-red-500]="esFavorito(producto.id)"
-                     [class.text-gray-400]="!esFavorito(producto.id)"
-                     fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
-                </svg>
-              </button>
-            </div>
-
-            <!-- Info -->
-            <div class="p-4">
-              @if (producto.categoria) {
-                <span class="text-xs font-medium text-violet-600 bg-violet-50 px-2 py-0.5 rounded-full">
-                  {{ producto.categoria.nombre }}
-                </span>
-              }
-              <h3 class="font-semibold text-gray-900 mt-2 text-sm leading-snug line-clamp-2">
-                {{ producto.nombre }}
-              </h3>
-
-              <div class="mt-3 flex items-end justify-between">
-                <div>
-                  <p class="text-xs text-gray-400">Precio base</p>
-                  <p class="text-lg font-extrabold text-gray-900">
+                <!-- Precio bottom -->
+                <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                  <span class="text-slate-100 font-bold text-sm">
                     {{ producto.precio_base | currency:'USD':'symbol':'1.2-2' }}
-                  </p>
-                  @if (producto.precio_sugerido) {
-                    <p class="text-xs text-green-600 font-medium">
-                      Venta: {{ producto.precio_sugerido | currency:'USD':'symbol':'1.2-2' }}
-                    </p>
+                  </span>
+                  @if (calcularMargen(producto) > 0) {
+                    <span class="text-green-400 text-[10px] font-bold">+{{ calcularMargen(producto) }}% margen</span>
                   }
                 </div>
               </div>
 
-              <button class="mt-4 w-full bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold py-2.5 rounded-xl transition-colors">
-                Ver detalles
-              </button>
+              <!-- Info -->
+              <div class="p-4 flex-1 flex flex-col gap-3">
+                <div>
+                  <h3 class="text-slate-100 font-bold group-hover:text-primary transition-colors text-sm">
+                    {{ producto.nombre }}
+                  </h3>
+                  @if (producto.categoria) {
+                    <p class="text-slate-500 text-[11px] mt-0.5">{{ producto.categoria.nombre }}</p>
+                  }
+                </div>
+
+                <!-- Iconos de creativos -->
+                @if (producto.creativos?.length) {
+                  <div class="flex gap-2">
+                    @for (c of producto.creativos!.slice(0, 4); track c.id) {
+                      <div class="bg-neutral-charcoal/50 p-1.5 rounded-lg border border-neutral-border flex items-center gap-1"
+                           [title]="c.nombre">
+                        <span class="material-symbols-outlined text-[14px] text-primary">{{ iconoMaterial(c.tipo) }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!-- Botón descargar -->
+                @if (producto.creativos?.length) {
+                  <button (click)="descargarCreativo(producto.creativos![0])"
+                          class="w-full py-2.5 bg-neutral-charcoal hover:bg-neutral-border border border-neutral-border text-primary rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 mt-auto">
+                    <span class="material-symbols-outlined text-[16px]">cloud_download</span>
+                    Recursos de Venta
+                  </button>
+                } @else {
+                  <div class="w-full py-2.5 border border-neutral-border/50 text-slate-600 rounded-xl text-xs font-bold flex items-center justify-center gap-2 mt-auto">
+                    <span class="material-symbols-outlined text-[16px]">hourglass_empty</span>
+                    Sin creativos aún
+                  </div>
+                }
+              </div>
             </div>
-          </div>
-        }
-      </div>
-    }
+          }
+        </div>
+      }
+
+    </main>
   </div>
+
+  <!-- Footer móvil -->
+  <footer class="md:hidden sticky bottom-0 z-50 bg-neutral-charcoal/90 backdrop-blur-md border-t border-neutral-border p-3 flex justify-around">
+    <button (click)="filtroAsset.set('todos')"
+            class="flex flex-col items-center gap-1 transition-colors"
+            [class]="filtroAsset() === 'todos' ? 'text-primary' : 'text-slate-400'">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span class="text-[10px] font-bold">Catálogo</span>
+    </button>
+    <button (click)="filtroAsset.set('video')"
+            class="flex flex-col items-center gap-1 transition-colors"
+            [class]="filtroAsset() === 'video' ? 'text-primary' : 'text-slate-400'">
+      <span class="material-symbols-outlined">download</span>
+      <span class="text-[10px] font-bold">Videos</span>
+    </button>
+    <button (click)="filtroAsset.set('imagen')"
+            class="flex flex-col items-center gap-1 transition-colors"
+            [class]="filtroAsset() === 'imagen' ? 'text-primary' : 'text-slate-400'">
+      <span class="material-symbols-outlined">photo_library</span>
+      <span class="text-[10px] font-bold">Imágenes</span>
+    </button>
+    <button (click)="filtroAsset.set('ganador')"
+            class="flex flex-col items-center gap-1 transition-colors"
+            [class]="filtroAsset() === 'ganador' ? 'text-primary' : 'text-slate-400'">
+      <span class="material-symbols-outlined">verified</span>
+      <span class="text-[10px] font-bold">Ganadores</span>
+    </button>
+  </footer>
+
 </div>
