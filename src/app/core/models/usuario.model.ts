@@ -17,6 +17,7 @@ export interface Perfil {
   rol: Rol;
   pais?: string;
   telefono?: string;
+  plataforma?: string;
   avatar_url?: string;
   creado_en: string;
 }

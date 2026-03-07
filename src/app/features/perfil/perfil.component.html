@@ -1,100 +1,195 @@
-<div class="min-h-screen bg-gray-50">
-  <div class="max-w-2xl mx-auto px-4 sm:px-6 py-10">
+<div class="min-h-screen bg-[#0a0a08] p-6 lg:p-10">
 
-    <h1 class="text-2xl font-extrabold text-gray-900 mb-2">Mi perfil</h1>
-    <p class="text-gray-500 mb-8">Gestiona tu información personal</p>
+  @if (cargando()) {
+    <!-- Skeleton -->
+    <div class="max-w-3xl mx-auto space-y-4 animate-pulse">
+      <div class="h-32 rounded-2xl bg-white/5"></div>
+      <div class="h-48 rounded-2xl bg-white/5"></div>
+    </div>
+  } @else {
 
-    @if (cargando()) {
-      <div class="bg-white rounded-2xl p-8 border border-gray-100 animate-pulse space-y-4">
-        <div class="h-4 bg-gray-200 rounded w-1/3"></div>
-        <div class="h-10 bg-gray-200 rounded"></div>
-        <div class="h-4 bg-gray-200 rounded w-1/3"></div>
-        <div class="h-10 bg-gray-200 rounded"></div>
-      </div>
-    } @else {
-      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <div class="max-w-3xl mx-auto space-y-6">
 
-        <!-- Avatar header -->
-        <div class="bg-gradient-to-r from-violet-600 to-indigo-600 px-8 py-10 text-white">
-          <div class="flex items-center gap-5">
-            <div class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-2xl font-bold">
-              {{ auth.usuario()?.email?.[0]?.toUpperCase() }}
-            </div>
-            <div>
-              <p class="font-bold text-lg">{{ perfil()?.nombre || 'Vendedor' }}</p>
-              <p class="text-white/70 text-sm">{{ auth.usuario()?.email }}</p>
-              <span class="mt-1 inline-block text-xs bg-white/20 px-2 py-0.5 rounded-full">
-                {{ perfil()?.rol || 'vendedor' }}
-              </span>
+      <!-- ── Header card ── -->
+      <div class="glass-card rounded-2xl overflow-hidden">
+        <!-- Gold accent strip -->
+        <div class="h-1 gold-gradient w-full"></div>
+        <div class="p-6 flex items-center gap-5">
+          <!-- Avatar -->
+          <div class="w-16 h-16 rounded-2xl gold-gradient flex items-center justify-center text-2xl font-extrabold text-[#0a0a08] shrink-0">
+            {{ auth.usuario()?.email?.[0]?.toUpperCase() }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <h1 class="text-xl font-extrabold text-slate-100 truncate">{{ perfil()?.nombre || 'Sin nombre' }}</h1>
+            <p class="text-sm text-slate-500 truncate">{{ auth.usuario()?.email }}</p>
+            <div class="mt-2 flex items-center gap-2 flex-wrap">
+              @if (perfil()?.rol === 'admin') {
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-widest bg-red-900/30 text-red-300 border border-red-700/30">
+                  <span class="material-symbols-outlined text-xs">shield_person</span> Admin
+                </span>
+              } @else if (perfil()?.rol === 'inventario') {
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-widest bg-amber-900/30 text-amber-300 border border-amber-700/30">
+                  <span class="material-symbols-outlined text-xs">inventory_2</span> Inventario
+                </span>
+              } @else {
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-widest bg-slate-800/50 text-slate-300 border border-slate-600/30">
+                  <span class="material-symbols-outlined text-xs">person</span> Usuario
+                </span>
+              }
+              @if (perfil()?.pais) {
+                <span class="text-xs text-slate-500">{{ perfil()?.pais }}</span>
+              }
             </div>
           </div>
         </div>
-
-        <!-- Formulario -->
-        <div class="p-8">
-          @if (mensajeExito()) {
-            <div class="mb-5 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700 flex items-center gap-2">
-              <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-              </svg>
-              {{ mensajeExito() }}
-            </div>
-          }
-          @if (error()) {
-            <div class="mb-5 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">{{ error() }}</div>
-          }
-
-          <form [formGroup]="form" (ngSubmit)="onGuardar()" class="space-y-5">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1.5">Nombre completo</label>
-              <input formControlName="nombre" type="text"
-                     class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm" />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1.5">Correo electrónico</label>
-              <input [value]="auth.usuario()?.email" type="email" disabled
-                     class="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 text-gray-400 text-sm cursor-not-allowed" />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1.5">País</label>
-              <select formControlName="pais"
-                      class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm bg-white">
-                <option value="">Sin especificar</option>
-                @for (pais of paises; track pais) {
-                  <option [value]="pais">{{ pais }}</option>
-                }
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1.5">Teléfono</label>
-              <input formControlName="telefono" type="tel" placeholder="+52 55 0000 0000"
-                     class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm" />
-            </div>
-
-            <div class="flex gap-3 pt-2">
-              <button type="submit" [disabled]="guardando()"
-                      class="flex-1 bg-violet-600 hover:bg-violet-700 disabled:opacity-60 text-white font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
-                @if (guardando()) {
-                  <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                  </svg>
-                  Guardando...
-                } @else {
-                  Guardar cambios
-                }
-              </button>
-              <button type="button" (click)="auth.cerrarSesion()"
-                      class="px-6 py-3 border border-red-200 text-red-500 hover:bg-red-50 font-semibold rounded-xl transition-colors text-sm">
-                Cerrar sesión
-              </button>
-            </div>
-          </form>
-        </div>
       </div>
-    }
-  </div>
+
+      <!-- ── ADMIN: Stats row ── -->
+      @if (esAdmin() && stats()) {
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div class="glass rounded-xl p-4 flex flex-col gap-1">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Total usuarios</span>
+            <span class="text-3xl font-extrabold text-slate-100">{{ stats()!.totalUsuarios }}</span>
+          </div>
+          <div class="glass rounded-xl p-4 flex flex-col gap-1">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-red-500/80">Admins</span>
+            <span class="text-3xl font-extrabold text-red-300">{{ stats()!.admins }}</span>
+          </div>
+          <div class="glass rounded-xl p-4 flex flex-col gap-1">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-amber-500/80">Inventario</span>
+            <span class="text-3xl font-extrabold text-amber-300">{{ stats()!.inventario }}</span>
+          </div>
+          <div class="glass rounded-xl p-4 flex flex-col gap-1">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Productos</span>
+            <span class="text-3xl font-extrabold text-primary">{{ stats()!.totalProductos }}</span>
+          </div>
+        </div>
+
+        <!-- Admin quick-access links -->
+        <div class="glass-card rounded-2xl p-5">
+          <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Acceso rápido</p>
+          <div class="grid grid-cols-2 gap-3">
+            <a routerLink="/admin"
+               class="flex items-center gap-3 p-4 rounded-xl bg-white/[0.04] border border-white/[0.07] hover:border-primary/30 hover:bg-white/[0.07] transition-all group">
+              <span class="material-symbols-outlined text-2xl text-red-400 group-hover:text-primary transition-colors">shield_person</span>
+              <div>
+                <p class="text-sm font-semibold text-slate-200">Panel Admin</p>
+                <p class="text-xs text-slate-500">Gestión de usuarios</p>
+              </div>
+            </a>
+            <a routerLink="/inventario"
+               class="flex items-center gap-3 p-4 rounded-xl bg-white/[0.04] border border-white/[0.07] hover:border-primary/30 hover:bg-white/[0.07] transition-all group">
+              <span class="material-symbols-outlined text-2xl text-amber-400 group-hover:text-primary transition-colors">inventory_2</span>
+              <div>
+                <p class="text-sm font-semibold text-slate-200">Inventario</p>
+                <p class="text-xs text-slate-500">Productos y creativos</p>
+              </div>
+            </a>
+            <a routerLink="/catalogo"
+               class="flex items-center gap-3 p-4 rounded-xl bg-white/[0.04] border border-white/[0.07] hover:border-primary/30 hover:bg-white/[0.07] transition-all group">
+              <span class="material-symbols-outlined text-2xl text-slate-400 group-hover:text-primary transition-colors">shopping_bag</span>
+              <div>
+                <p class="text-sm font-semibold text-slate-200">Catálogo</p>
+                <p class="text-xs text-slate-500">Vista de dropshippers</p>
+              </div>
+            </a>
+            <div class="flex items-center gap-3 p-4 rounded-xl bg-white/[0.04] border border-white/[0.07]">
+              <span class="material-symbols-outlined text-2xl text-primary">workspace_premium</span>
+              <div>
+                <p class="text-sm font-semibold text-slate-200">Landazury</p>
+                <p class="text-xs text-slate-500">Acceso total</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ── Formulario datos personales ── -->
+      <div class="glass-card rounded-2xl p-6">
+        <h2 class="text-sm font-bold uppercase tracking-widest text-slate-400 mb-5 flex items-center gap-2">
+          <span class="material-symbols-outlined text-base text-primary">edit_note</span>
+          Datos personales
+        </h2>
+
+        @if (mensajeExito()) {
+          <div class="mb-5 p-3 bg-green-500/10 border border-green-500/30 rounded-xl text-sm text-green-400 flex items-center gap-2">
+            <span class="material-symbols-outlined text-base">check_circle</span>
+            {{ mensajeExito() }}
+          </div>
+        }
+        @if (error()) {
+          <div class="mb-5 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400">{{ error() }}</div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="onGuardar()" class="space-y-4">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Nombre -->
+            <div class="space-y-1.5">
+              <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Nombre completo</label>
+              <div class="relative group input-glow rounded-xl">
+                <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors text-xl">badge</span>
+                <input formControlName="nombre" type="text" placeholder="Tu nombre"
+                       class="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all text-sm"/>
+              </div>
+            </div>
+
+            <!-- Email (disabled) -->
+            <div class="space-y-1.5">
+              <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Correo electrónico</label>
+              <div class="relative rounded-xl">
+                <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-600 text-xl">mail</span>
+                <input [value]="auth.usuario()?.email" type="email" disabled
+                       class="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl py-3 pl-11 pr-4 text-slate-500 text-sm cursor-not-allowed"/>
+              </div>
+            </div>
+
+            <!-- País -->
+            <div class="space-y-1.5">
+              <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">País</label>
+              <div class="relative group input-glow rounded-xl">
+                <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors text-xl">public</span>
+                <select formControlName="pais"
+                        class="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all text-sm appearance-none">
+                  <option value="" class="bg-[#1a1a0f]">Sin especificar</option>
+                  @for (pais of paises; track pais) {
+                    <option [value]="pais" class="bg-[#1a1a0f]">{{ pais }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <!-- Teléfono -->
+            <div class="space-y-1.5">
+              <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Teléfono</label>
+              <div class="relative group input-glow rounded-xl">
+                <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors text-xl">phone</span>
+                <input formControlName="telefono" type="tel" placeholder="+52 55 0000 0000"
+                       class="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all text-sm"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <button type="submit" [disabled]="guardando()"
+                    class="w-full gold-gradient hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-[#0a0a08] py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 uppercase tracking-widest text-xs font-extrabold">
+              @if (guardando()) {
+                <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                </svg>
+                Guardando...
+              } @else {
+                <span class="material-symbols-outlined text-base">save</span>
+                Guardar cambios
+              }
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+  }
+
 </div>

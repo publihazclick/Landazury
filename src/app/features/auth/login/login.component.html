@@ -11,11 +11,33 @@
         <p class="text-slate-400 text-center text-sm">Ingresa tus credenciales para acceder a tu panel de dropshipping</p>
       </div>
 
+      <!-- Email sin confirmar -->
+      @if (emailSinConfirmar()) {
+        <div class="mb-5 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl text-sm text-amber-300 flex gap-3">
+          <span class="material-symbols-outlined text-lg shrink-0 mt-0.5">mark_email_unread</span>
+          <div>
+            <p class="font-bold mb-0.5">Correo sin confirmar</p>
+            <p class="text-amber-300/70 text-xs leading-relaxed">Revisa tu bandeja de entrada y haz clic en el enlace de confirmación para activar tu cuenta.</p>
+          </div>
+        </div>
+      }
+
       <!-- Error global -->
       @if (error()) {
-        <div class="mb-5 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400 flex items-center gap-2">
-          <span class="material-symbols-outlined text-base shrink-0">error</span>
-          {{ error() }}
+        <div class="mb-5 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400 flex items-start gap-3">
+          <span class="material-symbols-outlined text-lg shrink-0 mt-0.5">error</span>
+          <p class="flex-1 leading-relaxed">{{ error() }}</p>
+          <button type="button" (click)="cerrarError()" class="text-red-400/60 hover:text-red-400 transition-colors shrink-0">
+            <span class="material-symbols-outlined text-base">close</span>
+          </button>
+        </div>
+      }
+
+      <!-- Demasiados intentos -->
+      @if (intentos() >= 3 && !cargando()) {
+        <div class="mb-5 p-3 bg-white/5 border border-white/10 rounded-xl text-xs text-slate-400 flex gap-2">
+          <span class="material-symbols-outlined text-base shrink-0 text-slate-500">info</span>
+          <span>¿Olvidaste tu contraseña? Usa el enlace de recuperación o revisa tus credenciales de prueba.</span>
         </div>
       }
 
@@ -73,6 +95,22 @@
           }
         </button>
       </form>
+
+      <!-- Cuentas de prueba -->
+      <div class="mt-6">
+        <p class="text-center text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-3">Acceso rápido — Cuentas de prueba</p>
+        <div class="grid grid-cols-3 gap-2">
+          @for (cuenta of cuentasPrueba; track cuenta.rol) {
+            <button type="button" (click)="usarCredencial(cuenta.email, cuenta.contrasena)"
+                    class="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-white/5 border border-white/[0.08] hover:border-primary/30 hover:bg-white/10 transition-all group">
+              <span class="material-symbols-outlined text-xl" [class]="cuenta.color">{{ cuenta.icono }}</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-slate-200 transition-colors">
+                {{ cuenta.rol }}
+              </span>
+            </button>
+          }
+        </div>
+      </div>
 
       <!-- Link registro + regresar -->
       <div class="mt-8 text-center space-y-4">

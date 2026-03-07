@@ -1,148 +1,299 @@
-<!-- Hero Section -->
-<section class="-mt-20 relative min-h-screen flex items-center justify-center overflow-hidden bg-background-dark">
+<!-- ===================== HERO ===================== -->
+<section class="-mt-20 h-screen min-h-[700px] flex items-center justify-center overflow-hidden bg-background-dark relative">
 
-  <!-- Background image grid + overlays -->
-  <div class="absolute inset-0 z-0 pointer-events-none">
-    <div class="absolute inset-0 bg-gradient-to-b from-background-dark via-background-dark/80 to-background-dark z-10"></div>
-    <div class="absolute inset-0 bg-grid-mesh z-10"></div>
-    <div class="absolute inset-0 grid grid-cols-4 gap-6 p-10 rotate-12 scale-125 opacity-20">
-      <div class="h-96 rounded-2xl bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBUgc93Q9YrQBQMWXsX4dV1VznzzPdta1RU41RDxf-rV2_SJnoq1SqcnYhFsUVLL08EYM8auzpQXKXIgHgev9Y48XhoVSUbLos0OyXfOpN9yPpVOmO8IGYofhcK8o93R1kPx4sIEp2mF49UK9LTLvghqxTmzuILawjn2EWijuloJXuck7A4_1RmZacMZB3lA_PO1F-eInJ-rdXg8fhU78cGlNbVBmoUG-hEggNxYr3QMR4MJuArMGO9RaVrml21mpemZxXnMoqxjv0')"></div>
-      <div class="h-80 mt-12 rounded-2xl bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBFB8rPxvipmYeKRv1jdlbh78jPXLJjfAnzy7vnT2pYqxBBQrncGjPCmTOWbeiFwlLjQgosR5TTjBif-C4s8AUaK1_vQ3DCMCppn9SQ4SHIrSkHbs3774N8gEIEXGtk10K-w4LnbMyy714e0HzmovKts7MI0CuwnnDUepqFotCXNrQWUkRpKSuWJ86-O73p0gAQpBZKUHkr86Bwim-r_AP-U4nQlNqlj6TtC7bHiTaQhjy93ZJxtGy8LWbrag2vjWwWjIYnpOgsBh4')"></div>
-      <div class="h-96 rounded-2xl bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA2bl_OWRryhitwvwB0Vy8HLC_TXpgakYp3trs-AIPgh3CgXog4S4eZUi4tFGOef49q5izb9i2Apm--38uvyx-Ue5o3gDfr4cyqtEmkU9NJ07iMcTD3-f9fuFuF4izuJOWAHkj8CHlsQkxjaRxHuNIWqqcA9ts6OjrtR0DpHzqWZuieyMs38FlPq4klGFiAw0b7vDZartzjLe53xv5FDnzh6O6hl6S0H5Lp9-262-fo4-bB0aeMd8wo3JUjL3aB8LvUUISzmo4-rjw')"></div>
-      <div class="h-80 mt-20 rounded-2xl bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBCCfg-0nFruuF6pB2pQLpkC1IsbnearYoTMViL-QTEoMFxfxykqK6dmYxnR-r5PZGUYkC4-sbuR6-woIlT_4XOAgbWC-s2nPORk1rPv1CeXEX65kYlvXWwdviJvnK4ybqbGYR_-5-4Va06bT1042qcSeAFmjCqfrNBnhF3ycic8wkSOoonqiX0FgPNrLBm8rkW_u4WM67Zggz8mxRknI2uGRaoQ5FCbIS9S9TCDLTs_Y5tYq1v_kWYLSwzTcXwzWml1Yjut0zZdjM')"></div>
-      <div class="h-80 -mt-10 rounded-2xl bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD_dW6Jk_NxNW2PZ3bH-DHtAF5aOXO7Tbw9GCmMJOHXJYtLtaZiPVi0TOssBcNNCn699VHFEPNMQT6uIKeEqt6SP4n6IgE4gQG8kuAr4FRPDcpoiLUFoYZhneNcjfkXNwmiEpEkpQAO-G2iCxRJvvK0rQZ-bkUyaa2RpVIEyPgxG2O57CWg8N4sJCEmRViVAA44hJpV1RD_3ADKcDlkx0p1yaneNbS1rnS6bqyUBe66_ezNxSBsx4bGxUxOG5d-NVx63ZQYEtGsIpE')"></div>
-      <div class="h-96 rounded-2xl bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuArUEbVHexecXWDTF1Ocf1goVSmUXXMUYzmtOYIKyCXFveJDz_bvTga8EZ3wVlJpacX7veY3f1pdcsFPLMNdEOf2qgwKglImbo0-TMtVFsqZakBIRFRuuEaVfjZWKOfNo2r871eGIM-pKnPY-OFLSzYhZiT2jJ8AR2V7Afk4OcCwOMdl9u50c6C8qi9RhU8BNzAkt1fEUGGF7in9t5fkiY8Xp4XGwY7ZXfctcTbLwq8iyQLPtBNNUjz25PuGBPwSs-TeEGrn9nHm3Y')"></div>
+  <!-- Background: columnas de productos con drift animation -->
+  <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-r from-[#0F0F0F]/85 via-[#0F0F0F]/40 to-[#0F0F0F]/10 z-10"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-[#0F0F0F]/60 via-transparent to-[#0F0F0F]/75 z-10"></div>
+    <div class="absolute inset-[-15%] flex gap-3 -rotate-6 opacity-[0.93]">
+      <!-- Columna 1 -->
+      <div class="flex flex-col gap-3 flex-1" style="animation: bgDrift 26s ease-in-out infinite alternate;">
+        <div class="w-full h-48 rounded-xl bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&fit=crop')"></div>
+        <div class="w-full h-56 rounded-xl bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=400&fit=crop')"></div>
+        <div class="w-full h-52 rounded-xl bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&fit=crop')"></div>
+        <div class="w-full h-48 rounded-xl bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1608667508764-33cf0726b13a?w=400&fit=crop')"></div>
+      </div>
+      <!-- Columna 2 — offset alto -->
+      <div class="flex flex-col gap-3 flex-1 -mt-20" style="animation: bgDrift 32s ease-in-out infinite alternate-reverse;">
+        <div class="w-full h-56 rounded-xl bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&fit=crop')"></div>
+        <div class="w-full h-48 rounded-xl bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&fit=crop')"></div>
+        <div class="w-full h-52 rounded-xl bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=400&fit=crop')"></div>
+        <div class="w-full h-48 rounded-xl bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&fit=crop')"></div>
+      </div>
+      <!-- Columna 3 — offset bajo -->
+      <div class="flex flex-col gap-3 flex-1 mt-12" style="animation: bgDrift 22s ease-in-out infinite alternate;">
+        <div class="w-full h-48 rounded-xl bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&fit=crop')"></div>
+        <div class="w-full h-56 rounded-xl bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400&fit=crop')"></div>
+        <div class="w-full h-52 rounded-xl bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&fit=crop')"></div>
+        <div class="w-full h-48 rounded-xl bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&fit=crop')"></div>
+      </div>
+      <!-- Columna 4 — offset medio -->
+      <div class="flex flex-col gap-3 flex-1 -mt-8" style="animation: bgDrift 28s ease-in-out infinite alternate-reverse;">
+        <div class="w-full h-52 rounded-xl bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400&fit=crop')"></div>
+        <div class="w-full h-48 rounded-xl bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&fit=crop')"></div>
+        <div class="w-full h-56 rounded-xl bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=400&fit=crop')"></div>
+        <div class="w-full h-48 rounded-xl bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&fit=crop')"></div>
+      </div>
+      <!-- Columna 5 -->
+      <div class="flex flex-col gap-3 flex-1 mt-16" style="animation: bgDrift 24s ease-in-out infinite alternate;">
+        <div class="w-full h-48 rounded-xl bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&fit=crop')"></div>
+        <div class="w-full h-56 rounded-xl bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=400&fit=crop')"></div>
+        <div class="w-full h-52 rounded-xl bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1585184394271-4c0a47dc59c9?w=400&fit=crop')"></div>
+        <div class="w-full h-48 rounded-xl bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=400&fit=crop')"></div>
+      </div>
     </div>
   </div>
 
-  <!-- Center form card -->
-  <div class="relative z-10 w-full max-w-2xl px-6 py-12">
-    <div class="ultra-glass rounded-[2rem] p-10 md:p-16 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)]">
-      <div class="text-center mb-12">
-        <h1 class="text-4xl md:text-5xl font-extrabold leading-[1.1] mb-6 text-white tracking-tight">
+  <!-- Card centrado — scrollable en móvil -->
+  <div class="relative z-10 w-full max-w-2xl px-4 pt-20 pb-4 md:py-0 h-full md:h-auto flex items-center overflow-y-auto md:overflow-visible">
+    <div class="ultra-glass rounded-2xl md:rounded-[2rem] p-5 sm:p-8 md:p-12 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] w-full my-auto">
+
+      <!-- Título -->
+      <div class="text-center mb-4 md:mb-7">
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold leading-tight mb-2 text-white tracking-tight">
           Domina el arte del <span class="text-primary">Dropshipping</span> con mentoría experta
         </h1>
-        <p class="text-white/60 text-lg font-light leading-relaxed">
+        <p class="text-white/60 text-sm md:text-base font-light leading-relaxed">
           Accede al catálogo de productos con mayor margen y escala tu negocio hoy mismo.
         </p>
       </div>
-      <div class="space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="space-y-2">
-            <label class="text-[11px] uppercase tracking-widest font-bold text-white/40 ml-1">Email Corporativo</label>
-            <input class="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-5 text-white placeholder:text-white/20 focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-300 outline-none"
-                   placeholder="nombre@empresa.com" type="email"/>
+
+      <!-- Estado éxito -->
+      @if (registroExitoso()) {
+        <div class="text-center py-6">
+          <div class="w-16 h-16 bg-primary/10 border border-primary/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="material-symbols-outlined text-3xl text-primary">mark_email_read</span>
           </div>
-          <div class="space-y-2">
-            <label class="text-[11px] uppercase tracking-widest font-bold text-white/40 ml-1">Teléfono</label>
-            <input class="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-5 text-white placeholder:text-white/20 focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-300 outline-none"
-                   placeholder="+57 300 000 000" type="tel"/>
-          </div>
-          <div class="space-y-2">
-            <label class="text-[11px] uppercase tracking-widest font-bold text-white/40 ml-1">Plataforma Actual</label>
-            <select class="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-5 text-white focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-300 outline-none">
-              <option style="background:#1A1A1A" value="" disabled selected>Selecciona tu plataforma</option>
-              <optgroup label="── Dropshipping" style="background:#1A1A1A; color:#D4AF37">
-                <option style="background:#1A1A1A">Dropi</option>
-                <option style="background:#1A1A1A">DSers</option>
-                <option style="background:#1A1A1A">AutoDS</option>
-                <option style="background:#1A1A1A">Zendrop</option>
-                <option style="background:#1A1A1A">Spocket</option>
-                <option style="background:#1A1A1A">Modalyst</option>
-                <option style="background:#1A1A1A">CJdropshipping</option>
-                <option style="background:#1A1A1A">AliDropship</option>
-              </optgroup>
-              <optgroup label="── E-commerce" style="background:#1A1A1A; color:#D4AF37">
-                <option style="background:#1A1A1A">Shopify</option>
-                <option style="background:#1A1A1A">WooCommerce</option>
-                <option style="background:#1A1A1A">Wix eCommerce</option>
-                <option style="background:#1A1A1A">BigCommerce</option>
-                <option style="background:#1A1A1A">PrestaShop</option>
-                <option style="background:#1A1A1A">Magento</option>
-                <option style="background:#1A1A1A">Squarespace</option>
-                <option style="background:#1A1A1A">VTEX</option>
-              </optgroup>
-              <optgroup label="── Marketplaces América" style="background:#1A1A1A; color:#D4AF37">
-                <option style="background:#1A1A1A">Amazon (USA/MX)</option>
-                <option style="background:#1A1A1A">MercadoLibre</option>
-                <option style="background:#1A1A1A">Walmart Marketplace</option>
-                <option style="background:#1A1A1A">Linio</option>
-                <option style="background:#1A1A1A">Falabella Marketplace</option>
-                <option style="background:#1A1A1A">Rappi Tienda</option>
-                <option style="background:#1A1A1A">eBay</option>
-                <option style="background:#1A1A1A">Etsy</option>
-              </optgroup>
-              <optgroup label="── Marketplaces Europa" style="background:#1A1A1A; color:#D4AF37">
-                <option style="background:#1A1A1A">Amazon (ES/DE/FR/IT)</option>
-                <option style="background:#1A1A1A">Zalando</option>
-                <option style="background:#1A1A1A">Cdiscount</option>
-                <option style="background:#1A1A1A">Otto</option>
-                <option style="background:#1A1A1A">Bol.com</option>
-                <option style="background:#1A1A1A">Allegro</option>
-                <option style="background:#1A1A1A">Fruugo</option>
-              </optgroup>
-              <optgroup label="── Redes Sociales" style="background:#1A1A1A; color:#D4AF37">
-                <option style="background:#1A1A1A">TikTok Shop</option>
-                <option style="background:#1A1A1A">Instagram Shopping</option>
-                <option style="background:#1A1A1A">Facebook Shops</option>
-                <option style="background:#1A1A1A">Pinterest Shopping</option>
-              </optgroup>
-              <option style="background:#1A1A1A" value="propia">Tienda propia</option>
-              <option style="background:#1A1A1A" value="otra">Otra</option>
-            </select>
-          </div>
-          <div class="space-y-2">
-            <label class="text-[11px] uppercase tracking-widest font-bold text-white/40 ml-1">Contraseña</label>
-            <input class="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-5 text-white placeholder:text-white/20 focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-300 outline-none"
-                   placeholder="••••••••" type="password"/>
-          </div>
+          <h2 class="text-xl font-bold text-white mb-2">¡Registro exitoso!</h2>
+          <p class="text-white/50 text-sm leading-relaxed max-w-xs mx-auto">
+            Revisa tu correo y confirma tu cuenta para comenzar a vender.
+          </p>
+          <a routerLink="/auth/login"
+             class="inline-flex items-center gap-2 gold-gradient text-[#0F0F0F] font-bold px-8 py-3 rounded-xl uppercase tracking-widest text-xs hover:opacity-90 transition-all mt-5">
+            Ir a iniciar sesión
+            <span class="material-symbols-outlined text-base">arrow_right_alt</span>
+          </a>
         </div>
-        <a routerLink="/auth/registro"
-           class="block w-full bg-gradient-to-r from-primary to-primary-dark text-[#0F0F0F] py-5 rounded-xl font-bold text-lg hover:brightness-110 transition-all duration-300 shadow-xl gold-glow text-center mt-4">
-          ACCEDER AL CATÁLOGO
-        </a>
-        <p class="text-center text-[10px] uppercase tracking-[0.2em] text-white/30 mt-6">
-          Garantía de privacidad Landazury ©
-        </p>
-      </div>
+      } @else {
+
+        <!-- Email ya registrado -->
+        @if (emailExiste()) {
+          <div class="mb-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-300 flex gap-2">
+            <span class="material-symbols-outlined text-base shrink-0 mt-0.5">person_check</span>
+            <div>
+              <span class="font-bold">Correo ya registrado. </span>
+              <a routerLink="/auth/login" class="underline underline-offset-2 hover:text-amber-200 transition-colors">Inicia sesión aquí</a>.
+            </div>
+          </div>
+        }
+
+        <!-- Error -->
+        @if (error()) {
+          <div class="mb-3 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-400 flex items-start gap-2">
+            <span class="material-symbols-outlined text-base shrink-0 mt-0.5">error</span>
+            <p class="flex-1 leading-relaxed">{{ error() }}</p>
+            <button type="button" (click)="cerrarError()" class="text-red-400/60 hover:text-red-400 transition-colors shrink-0">
+              <span class="material-symbols-outlined text-sm">close</span>
+            </button>
+          </div>
+        }
+
+        <!-- Formulario -->
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-3">
+          <div class="grid grid-cols-2 gap-3">
+
+            <!-- Nombre -->
+            <div class="space-y-1">
+              <label class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">Nombre</label>
+              <input formControlName="nombre" type="text" placeholder="Juan García"
+                     class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white text-sm placeholder:text-white/20 focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none"
+                     [class.border-red-500]="form.get('nombre')?.invalid && form.get('nombre')?.touched"/>
+              @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
+                <p class="text-[10px] text-red-400 ml-1">Ingresa tu nombre.</p>
+              }
+            </div>
+
+            <!-- Email -->
+            <div class="space-y-1">
+              <label class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">Email</label>
+              <input formControlName="email" type="email" placeholder="tu@correo.com"
+                     class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white text-sm placeholder:text-white/20 focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none"
+                     [class.border-red-500]="form.get('email')?.invalid && form.get('email')?.touched"/>
+              @if (form.get('email')?.invalid && form.get('email')?.touched) {
+                <p class="text-[10px] text-red-400 ml-1">Correo válido requerido.</p>
+              }
+            </div>
+
+            <!-- País -->
+            <div class="space-y-1">
+              <label class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">País</label>
+              <select formControlName="pais"
+                      class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white text-sm focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none appearance-none"
+                      [class.border-red-500]="form.get('pais')?.invalid && form.get('pais')?.touched">
+                <option value="" style="background:#1A1A1A" disabled>Selecciona</option>
+                @for (pais of paises; track pais) {
+                  <option [value]="pais" style="background:#1A1A1A">{{ pais }}</option>
+                }
+              </select>
+              @if (form.get('pais')?.invalid && form.get('pais')?.touched) {
+                <p class="text-[10px] text-red-400 ml-1">Selecciona tu país.</p>
+              }
+            </div>
+
+            <!-- Teléfono -->
+            <div class="space-y-1">
+              <label class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">Teléfono</label>
+              <input formControlName="telefono" type="tel" placeholder="+57 300 000 000"
+                     class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white text-sm placeholder:text-white/20 focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none"
+                     [class.border-red-500]="form.get('telefono')?.invalid && form.get('telefono')?.touched"/>
+              @if (form.get('telefono')?.invalid && form.get('telefono')?.touched) {
+                <p class="text-[10px] text-red-400 ml-1">Ingresa tu teléfono.</p>
+              }
+            </div>
+
+            <!-- Plataforma -->
+            <div class="space-y-1">
+              <label class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">Plataforma</label>
+              <select formControlName="plataforma"
+                      class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white text-sm focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none"
+                      [class.border-red-500]="form.get('plataforma')?.invalid && form.get('plataforma')?.touched">
+                <option value="" style="background:#1A1A1A" disabled>Selecciona</option>
+                <optgroup label="── Dropshipping" style="background:#1A1A1A; color:#D4AF37">
+                  <option style="background:#1A1A1A" value="Dropi">Dropi</option>
+                  <option style="background:#1A1A1A" value="DSers">DSers</option>
+                  <option style="background:#1A1A1A" value="AutoDS">AutoDS</option>
+                  <option style="background:#1A1A1A" value="Zendrop">Zendrop</option>
+                  <option style="background:#1A1A1A" value="CJdropshipping">CJdropshipping</option>
+                </optgroup>
+                <optgroup label="── E-commerce" style="background:#1A1A1A; color:#D4AF37">
+                  <option style="background:#1A1A1A" value="Shopify">Shopify</option>
+                  <option style="background:#1A1A1A" value="WooCommerce">WooCommerce</option>
+                  <option style="background:#1A1A1A" value="Wix eCommerce">Wix eCommerce</option>
+                  <option style="background:#1A1A1A" value="BigCommerce">BigCommerce</option>
+                </optgroup>
+                <optgroup label="── Marketplaces" style="background:#1A1A1A; color:#D4AF37">
+                  <option style="background:#1A1A1A" value="Amazon">Amazon</option>
+                  <option style="background:#1A1A1A" value="MercadoLibre">MercadoLibre</option>
+                  <option style="background:#1A1A1A" value="TikTok Shop">TikTok Shop</option>
+                  <option style="background:#1A1A1A" value="Instagram Shopping">Instagram Shopping</option>
+                </optgroup>
+                <option style="background:#1A1A1A" value="Otra">Otra</option>
+              </select>
+              @if (form.get('plataforma')?.invalid && form.get('plataforma')?.touched) {
+                <p class="text-[10px] text-red-400 ml-1">Selecciona tu plataforma.</p>
+              }
+            </div>
+
+            <!-- Contraseña -->
+            <div class="space-y-1">
+              <label class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">Contraseña</label>
+              <div class="relative">
+                <input formControlName="contrasena" [type]="mostrarContrasena() ? 'text' : 'password'"
+                       placeholder="••••••••"
+                       class="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-4 pr-10 text-white text-sm placeholder:text-white/20 focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none"
+                       [class.border-red-500]="form.get('contrasena')?.invalid && form.get('contrasena')?.touched"/>
+                <button type="button" (click)="mostrarContrasena.update(v => !v)"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
+                  <span class="material-symbols-outlined text-lg">{{ mostrarContrasena() ? 'visibility_off' : 'visibility' }}</span>
+                </button>
+              </div>
+              @if (form.get('contrasena')?.invalid && form.get('contrasena')?.touched) {
+                <p class="text-[10px] text-red-400 ml-1">Mínimo 6 caracteres.</p>
+              }
+              @if ((form.get('contrasena')?.value ?? '').length > 0) {
+                <div class="flex gap-1 mt-1">
+                  @for (i of [1,2,3,4]; track i) {
+                    <div class="h-1 flex-1 rounded-full transition-colors duration-300"
+                         [class]="i <= fuerzaContrasena.nivel ? fuerzaContrasena.color : 'bg-white/10'"></div>
+                  }
+                </div>
+              }
+            </div>
+
+          </div>
+
+          <button type="submit" [disabled]="cargando()"
+                  class="group flex items-center justify-center gap-2 w-full gold-gradient text-[#0F0F0F] py-4 rounded-xl font-extrabold text-sm md:text-base hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-300 shadow-xl gold-glow mt-1">
+            @if (cargando()) {
+              <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              </svg>
+              Creando cuenta…
+            } @else {
+              ACCEDER AL CATÁLOGO
+              <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-1">arrow_forward</span>
+            }
+          </button>
+        </form>
+
+        <div class="flex items-center justify-between mt-3">
+          <p class="text-[10px] uppercase tracking-[0.15em] text-white/25">Garantía de privacidad Landazury ©</p>
+          <a routerLink="/auth/login" class="text-[10px] text-white/30 hover:text-primary transition-colors font-medium">
+            ¿Ya tienes cuenta?
+          </a>
+        </div>
+      }
     </div>
   </div>
 </section>
 
-<!-- Selección Exclusiva -->
-<section class="py-24 bg-background-dark border-y border-primary/10">
-  <div class="max-w-7xl mx-auto px-6">
-    <div class="flex items-end justify-between mb-16">
+<!-- ===================== SELECCIÓN EXCLUSIVA ===================== -->
+<section class="py-14 md:py-24 bg-background-dark border-y border-primary/10">
+  <div class="max-w-7xl mx-auto px-4 md:px-6">
+    <div class="flex items-end justify-between mb-8 md:mb-16">
       <div class="max-w-xl">
-        <h2 class="text-4xl font-black text-white tracking-tight mb-4">Selección Exclusiva</h2>
-        <p class="text-white/50 text-lg font-light">Tendencias de alta rotación analizadas por nuestro equipo de expertos esta semana.</p>
+        <h2 class="text-2xl md:text-4xl font-black text-white tracking-tight mb-2 md:mb-4">Selección Exclusiva</h2>
+        <p class="text-white/50 text-sm md:text-lg font-light">Tendencias de alta rotación analizadas por nuestro equipo.</p>
       </div>
-      <div class="hidden md:flex gap-4">
-        <button class="w-12 h-12 flex items-center justify-center rounded-full border border-white/10 text-white hover:bg-white/5 transition-all">
+      <div class="flex gap-3">
+        <button (click)="scrollCarrusel(-1)"
+                class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full border border-white/10 text-white hover:bg-white/5 active:bg-white/10 transition-all">
           <span class="material-symbols-outlined text-xl">west</span>
         </button>
-        <button class="w-12 h-12 flex items-center justify-center rounded-full border border-white/10 text-white hover:bg-white/5 transition-all">
+        <button (click)="scrollCarrusel(1)"
+                class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full border border-white/10 text-white hover:bg-white/5 active:bg-white/10 transition-all">
           <span class="material-symbols-outlined text-xl">east</span>
         </button>
       </div>
     </div>
 
-    <div class="flex gap-8 overflow-x-auto pb-12 snap-x no-scrollbar">
-      @for (producto of productosDestacados; track producto.nombre) {
-        <div class="min-w-[300px] md:min-w-[340px] snap-start">
-          <div class="relative aspect-[4/5] rounded-[2rem] overflow-hidden mb-6 group">
-            <img [src]="producto.imagen" [alt]="producto.nombre"
-                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
-            <div class="absolute top-6 left-6 ultra-glass px-4 py-1.5 rounded-full">
-              <span class="text-[10px] font-bold tracking-[0.2em] text-white uppercase">{{ producto.categoria }}</span>
-            </div>
+    <div id="carrusel" class="flex gap-4 md:gap-8 overflow-x-auto pb-6 snap-x snap-mandatory no-scrollbar scroll-smooth -mx-4 px-4 md:mx-0 md:px-0">
+      @for (producto of exclusivosVisibles; track producto.id) {
+        <div class="w-[78vw] max-w-[300px] md:min-w-[340px] md:w-auto flex-shrink-0 snap-start">
+          <div class="relative aspect-[4/5] rounded-2xl md:rounded-[2rem] overflow-hidden mb-4 group">
+            @if (producto.imagenes?.length) {
+              <img [src]="producto.imagenes[0]" [alt]="producto.nombre"
+                   class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
+            } @else {
+              <div class="w-full h-full bg-gradient-to-br from-[#2a2116] to-[#1a160f] flex items-center justify-center">
+                <span class="text-6xl font-black text-primary/20">{{ producto.nombre.charAt(0) }}</span>
+              </div>
+            }
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+            @if (producto.categoria) {
+              <div class="absolute top-4 left-4 ultra-glass px-3 py-1 rounded-full">
+                <span class="text-[10px] font-bold tracking-[0.2em] text-white uppercase">{{ producto.categoria.nombre }}</span>
+              </div>
+            }
+            @if (producto.ganador) {
+              <div class="absolute top-4 right-4">
+                <span class="flex items-center gap-1 bg-primary text-[#0f0f0f] px-2.5 py-1 rounded-full text-[9px] font-black uppercase">
+                  <span class="material-symbols-outlined text-[11px]">verified</span> Ganador
+                </span>
+              </div>
+            }
           </div>
-          <div class="px-2">
-            <h4 class="text-xl font-bold text-white mb-1">{{ producto.nombre }}</h4>
+          <div class="px-1">
+            <h4 class="text-base md:text-xl font-bold text-white mb-1">{{ producto.nombre }}</h4>
             <div class="flex items-center gap-2">
-              <span class="text-primary text-sm font-medium">Margen: {{ producto.margen }}</span>
-              <span class="w-1 h-1 bg-white/20 rounded-full"></span>
-              <span class="text-white/30 text-sm">{{ producto.badge }}</span>
+              @if (margenProducto(producto) > 0) {
+                <span class="text-primary text-xs md:text-sm font-medium">Margen: +{{ margenProducto(producto) }}%</span>
+                <span class="w-1 h-1 bg-white/20 rounded-full"></span>
+              }
+              <span class="flex items-center gap-1 text-purple-400/80 text-xs md:text-sm">
+                <span class="material-symbols-outlined text-[12px]">diamond</span> Exclusivo
+              </span>
             </div>
           </div>
         </div>
@@ -151,49 +302,128 @@
   </div>
 </section>
 
-<!-- Excelencia Operativa -->
-<section id="features" class="py-24 bg-background-dark relative overflow-hidden">
-  <div class="max-w-7xl mx-auto px-6">
-    <div class="flex flex-col items-center text-center mb-20">
-      <div class="w-12 h-[1px] bg-primary mb-6"></div>
-      <h2 class="text-3xl font-bold tracking-tight text-white uppercase">Excelencia Operativa</h2>
+<!-- ===================== PRODUCTOS GANADORES ===================== -->
+<section id="ganadores" class="py-14 md:py-24 bg-[#111008] relative overflow-hidden">
+
+  <!-- Gold glow background -->
+  <div class="absolute inset-0 pointer-events-none">
+    <div class="absolute top-1/2 left-1/4 w-[500px] h-[500px] bg-primary/6 rounded-full blur-[120px] -translate-y-1/2"></div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10 md:mb-14">
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <span class="flex h-2 w-2 rounded-full bg-green-400 animate-pulse"></span>
+          <span class="text-green-400 text-[10px] font-bold uppercase tracking-[0.2em]">Actualizados en tiempo real</span>
+        </div>
+        <h2 class="text-2xl md:text-4xl font-black text-white tracking-tight leading-tight">
+          Productos <span class="text-primary">Ganadores</span>
+        </h2>
+        <p class="text-white/40 text-sm md:text-base mt-2 font-light">Selección con mayor margen y rotación comprobada en el mercado.</p>
+      </div>
+      <a routerLink="/auth/registro"
+         class="self-start sm:self-auto flex items-center gap-2 text-sm font-bold text-primary border border-primary/30 px-5 py-2.5 rounded-xl hover:bg-primary/10 transition-all whitespace-nowrap">
+        Ver catálogo completo
+        <span class="material-symbols-outlined text-base">arrow_forward</span>
+      </a>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-      @for (item of excelencia; track item.titulo) {
-        <div class="group">
-          <div class="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-6 group-hover:border-primary/50 transition-all">
-            <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'wght' 200">{{ item.icono }}</span>
+
+    <!-- Grid 2x2 (desktop) / 2 cols (mobile) -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
+      @for (producto of ganadoresVisibles; track producto.id; let i = $index) {
+        <div class="relative rounded-2xl md:rounded-3xl overflow-hidden group cursor-pointer"
+             [class]="i === 0 ? 'md:col-span-2 md:row-span-2' : ''">
+
+          <!-- Image -->
+          <div [class]="i === 0 ? 'aspect-square md:aspect-auto md:h-full min-h-[240px]' : 'aspect-square'">
+            @if (producto.imagenes?.length) {
+              <img [src]="producto.imagenes[0]" [alt]="producto.nombre"
+                   class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"/>
+            } @else {
+              <div class="w-full h-full bg-gradient-to-br from-[#2a2116] to-[#111008] flex items-center justify-center">
+                <span class="text-6xl font-black text-primary/10">{{ producto.nombre.charAt(0) }}</span>
+              </div>
+            }
           </div>
-          <h4 class="text-lg font-bold text-white mb-3">{{ item.titulo }}</h4>
-          <p class="text-white/40 text-sm leading-relaxed">{{ item.descripcion }}</p>
+
+          <!-- Overlay gradient -->
+          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+
+          <!-- Rank number watermark -->
+          <div class="absolute top-3 left-4 font-black text-white/10 select-none leading-none"
+               [class]="i === 0 ? 'text-[88px] md:text-[120px]' : 'text-[64px]'">
+            #{{ i + 1 }}
+          </div>
+
+          <!-- Top badges -->
+          <div class="absolute top-3 right-3 flex flex-col items-end gap-1.5">
+            @if (producto.exclusivo) {
+              <span class="flex items-center gap-1 bg-purple-500/90 text-white px-2 py-0.5 rounded-full text-[9px] font-black uppercase">
+                <span class="material-symbols-outlined text-[10px]">diamond</span>
+                Exclusivo
+              </span>
+            }
+          </div>
+
+          <!-- Bottom info -->
+          <div class="absolute bottom-0 left-0 right-0 p-4" [class]="i === 0 ? 'md:p-6' : ''">
+            <div class="flex items-center gap-1.5 mb-1">
+              <span class="flex h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse"></span>
+              @if (producto.categoria) {
+                <span class="text-white/50 text-[9px] font-semibold uppercase tracking-wider">{{ producto.categoria.nombre }}</span>
+              }
+            </div>
+            <h3 class="font-black text-white leading-tight mb-2"
+                [class]="i === 0 ? 'text-lg md:text-2xl' : 'text-sm'">
+              {{ producto.nombre }}
+            </h3>
+            <div class="flex items-center gap-2">
+              @if (margenProducto(producto) > 0) {
+                <span class="text-primary font-black"
+                      [class]="i === 0 ? 'text-2xl md:text-3xl' : 'text-xl'">
+                  +{{ margenProducto(producto) }}%
+                </span>
+                <span class="text-white/30 text-[10px] font-medium">margen</span>
+              }
+              <span class="ml-auto flex items-center gap-1 text-green-400 text-[10px] font-bold">
+                <span class="material-symbols-outlined text-[12px]">trending_up</span>
+                @if (i === 0) { Tendencia }
+              </span>
+            </div>
+          </div>
         </div>
       }
     </div>
+
   </div>
 </section>
 
-<!-- CTA Banner -->
-<section id="cta" class="py-32 max-w-7xl mx-auto px-6">
-  <div class="relative rounded-[3rem] overflow-hidden bg-charcoal p-12 md:p-24 border border-white/5">
-    <!-- Glow blobs -->
+<!-- ===================== CTA BANNER ===================== -->
+<section id="cta" class="py-10 md:py-32 px-4 md:px-6 max-w-7xl mx-auto">
+  <div class="relative rounded-2xl md:rounded-[3rem] overflow-hidden bg-charcoal p-8 md:p-24 border border-white/5">
     <div class="absolute inset-0 pointer-events-none">
-      <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/30 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 opacity-10"></div>
-      <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-primary/20 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 opacity-10"></div>
+      <div class="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/30 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 opacity-10"></div>
+      <div class="absolute bottom-0 left-0 w-[300px] h-[300px] bg-primary/20 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 opacity-10"></div>
     </div>
     <div class="relative z-10 flex flex-col items-center text-center">
-      <h2 class="text-4xl md:text-6xl font-black text-white leading-tight mb-8 max-w-3xl" style="letter-spacing: -0.04em">
+      <h2 class="text-2xl sm:text-4xl md:text-6xl font-black text-white leading-tight mb-4 md:mb-8 max-w-3xl" style="letter-spacing: -0.03em">
         ¿Preparado para el siguiente nivel de facturación?
       </h2>
-      <p class="text-white/50 text-xl max-w-2xl mb-12 font-light leading-relaxed">
-        Únete a la red más exclusiva de dropshippers en Latinoamérica. Resultados comprobados y soporte élite.
+      <p class="text-white/50 text-sm md:text-xl max-w-2xl mb-8 md:mb-12 font-light leading-relaxed">
+        Únete a la red más exclusiva de dropshippers en Latinoamérica.
       </p>
-      <div class="flex flex-col sm:flex-row gap-6">
+      <div class="flex flex-col sm:flex-row gap-3 md:gap-6 w-full sm:w-auto">
         <a routerLink="/auth/registro"
-           class="bg-primary text-[#0F0F0F] px-12 py-5 rounded-2xl font-bold text-lg hover:brightness-110 gold-glow transition-all">
+           class="group flex items-center justify-center gap-2 bg-primary text-[#0F0F0F] px-8 md:px-12 py-4 md:py-5 rounded-xl md:rounded-2xl font-bold text-sm md:text-lg hover:brightness-110 gold-glow transition-all">
           EMPEZAR AHORA
+          <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-0.5">arrow_forward</span>
         </a>
         <a routerLink="/catalogo"
-           class="bg-white/5 backdrop-blur-md text-white border border-white/10 px-12 py-5 rounded-2xl font-bold text-lg hover:bg-white/10 transition-all">
+           class="flex items-center justify-center gap-2 bg-white/5 backdrop-blur-md text-white border border-white/10 px-8 md:px-12 py-4 md:py-5 rounded-xl md:rounded-2xl font-bold text-sm md:text-lg hover:bg-white/10 transition-all">
+          <span class="material-symbols-outlined text-[18px]">grid_view</span>
           VER CATÁLOGO
         </a>
       </div>
@@ -201,22 +431,20 @@
   </div>
 </section>
 
-<!-- Footer -->
-<footer class="bg-background-dark border-t border-primary/10 py-12">
-  <div class="max-w-7xl mx-auto px-6">
-    <div class="flex flex-col md:flex-row justify-between items-center gap-12 pb-12">
-      <div class="flex flex-col items-center md:items-start">
-        <img src="/logo.png" alt="Landazury Importaciones" class="h-14 w-auto object-contain"/>
-      </div>
-      <div class="flex gap-12 text-[11px] uppercase tracking-[0.2em] font-bold text-white/40">
+<!-- ===================== FOOTER ===================== -->
+<footer class="bg-background-dark border-t border-primary/10 py-8 md:py-12">
+  <div class="max-w-7xl mx-auto px-4 md:px-6">
+    <div class="flex flex-col md:flex-row justify-between items-center gap-6 md:gap-12 pb-6 md:pb-12">
+      <img src="/logo.png" alt="Landazury Importaciones" class="h-10 md:h-14 w-auto object-contain"/>
+      <div class="flex gap-8 text-[11px] uppercase tracking-[0.2em] font-bold text-white/40">
         <a href="#" class="hover:text-primary transition-colors">Términos</a>
         <a href="#" class="hover:text-primary transition-colors">Privacidad</a>
         <a href="#" class="hover:text-primary transition-colors">Contacto</a>
       </div>
     </div>
-    <div class="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-      <p class="text-xs text-white/20 tracking-wider">© 2024 LANDAZURY ELITE DROPSHIPPING. ALL RIGHTS RESERVED.</p>
-      <div class="flex gap-6">
+    <div class="pt-6 md:pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4">
+      <p class="text-xs text-white/20 tracking-wider text-center">© 2024 LANDAZURY ELITE DROPSHIPPING. ALL RIGHTS RESERVED.</p>
+      <div class="flex gap-4">
         <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors cursor-pointer">
           <span class="material-symbols-outlined text-sm">share</span>
         </div>

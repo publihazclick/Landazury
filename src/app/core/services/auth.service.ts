@@ -19,9 +19,7 @@ export class AuthService {
 
   readonly rol = computed<Rol | null>(() => this.perfil()?.rol ?? null);
   readonly esAdmin = computed(() => this.perfil()?.rol === 'admin');
-  readonly esInventario = computed(() =>
-    this.perfil()?.rol === 'admin' || this.perfil()?.rol === 'inventario'
-  );
+  readonly esInventario = computed(() => this.perfil()?.rol === 'inventario');
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
@@ -62,22 +60,51 @@ export class AuthService {
       password: contrasena,
     });
     if (error) throw error;
+    // Asegurar que el perfil esté cargado antes de retornar
+    if (data.session) await this.cargarPerfil(data.session.user.id);
     return data;
   }
 
-  async registrar(email: string, contrasena: string, nombre: string) {
+  async registrar(
+    email: string,
+    contrasena: string,
+    nombre: string,
+    extra?: { pais?: string; telefono?: string; plataforma?: string }
+  ) {
     const { data, error } = await this.supabase.cliente.auth.signUp({
       email,
       password: contrasena,
-      options: { data: { nombre } },
+      options: { data: { nombre, ...extra } },
     });
     if (error) throw error;
+
+    // Si hay sesión inmediata (auto-confirm), guardar campos extra en el perfil
+    if (data.session && data.user && extra) {
+      const patch: Record<string, string> = {};
+      if (extra.pais)       patch['pais']       = extra.pais;
+      if (extra.telefono)   patch['telefono']   = extra.telefono;
+      if (extra.plataforma) patch['plataforma'] = extra.plataforma;
+      if (Object.keys(patch).length > 0) {
+        await this.supabase.cliente.from('perfiles').update(patch).eq('id', data.user.id);
+      }
+    }
+
     return data;
   }
 
+  readonly cerrandoSesion = signal(false);
+
   async cerrarSesion() {
-    await this.supabase.cliente.auth.signOut();
-    this.router.navigate(['/auth/login']);
+    if (this.cerrandoSesion()) return;
+    this.cerrandoSesion.set(true);
+    try {
+      await this.supabase.cliente.auth.signOut();
+    } catch { /* ignorar errores de red — igual limpiamos estado local */ } finally {
+      this.sesion.set(null);
+      this.perfil.set(null);
+      this.cerrandoSesion.set(false);
+      await this.router.navigate(['/auth/login']);
+    }
   }
 
   async recuperarContrasena(email: string) {

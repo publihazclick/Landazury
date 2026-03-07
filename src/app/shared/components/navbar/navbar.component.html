@@ -35,62 +35,68 @@
           </span>
         }
         <button (click)="auth.cerrarSesion()"
-                class="px-5 py-2 text-sm font-bold text-slate-100 hover:text-primary transition-colors">
-          Salir
+                [disabled]="auth.cerrandoSesion()"
+                class="px-5 py-2 text-sm font-bold text-slate-100 hover:text-primary transition-colors disabled:opacity-40 disabled:cursor-wait">
+          {{ auth.cerrandoSesion() ? 'Saliendo…' : 'Salir' }}
         </button>
       </div>
     } @else {
-      <div class="hidden md:flex items-center gap-4">
+      <div class="hidden md:flex items-center gap-3">
         <a routerLink="/auth/login"
-           class="px-5 py-2 text-sm font-bold text-slate-100 hover:text-primary transition-colors">
+           class="group flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-semibold text-slate-200 hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all duration-200">
+          <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-0.5">login</span>
           Ingresar
         </a>
         <a routerLink="/auth/registro"
-           class="bg-primary text-[#0F0F0F] px-6 py-2 rounded-lg text-sm font-bold hover:brightness-110 transition-all">
+           class="group flex items-center gap-2 px-5 py-2.5 rounded-xl gold-gradient text-[#0F0F0F] text-sm font-extrabold hover:brightness-110 hover:shadow-lg hover:shadow-primary/20 transition-all duration-200">
           Únete Ahora
+          <span class="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-0.5">arrow_forward</span>
         </a>
       </div>
     }
 
-    <!-- Botón menú móvil -->
-    <button class="md:hidden p-2 rounded-lg text-slate-400 hover:text-white transition-colors"
-            (click)="toggleMenu()" aria-label="Menú">
-      @if (menuAbierto()) {
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-      } @else {
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-      }
-    </button>
-  </div>
-
-  <!-- Menú móvil -->
-  @if (menuAbierto()) {
-    <div class="md:hidden border-t border-white/5 bg-[#1A1A1A]/90 backdrop-blur-xl px-6 py-4 space-y-3">
-      @if (auth.estaAutenticado()) {
-        <a routerLink="/catalogo" (click)="toggleMenu()"
-           class="block py-2 text-slate-300 hover:text-primary font-medium">Catálogo</a>
+    <!-- Botones móvil (siempre visibles, sin menú) -->
+    @if (!auth.estaAutenticado()) {
+      <div class="flex md:hidden items-center gap-2">
+        <a routerLink="/auth/login"
+           class="flex items-center gap-1 px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-xs font-semibold text-slate-200 hover:border-primary/50 hover:text-primary transition-all">
+          <span class="material-symbols-outlined text-[16px]">login</span>
+          Ingresar
+        </a>
+        <a routerLink="/auth/registro"
+           class="flex items-center gap-1 px-3 py-2 rounded-lg gold-gradient text-[#0F0F0F] text-xs font-extrabold">
+          Unirse
+          <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+        </a>
+      </div>
+    } @else {
+      <div class="flex md:hidden items-center gap-2">
+        <a routerLink="/catalogo" routerLinkActive="text-primary"
+           class="flex flex-col items-center text-slate-400 hover:text-primary transition-colors">
+          <span class="material-symbols-outlined text-[22px]">grid_view</span>
+        </a>
         @if (auth.esInventario()) {
-          <a routerLink="/inventario" (click)="toggleMenu()"
-             class="block py-2 text-slate-300 hover:text-primary font-medium">Inventario</a>
+          <a routerLink="/inventario" routerLinkActive="text-primary"
+             class="flex flex-col items-center text-slate-400 hover:text-primary transition-colors ml-1">
+            <span class="material-symbols-outlined text-[22px]">inventory_2</span>
+          </a>
         }
         @if (auth.esAdmin()) {
-          <a routerLink="/admin" (click)="toggleMenu()"
-             class="block py-2 text-slate-300 hover:text-primary font-medium">Admin</a>
+          <a routerLink="/admin" routerLinkActive="text-primary"
+             class="flex flex-col items-center text-slate-400 hover:text-primary transition-colors ml-1">
+            <span class="material-symbols-outlined text-[22px]">admin_panel_settings</span>
+          </a>
         }
-        <a routerLink="/perfil" (click)="toggleMenu()"
-           class="block py-2 text-slate-300 hover:text-primary font-medium">Mi Perfil</a>
+        <a routerLink="/perfil" routerLinkActive="text-primary"
+           class="flex flex-col items-center text-slate-400 hover:text-primary transition-colors ml-1">
+          <span class="material-symbols-outlined text-[22px]">person</span>
+        </a>
         <button (click)="auth.cerrarSesion()"
-                class="block py-2 text-slate-400 hover:text-red-400 font-medium w-full text-left">Cerrar sesión</button>
-      } @else {
-        <a routerLink="/auth/login" (click)="toggleMenu()"
-           class="block py-2 text-slate-300 hover:text-primary font-medium">Ingresar</a>
-        <a routerLink="/auth/registro" (click)="toggleMenu()"
-           class="block py-2 text-primary font-semibold">Únete Ahora</a>
-      }
-    </div>
-  }
+                [disabled]="auth.cerrandoSesion()"
+                class="flex flex-col items-center text-slate-500 hover:text-red-400 transition-colors ml-1 disabled:opacity-40 disabled:cursor-wait">
+          <span class="material-symbols-outlined text-[22px]">{{ auth.cerrandoSesion() ? 'hourglass_empty' : 'logout' }}</span>
+        </button>
+      </div>
+    }
+  </div>
 </header>

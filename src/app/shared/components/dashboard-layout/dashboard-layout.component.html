@@ -1,0 +1,176 @@
+<div class="flex min-h-screen bg-[#0a0a08]">
+
+  <!-- Mobile overlay -->
+  @if (menuAbierto()) {
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden"
+         (click)="menuAbierto.set(false)"></div>
+  }
+
+  <!-- ───── SIDEBAR ───── -->
+  <aside class="fixed top-0 left-0 h-full w-64 flex flex-col z-40 transition-transform duration-300 lg:translate-x-0"
+         [class.-translate-x-full]="!menuAbierto()"
+         [class.translate-x-0]="menuAbierto()"
+         style="background:rgba(10,10,8,0.97);border-right:1px solid rgba(224,172,41,0.1);backdrop-filter:blur(24px);">
+
+    <!-- Logo -->
+    <div class="flex items-center justify-between px-5 py-3 border-b border-white/5">
+      <img src="/logo.png" class="h-14 w-auto object-contain mx-auto" alt="Landazury"/>
+      <button class="lg:hidden p-1 text-slate-500 hover:text-slate-300 transition-colors absolute right-3 top-3"
+              (click)="menuAbierto.set(false)">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <!-- Role badge -->
+    <div class="px-4 pt-3 pb-1">
+      <span [class]="badgeRolClass()"
+            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest">
+        <span class="material-symbols-outlined text-sm">{{ iconoRol() }}</span>
+        {{ auth.perfil()?.rol ?? '...' }}
+      </span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 px-3 py-3 overflow-y-auto space-y-0.5">
+
+      <!-- ══ ROL: ADMIN ══ -->
+      @if (auth.esAdmin()) {
+        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-600 px-3 pt-2 pb-1">Administración</p>
+        <a [routerLink]="['/admin']" [queryParams]="{tab:'estadisticas'}"
+           [class.bg-primary\/10]="esRutaActiva('/admin','estadisticas')"
+           [class.text-primary]="esRutaActiva('/admin','estadisticas')"
+           [class.border-primary\/20]="esRutaActiva('/admin','estadisticas')"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 border border-transparent hover:bg-white/5 hover:text-slate-200 transition-all">
+          <span class="material-symbols-outlined text-xl">bar_chart</span>
+          Estadísticas
+        </a>
+        <a [routerLink]="['/admin']" [queryParams]="{}"
+           [class.bg-primary\/10]="esRutaActiva('/admin') && !esRutaActiva('/admin','estadisticas')"
+           [class.text-primary]="esRutaActiva('/admin') && !esRutaActiva('/admin','estadisticas')"
+           [class.border-primary\/20]="esRutaActiva('/admin') && !esRutaActiva('/admin','estadisticas')"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 border border-transparent hover:bg-white/5 hover:text-slate-200 transition-all">
+          <span class="material-symbols-outlined text-xl">group</span>
+          Gestión de Usuarios
+        </a>
+      }
+
+      <!-- ══ ROL: INVENTARIO ══ -->
+      @if (auth.esInventario()) {
+        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-600 px-3 pt-2 pb-1">Operaciones</p>
+        <a routerLink="/inventario" routerLinkActive="bg-primary/10 text-primary border-primary/20"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 border border-transparent hover:bg-white/5 hover:text-slate-200 transition-all">
+          <span class="material-symbols-outlined text-xl">inventory_2</span>
+          Inventario
+        </a>
+      }
+
+      <!-- ══ ROL: USUARIO ══ -->
+      @if (!auth.esAdmin() && !auth.esInventario()) {
+        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-600 px-3 pt-2 pb-1">Dropshipping</p>
+        <a routerLink="/catalogo" routerLinkActive="bg-primary/10 text-primary border-primary/20"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 border border-transparent hover:bg-white/5 hover:text-slate-200 transition-all">
+          <span class="material-symbols-outlined text-xl">shopping_bag</span>
+          Catálogo
+        </a>
+
+        <!-- Filtros de activos (solo visible en /catalogo) -->
+        @if (esRutaActiva('/catalogo')) {
+          <div class="mt-1 space-y-0.5">
+            @for (f of [
+              {v:'todos',   ico:'dashboard',      label:'Todos'},
+              {v:'video',   ico:'play_circle',    label:'Video Ads'},
+              {v:'copy',    ico:'description',    label:'Ad Copy'},
+              {v:'imagen',  ico:'photo_library',  label:'Imágenes'},
+              {v:'ganador', ico:'verified',       label:'Ganadores'}
+            ]; track f.v) {
+              <button (click)="filtros.filtroAsset.set($any(f.v))"
+                      class="w-full flex items-center gap-2.5 pl-10 pr-3 py-2 rounded-xl text-xs font-semibold transition-all"
+                      [class.text-primary]="filtros.filtroAsset() === f.v"
+                      [class.bg-primary\/10]="filtros.filtroAsset() === f.v"
+                      [class.text-slate-500]="filtros.filtroAsset() !== f.v"
+                      [class.hover\:text-slate-300]="filtros.filtroAsset() !== f.v"
+                      [class.hover\:bg-white\/5]="filtros.filtroAsset() !== f.v">
+                <span class="material-symbols-outlined text-base">{{ f.ico }}</span>
+                {{ f.label }}
+              </button>
+            }
+          </div>
+
+          <!-- Categorías -->
+          @if (filtros.categorias().length > 0) {
+            <div class="mt-3">
+              <p class="text-[10px] font-bold uppercase tracking-widest text-slate-600 px-3 pb-1">Categorías</p>
+              <button (click)="filtros.categoriaSeleccionada.set('')"
+                      class="w-full text-left pl-10 pr-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+                      [class.text-primary]="filtros.categoriaSeleccionada() === ''"
+                      [class.text-slate-500]="filtros.categoriaSeleccionada() !== ''"
+                      [class.hover\:text-slate-300]="filtros.categoriaSeleccionada() !== ''">
+                Todas
+              </button>
+              @for (cat of filtros.categorias(); track cat.id) {
+                <button (click)="filtros.categoriaSeleccionada.set(cat.id)"
+                        class="w-full text-left pl-10 pr-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+                        [class.text-primary]="filtros.categoriaSeleccionada() === cat.id"
+                        [class.text-slate-500]="filtros.categoriaSeleccionada() !== cat.id"
+                        [class.hover\:text-slate-300]="filtros.categoriaSeleccionada() !== cat.id">
+                  {{ cat.nombre }}
+                </button>
+              }
+            </div>
+          }
+        }
+      }
+
+      <!-- ══ CUENTA (todos) ══ -->
+      <p class="text-[10px] font-bold uppercase tracking-widest text-slate-600 px-3 pt-3 pb-1">Cuenta</p>
+      <a routerLink="/perfil" routerLinkActive="bg-primary/10 text-primary border-primary/20"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 border border-transparent hover:bg-white/5 hover:text-slate-200 transition-all">
+        <span class="material-symbols-outlined text-xl">manage_accounts</span>
+        Mi Perfil
+      </a>
+
+    </nav>
+
+    <!-- User footer -->
+    <div class="p-4 border-t border-white/5 space-y-2">
+      <div class="flex items-center gap-3 px-2 py-2 rounded-xl bg-white/[0.04]">
+        <div class="w-9 h-9 rounded-full gold-gradient flex items-center justify-center text-sm font-extrabold text-[#0a0a08] shrink-0">
+          {{ auth.usuario()?.email?.[0]?.toUpperCase() }}
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold text-slate-200 truncate">{{ auth.perfil()?.nombre || 'Usuario' }}</p>
+          <p class="text-[11px] text-slate-500 truncate">{{ auth.usuario()?.email }}</p>
+        </div>
+      </div>
+      <button (click)="auth.cerrarSesion()"
+              class="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors font-medium">
+        <span class="material-symbols-outlined text-base">logout</span>
+        Cerrar sesión
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- ───── MAIN AREA ───── -->
+  <div class="flex-1 lg:ml-64 flex flex-col min-h-screen">
+
+    <!-- Mobile topbar -->
+    <header class="lg:hidden sticky top-0 z-20 flex items-center gap-3 px-4 py-3 border-b border-white/5 bg-[#0a0a08]/90 backdrop-blur-xl">
+      <button (click)="menuAbierto.set(true)"
+              class="text-slate-400 hover:text-slate-200 transition-colors">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+      <img src="/logo.png" class="h-9 w-auto object-contain" alt="Landazury"/>
+      <div class="flex-1"></div>
+      <div class="w-8 h-8 rounded-full gold-gradient flex items-center justify-center text-xs font-extrabold text-[#0a0a08]">
+        {{ auth.usuario()?.email?.[0]?.toUpperCase() }}
+      </div>
+    </header>
+
+    <!-- Page content -->
+    <main class="flex-1">
+      <router-outlet />
+    </main>
+
+  </div>
+</div>

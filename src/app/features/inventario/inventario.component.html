@@ -1,244 +1,502 @@
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen bg-[#1a160f] text-slate-100 p-4 md:p-8">
+
   <!-- Header -->
-  <div class="bg-white border-b border-gray-200 px-6 py-4">
-    <h1 class="text-2xl font-bold text-gray-900">Inventario de Creativos</h1>
-    <p class="text-sm text-gray-500 mt-1">Sube y gestiona imágenes, videos, PDFs y documentos</p>
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+    <div>
+      <h1 class="text-2xl font-black text-slate-100 tracking-tight">Gestión de Productos</h1>
+      <p class="text-slate-500 text-sm mt-0.5">Crea productos y agrega sus creativos para el catálogo</p>
+    </div>
+    <button (click)="abrirCrear()"
+            class="self-start sm:self-auto flex items-center gap-2 bg-primary text-[#1a160f] px-5 py-2.5 rounded-xl text-sm font-black hover:brightness-110 transition-all shadow-lg shadow-primary/20 uppercase tracking-wider">
+      <span class="material-symbols-outlined text-base">add</span>
+      Nuevo Producto
+    </button>
   </div>
 
-  <div class="max-w-7xl mx-auto px-4 py-6 space-y-6">
-
-    <!-- Alertas -->
-    @if (error()) {
-      <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex justify-between items-center">
-        <span>{{ error() }}</span>
-        <button (click)="error.set(null)" class="text-red-400 hover:text-red-600 text-xl leading-none">&times;</button>
+  <!-- Alertas -->
+  @if (error()) {
+    <div class="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-base shrink-0">error</span>{{ error() }}
       </div>
-    }
-    @if (exito()) {
-      <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
-        {{ exito() }}
-      </div>
-    }
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-      <!-- Panel subida -->
-      <div class="bg-white rounded-xl border border-gray-200 p-5">
-        <h2 class="font-semibold text-gray-800 mb-4">Subir archivo</h2>
-
-        <!-- Drop zone -->
-        <label
-          class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-indigo-400 hover:bg-indigo-50 transition-colors"
-        >
-          <div class="text-center">
-            @if (archivoSeleccionado) {
-              <p class="text-sm font-medium text-indigo-600">{{ archivoSeleccionado.name }}</p>
-              <p class="text-xs text-gray-400">{{ tamano(archivoSeleccionado.size) }}</p>
-            } @else {
-              <p class="text-2xl mb-1">📁</p>
-              <p class="text-sm text-gray-600">Haz clic o arrastra un archivo</p>
-              <p class="text-xs text-gray-400 mt-1">Imagen, video, PDF, Word, Excel…</p>
-            }
-          </div>
-          <input type="file" class="hidden" (change)="onArchivoSeleccionado($event)"
-            accept="image/*,video/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,.zip" />
-        </label>
-
-        <!-- Campos -->
-        <div class="mt-4 space-y-3">
-          <div>
-            <label class="text-xs font-medium text-gray-600">Nombre *</label>
-            <input [(ngModel)]="nombreArchivo" type="text" placeholder="Nombre del archivo"
-              class="mt-1 w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          </div>
-          <div>
-            <label class="text-xs font-medium text-gray-600">Descripción</label>
-            <textarea [(ngModel)]="descripcionArchivo" rows="2" placeholder="Descripción opcional"
-              class="mt-1 w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
-          </div>
-          <div>
-            <label class="text-xs font-medium text-gray-600">Asociar a producto</label>
-            <select [(ngModel)]="productoAsociado"
-              class="mt-1 w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <option value="">Sin producto</option>
-              @for (producto of productos(); track producto.id) {
-                <option [value]="producto.id">{{ producto.nombre }}</option>
-              }
-            </select>
-          </div>
-          <div class="flex items-center gap-2">
-            <input type="checkbox" id="publico" [(ngModel)]="publicoArchivo" class="rounded text-indigo-600" />
-            <label for="publico" class="text-xs text-gray-600">Visible para usuarios</label>
-          </div>
-
-          <button (click)="subirArchivo()" [disabled]="subiendo() || !archivoSeleccionado"
-            class="w-full py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-            {{ subiendo() ? 'Subiendo…' : 'Subir archivo' }}
-          </button>
-        </div>
-      </div>
-
-      <!-- Lista de creativos -->
-      <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-5">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="font-semibold text-gray-800">Creativos ({{ creativos().length }})</h2>
-          <div class="flex gap-2">
-            <select [(ngModel)]="filtroTipo" (ngModelChange)="onFiltroChange()"
-              class="text-xs border border-gray-300 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500">
-              @for (t of tipos; track t.valor) {
-                <option [value]="t.valor">{{ t.etiqueta }}</option>
-              }
-            </select>
-            <select [(ngModel)]="filtroProducto" (ngModelChange)="onFiltroChange()"
-              class="text-xs border border-gray-300 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500">
-              <option value="">Todos los productos</option>
-              @for (p of productos(); track p.id) {
-                <option [value]="p.id">{{ p.nombre }}</option>
-              }
-            </select>
-          </div>
-        </div>
-
-        @if (cargando()) {
-          <div class="space-y-2">
-            @for (_ of [1,2,3,4]; track $index) {
-              <div class="h-14 bg-gray-100 rounded-lg animate-pulse"></div>
-            }
-          </div>
-        } @else if (creativos().length === 0) {
-          <div class="text-center py-12 text-gray-400">
-            <p class="text-4xl mb-2">📂</p>
-            <p class="text-sm">No hay creativos aún. Sube tu primer archivo.</p>
-          </div>
-        } @else {
-          <div class="divide-y divide-gray-100">
-            @for (creativo of creativos(); track creativo.id) {
-              <div class="py-3 flex items-center gap-3">
-                <span class="text-2xl flex-shrink-0">{{ icono(creativo.tipo) }}</span>
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-gray-800 truncate">{{ creativo.nombre }}</p>
-                  <p class="text-xs text-gray-400">
-                    {{ creativo.extension?.toUpperCase() }} · {{ tamano(creativo.tamano) }}
-                    @if (creativo.producto_id) {
-                      · <span class="text-indigo-500">{{ nombreProducto(creativo.producto_id) }}</span>
-                    }
-                    @if (!creativo.publico) {
-                      · <span class="text-amber-500">privado</span>
-                    }
-                  </p>
-                </div>
-                <div class="flex gap-2 flex-shrink-0">
-                  <button (click)="descargar(creativo)"
-                    class="text-xs px-2 py-1 bg-indigo-50 text-indigo-600 rounded hover:bg-indigo-100 transition-colors">
-                    Descargar
-                  </button>
-                  <button (click)="eliminar(creativo)"
-                    class="text-xs px-2 py-1 bg-red-50 text-red-500 rounded hover:bg-red-100 transition-colors">
-                    Eliminar
-                  </button>
-                </div>
-              </div>
-            }
-          </div>
-        }
-      </div>
+      <button (click)="error.set(null)" class="text-red-400 hover:text-red-300 text-xl leading-none shrink-0">×</button>
     </div>
+  }
+  @if (exito()) {
+    <div class="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-xl text-sm text-green-400 flex items-center gap-2">
+      <span class="material-symbols-outlined text-base">check_circle</span>{{ exito() }}
+    </div>
+  }
 
-    <!-- Sección productos -->
-    <div class="bg-white rounded-xl border border-gray-200 p-5">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="font-semibold text-gray-800">Productos ({{ productos().length }})</h2>
-        <button (click)="mostrarModalProducto = true"
-          class="text-sm px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
-          + Nuevo producto
-        </button>
-      </div>
+  <!-- Stats -->
+  <div class="grid grid-cols-3 gap-4 mb-8">
+    <div class="glass rounded-2xl p-4 text-center">
+      <p class="text-2xl font-black text-slate-100">{{ totalProductos() }}</p>
+      <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-0.5">Productos</p>
+    </div>
+    <div class="glass rounded-2xl p-4 text-center">
+      <p class="text-2xl font-black text-green-300">{{ productosPublicados() }}</p>
+      <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-0.5">Publicados</p>
+    </div>
+    <div class="glass rounded-2xl p-4 text-center">
+      <p class="text-2xl font-black text-primary">{{ totalCreativos() }}</p>
+      <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-0.5">Creativos</p>
+    </div>
+  </div>
 
-      @if (productos().length === 0) {
-        <p class="text-sm text-gray-400 py-4 text-center">No hay productos. Crea el primero.</p>
-      } @else {
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="text-left text-xs text-gray-500 border-b border-gray-100">
-                <th class="pb-2 font-medium">Nombre</th>
-                <th class="pb-2 font-medium">Proveedor</th>
-                <th class="pb-2 font-medium">Precio base</th>
-                <th class="pb-2 font-medium">P. sugerido</th>
-                <th class="pb-2 font-medium">Estado</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-50">
-              @for (producto of productos(); track producto.id) {
-                <tr class="hover:bg-gray-50">
-                  <td class="py-2.5 font-medium text-gray-800">{{ producto.nombre }}</td>
-                  <td class="py-2.5 text-gray-500">{{ producto.proveedor ?? '—' }}</td>
-                  <td class="py-2.5 text-gray-700">${{ producto.precio_base | number:'1.2-2' }}</td>
-                  <td class="py-2.5 text-gray-700">
-                    {{ producto.precio_sugerido ? ('$' + (producto.precio_sugerido | number:'1.2-2')) : '—' }}
-                  </td>
-                  <td class="py-2.5">
-                    <button (click)="toggleDisponible(producto)"
-                      class="text-xs px-2.5 py-1 rounded-full font-medium transition-colors"
-                      [class]="producto.disponible
-                        ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'">
-                      {{ producto.disponible ? 'Publicado' : 'Oculto' }}
-                    </button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
+  <!-- Product grid -->
+  @if (cargando()) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+      @for (_ of [1,2,3,4,5,6]; track $index) {
+        <div class="glass rounded-2xl overflow-hidden">
+          <div class="h-44 bg-[#262116] animate-pulse"></div>
+          <div class="p-4 space-y-3">
+            <div class="h-4 bg-[#262116] rounded animate-pulse w-3/4"></div>
+            <div class="h-3 bg-[#262116] rounded animate-pulse w-1/2"></div>
+            <div class="h-8 bg-[#262116] rounded-xl animate-pulse"></div>
+          </div>
         </div>
       }
     </div>
+  } @else if (productos().length === 0) {
+    <div class="glass rounded-2xl py-20 text-center">
+      <span class="material-symbols-outlined text-6xl text-slate-700 block mb-4">inventory_2</span>
+      <p class="text-slate-400 font-semibold mb-2">Sin productos todavía</p>
+      <p class="text-slate-600 text-sm mb-6">Crea tu primer producto y agrega sus creativos</p>
+      <button (click)="abrirCrear()"
+              class="inline-flex items-center gap-2 bg-primary text-[#1a160f] px-6 py-3 rounded-xl text-sm font-black hover:brightness-110 transition-all uppercase tracking-wider">
+        <span class="material-symbols-outlined text-base">add</span>
+        Crear Primer Producto
+      </button>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+      @for (producto of productos(); track producto.id) {
+        <div class="glass rounded-2xl overflow-hidden border border-[#3d3524] group hover:border-primary/30 transition-all duration-300 flex flex-col">
 
-  </div>
+          <!-- Image area -->
+          <div class="h-44 relative overflow-hidden shrink-0">
+            @if (primeraImagen(producto)) {
+              <img [src]="primeraImagen(producto)!" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"/>
+            } @else {
+              <div class="w-full h-full bg-gradient-to-br from-[#2a2116] via-[#1e1a10] to-[#0f0d07] flex items-center justify-center">
+                <span class="text-7xl font-black text-primary/10 select-none">{{ producto.nombre.charAt(0).toUpperCase() }}</span>
+              </div>
+            }
+            <!-- Gradient overlay -->
+            <div class="absolute inset-0 bg-gradient-to-t from-[#1a160f]/80 via-transparent to-transparent"></div>
+
+            <!-- Status badges -->
+            <div class="absolute top-3 right-3 flex flex-col items-end gap-1.5">
+              <button (click)="toggleDisponible(producto, $event)"
+                      class="text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider backdrop-blur-sm transition-all border"
+                      [class]="producto.disponible
+                        ? 'bg-green-500/20 border-green-500/40 text-green-300 hover:bg-green-500/30'
+                        : 'bg-black/40 border-white/10 text-slate-400 hover:bg-black/60'">
+                <span class="inline-block w-1.5 h-1.5 rounded-full mr-1 align-middle"
+                      [class]="producto.disponible ? 'bg-green-400' : 'bg-slate-600'"></span>
+                {{ producto.disponible ? 'Publicado' : 'Oculto' }}
+              </button>
+            </div>
+
+            <!-- Ganador / Exclusivo badges top-left -->
+            <div class="absolute top-3 left-3 flex flex-col gap-1.5">
+              <button (click)="toggleGanador(producto, $event)"
+                      class="flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider backdrop-blur-sm border transition-all"
+                      [class]="producto.ganador
+                        ? 'bg-primary/90 border-primary text-[#0f0f0f]'
+                        : 'bg-black/40 border-white/10 text-slate-500 hover:border-primary/30 hover:text-primary/60'">
+                <span class="material-symbols-outlined text-[11px]">verified</span>
+                Ganador
+              </button>
+              <button (click)="toggleExclusivo(producto, $event)"
+                      class="flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider backdrop-blur-sm border transition-all"
+                      [class]="producto.exclusivo
+                        ? 'bg-purple-500/90 border-purple-400 text-white'
+                        : 'bg-black/40 border-white/10 text-slate-500 hover:border-purple-400/30 hover:text-purple-400/60'">
+                <span class="material-symbols-outlined text-[11px]">diamond</span>
+                Exclusivo
+              </button>
+            </div>
+
+            <!-- Category badge -->
+            @if (producto.categoria) {
+              <div class="absolute bottom-3 left-3">
+                <span class="text-[10px] px-2.5 py-1 rounded-full bg-black/50 border border-white/10 text-slate-300 backdrop-blur-sm font-medium">
+                  {{ producto.categoria.icono }} {{ producto.categoria.nombre }}
+                </span>
+              </div>
+            }
+          </div>
+
+          <!-- Body -->
+          <div class="p-4 flex flex-col gap-3 flex-1">
+            <!-- Name + provider -->
+            <div>
+              <h3 class="font-bold text-slate-100 text-sm leading-snug line-clamp-2">{{ producto.nombre }}</h3>
+              @if (producto.proveedor) {
+                <p class="text-xs text-slate-500 mt-0.5">{{ producto.proveedor }}</p>
+              }
+            </div>
+
+            <!-- Prices -->
+            <div class="flex items-center gap-4">
+              <div>
+                <p class="text-[9px] font-bold uppercase tracking-widest text-slate-600">Costo</p>
+                <p class="text-sm font-bold text-slate-200">$ {{ producto.precio_base | number:'1.0-0' }}</p>
+              </div>
+              @if (producto.precio_sugerido) {
+                <span class="material-symbols-outlined text-slate-700 text-sm">arrow_forward</span>
+                <div>
+                  <p class="text-[9px] font-bold uppercase tracking-widest text-slate-600">Sugerido</p>
+                  <p class="text-sm font-bold text-primary">$ {{ producto.precio_sugerido | number:'1.0-0' }}</p>
+                </div>
+              }
+            </div>
+
+            <!-- Creativo type chips -->
+            <div class="flex flex-wrap gap-1.5 min-h-[24px]">
+              @for (tipo of tiposConContenido(producto); track tipo.valor) {
+                <span class="flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border"
+                      [class]="tipo.chipClass">
+                  <span class="material-symbols-outlined text-[12px]">{{ tipo.icono }}</span>
+                  {{ contarTipo(producto, tipo.valor) }} {{ tipo.label }}
+                </span>
+              }
+              @if ((producto.creativos?.length ?? 0) === 0) {
+                <span class="text-[11px] text-slate-600 italic">Sin creativos</span>
+              }
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-2 pt-2 border-t border-[#3d3524]/50 mt-auto">
+              <button (click)="abrirEditar(producto)"
+                      class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-all">
+                <span class="material-symbols-outlined text-[14px]">edit</span>
+                Editar / Creativos
+              </button>
+              <button (click)="confirmarEliminar(producto, $event)"
+                      class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-600 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all">
+                <span class="material-symbols-outlined text-base">delete</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
 </div>
 
-<!-- Modal nuevo producto -->
-@if (mostrarModalProducto) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-    <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
-      <h3 class="text-lg font-bold text-gray-900 mb-4">Nuevo producto</h3>
-      <div class="space-y-3">
-        <div>
-          <label class="text-xs font-medium text-gray-600">Nombre *</label>
-          <input [(ngModel)]="nuevoProducto.nombre" type="text"
-            class="mt-1 w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        </div>
-        <div>
-          <label class="text-xs font-medium text-gray-600">Descripción</label>
-          <textarea [(ngModel)]="nuevoProducto.descripcion" rows="2"
-            class="mt-1 w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="text-xs font-medium text-gray-600">Precio base *</label>
-            <input [(ngModel)]="nuevoProducto.precio_base" type="number" min="0" step="0.01"
-              class="mt-1 w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+<!-- ══════════════════════════════════
+     MODAL: PRODUCTO + CREATIVOS
+══════════════════════════════════ -->
+@if (mostrarModal()) {
+  <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+       (click)="cerrarModal()">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+
+    <div class="relative w-full sm:max-w-5xl h-[94dvh] sm:h-auto sm:max-h-[90vh] bg-[#111009] border border-white/10 rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+         (click)="$event.stopPropagation()">
+
+      <!-- Modal header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-white/8 shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary text-base">
+              {{ productoEnModal() ? 'edit' : 'add_box' }}
+            </span>
           </div>
           <div>
-            <label class="text-xs font-medium text-gray-600">Precio sugerido</label>
-            <input [(ngModel)]="nuevoProducto.precio_sugerido" type="number" min="0" step="0.01"
-              class="mt-1 w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <h3 class="text-slate-100 font-bold text-sm">
+              {{ productoEnModal() ? 'Editar Producto' : 'Nuevo Producto' }}
+            </h3>
+            @if (productoEnModal()) {
+              <p class="text-slate-500 text-[11px] truncate max-w-48">{{ productoEnModal()?.nombre }}</p>
+            }
           </div>
         </div>
-        <div>
-          <label class="text-xs font-medium text-gray-600">Proveedor</label>
-          <input [(ngModel)]="nuevoProducto.proveedor" type="text"
-            class="mt-1 w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <button (click)="cerrarModal()" class="text-slate-500 hover:text-slate-300 transition-colors">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <!-- Modal body: two panels -->
+      <div class="flex-1 overflow-hidden flex flex-col lg:flex-row">
+
+        <!-- ── LEFT: Product details ── -->
+        <div class="lg:w-3/5 overflow-y-auto p-6 space-y-5 border-b lg:border-b-0 lg:border-r border-white/8">
+
+          <!-- Nombre -->
+          <div class="space-y-1.5">
+            <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Nombre del producto *</label>
+            <input [(ngModel)]="formProducto.nombre" type="text"
+                   placeholder="Ej: Reloj Minimalista Gold Limited"
+                   class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-100 placeholder:text-slate-600 px-4 py-3 outline-none transition-all text-sm"/>
+          </div>
+
+          <!-- Precios -->
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1.5">
+              <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Precio proveedor (COP) *</label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-semibold">$</span>
+                <input [(ngModel)]="formProducto.precio_base" type="number" min="0" step="100" placeholder="0"
+                       class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-100 placeholder:text-slate-600 pl-8 pr-4 py-3 outline-none transition-all text-sm"/>
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Precio sugerido (COP)</label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-semibold">$</span>
+                <input [(ngModel)]="formProducto.precio_sugerido" type="number" min="0" step="100" placeholder="0"
+                       class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-100 placeholder:text-slate-600 pl-8 pr-4 py-3 outline-none transition-all text-sm"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- Categoria + Proveedor -->
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1.5">
+              <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Categoría</label>
+              <select [(ngModel)]="formProducto.categoria_id"
+                      class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary text-slate-100 px-4 py-3 outline-none transition-all text-sm appearance-none cursor-pointer">
+                <option value="" style="background:#111009">Sin categoría</option>
+                @for (cat of categorias(); track cat.id) {
+                  <option [value]="cat.id" style="background:#111009">{{ cat.icono }} {{ cat.nombre }}</option>
+                }
+              </select>
+            </div>
+            <div class="space-y-1.5">
+              <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Proveedor</label>
+              <input [(ngModel)]="formProducto.proveedor" type="text" placeholder="Ej: TechSupply MX"
+                     class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-100 placeholder:text-slate-600 px-4 py-3 outline-none transition-all text-sm"/>
+            </div>
+          </div>
+
+          <!-- Descripción -->
+          <div class="space-y-1.5">
+            <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Descripción</label>
+            <textarea [(ngModel)]="formProducto.descripcion" rows="4"
+                      placeholder="Describe los beneficios y características del producto..."
+                      class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-100 placeholder:text-slate-600 px-4 py-3 outline-none transition-all text-sm resize-none"></textarea>
+          </div>
+
+          <!-- Disponible toggle -->
+          <label class="flex items-center gap-3.5 cursor-pointer p-3.5 rounded-xl border border-[#3d3524] hover:border-primary/20 transition-all">
+            <div class="relative shrink-0">
+              <input type="checkbox" class="sr-only" [(ngModel)]="formProducto.disponible"/>
+              <div class="w-10 h-5 rounded-full transition-all" [class]="formProducto.disponible ? 'bg-primary' : 'bg-[#3d3524]'">
+                <div class="absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all"
+                     [style.left]="formProducto.disponible ? '22px' : '2px'"></div>
+              </div>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-slate-200">Publicado en catálogo</p>
+              <p class="text-xs text-slate-500 mt-0.5">Los usuarios verán este producto al ingresar</p>
+            </div>
+          </label>
+
+          <!-- Save button -->
+          <button (click)="guardarProducto()"
+                  [disabled]="guardandoProducto() || !formProducto.nombre.trim() || !formProducto.precio_base"
+                  class="w-full py-3.5 bg-primary hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed text-[#1a160f] font-black text-xs uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
+            @if (guardandoProducto()) {
+              <span class="w-4 h-4 border-2 border-[#1a160f]/30 border-t-[#1a160f] rounded-full animate-spin"></span>
+              Guardando…
+            } @else {
+              <span class="material-symbols-outlined text-base">{{ productoEnModal() ? 'save' : 'rocket_launch' }}</span>
+              {{ productoEnModal() ? 'Guardar Cambios' : 'Crear Producto' }}
+            }
+          </button>
+        </div>
+
+        <!-- ── RIGHT: Creativos ── -->
+        <div class="lg:w-2/5 bg-[#0d0b06] flex flex-col overflow-hidden">
+
+          <!-- Panel header -->
+          <div class="px-5 py-4 border-b border-white/8 shrink-0 flex items-center justify-between">
+            <h4 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-base">photo_library</span>
+              Creativos
+              @if (productoEnModal()) {
+                <span class="text-xs font-normal text-slate-500">({{ creativosEnModal().length }})</span>
+              }
+            </h4>
+            @if (productoEnModal()) {
+              <!-- Type summary chips -->
+              <div class="flex gap-1">
+                @for (tipo of tiposConfig; track tipo.valor) {
+                  @if (contarTipo(productoEnModal()!, tipo.valor) > 0) {
+                    <span class="flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded border"
+                          [class]="tipo.chipClass">
+                      <span class="material-symbols-outlined text-[11px]">{{ tipo.icono }}</span>
+                      {{ contarTipo(productoEnModal()!, tipo.valor) }}
+                    </span>
+                  }
+                }
+              </div>
+            }
+          </div>
+
+          @if (!productoEnModal()) {
+            <!-- Locked: product not yet saved -->
+            <div class="flex-1 flex flex-col items-center justify-center p-8 text-center">
+              <div class="w-16 h-16 rounded-2xl bg-[#1a160f] border border-[#3d3524] flex items-center justify-center mb-4">
+                <span class="material-symbols-outlined text-slate-600 text-3xl">lock</span>
+              </div>
+              <p class="text-slate-400 text-sm font-semibold">Crea el producto primero</p>
+              <p class="text-slate-600 text-xs mt-2 max-w-52">Los creativos se vinculan al producto. Guarda los detalles y luego podrás subir archivos.</p>
+            </div>
+          } @else {
+
+            <!-- Upload zone -->
+            <div class="p-5 border-b border-white/8 space-y-4 shrink-0">
+
+              <!-- Dropzone -->
+              <label class="flex flex-col items-center justify-center gap-2 py-5 px-4 border-2 border-dashed border-[#3d3524] hover:border-primary/50 rounded-xl cursor-pointer transition-all group text-center">
+                @if (archivoModal) {
+                  <span class="material-symbols-outlined text-3xl text-primary">check_circle</span>
+                  <p class="text-sm font-bold text-primary leading-tight">{{ archivoModal.name }}</p>
+                  <p class="text-xs text-slate-500">{{ tamano(archivoModal.size) }}</p>
+                  <span class="text-xs text-slate-600 underline underline-offset-2 hover:text-slate-400 transition-colors">Cambiar archivo</span>
+                } @else {
+                  <span class="material-symbols-outlined text-3xl text-slate-600 group-hover:text-slate-400 transition-colors">cloud_upload</span>
+                  <div>
+                    <p class="text-sm font-semibold text-slate-500 group-hover:text-slate-300 transition-colors">Arrastra o selecciona</p>
+                    <p class="text-xs text-slate-700 mt-0.5">Imágenes · Videos · PDF · Word · ZIP — máx 500MB</p>
+                  </div>
+                }
+                <input type="file" class="hidden" (change)="onArchivoModal($event)"
+                       accept="image/*,video/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.zip,.rar"/>
+              </label>
+
+              <!-- Upload fields (visible only when file selected) -->
+              @if (archivoModal) {
+                <div class="space-y-3">
+                  <input [(ngModel)]="nombreArchivoModal" type="text" placeholder="Nombre del creativo *"
+                         class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary text-slate-100 placeholder:text-slate-600 px-4 py-2.5 outline-none transition-all text-sm"/>
+                  <textarea [(ngModel)]="descripcionArchivoModal" rows="2"
+                            placeholder="Copy o descripción del creativo (opcional)"
+                            class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary text-slate-100 placeholder:text-slate-600 px-4 py-2.5 outline-none transition-all text-sm resize-none"></textarea>
+
+                  <div class="flex items-center justify-between">
+                    <label class="flex items-center gap-2.5 cursor-pointer">
+                      <div class="relative">
+                        <input type="checkbox" class="sr-only" [(ngModel)]="publicoArchivoModal"/>
+                        <div class="w-8 h-4 rounded-full transition-all" [class]="publicoArchivoModal ? 'bg-primary' : 'bg-[#3d3524]'">
+                          <div class="absolute top-0.5 w-3 h-3 bg-white rounded-full shadow transition-all"
+                               [style.left]="publicoArchivoModal ? '18px' : '2px'"></div>
+                        </div>
+                      </div>
+                      <span class="text-xs text-slate-400">Visible para usuarios</span>
+                    </label>
+                    <button (click)="archivoModal = null; nombreArchivoModal = ''"
+                            class="text-xs text-slate-600 hover:text-slate-400 transition-colors">
+                      Cancelar
+                    </button>
+                  </div>
+
+                  <button (click)="subirCreativoModal()"
+                          [disabled]="subiendoCreativo() || !nombreArchivoModal.trim()"
+                          class="w-full py-2.5 flex items-center justify-center gap-2 bg-primary/15 hover:bg-primary/25 disabled:opacity-40 disabled:cursor-not-allowed text-primary font-bold text-xs uppercase tracking-widest rounded-xl transition-all border border-primary/30">
+                    @if (subiendoCreativo()) {
+                      <span class="w-3.5 h-3.5 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></span>
+                      Subiendo…
+                    } @else {
+                      <span class="material-symbols-outlined text-sm">upload</span>
+                      Subir Creativo
+                    }
+                  </button>
+                </div>
+              }
+            </div>
+
+            <!-- Creativo list -->
+            <div class="flex-1 overflow-y-auto">
+              @if (cargandoModal()) {
+                <div class="p-4 space-y-2">
+                  @for (_ of [1,2,3]; track $index) {
+                    <div class="h-14 bg-[#1a160f] rounded-xl animate-pulse"></div>
+                  }
+                </div>
+              } @else if (creativosEnModal().length === 0) {
+                <div class="flex flex-col items-center justify-center py-12 text-center px-4">
+                  <span class="material-symbols-outlined text-4xl text-slate-700 mb-2">folder_open</span>
+                  <p class="text-slate-500 text-sm">Sin creativos todavía</p>
+                  <p class="text-slate-700 text-xs mt-1">Sube imágenes, videos, PDFs o documentos</p>
+                </div>
+              } @else {
+                <div class="p-4 space-y-2">
+                  @for (creativo of creativosEnModal(); track creativo.id) {
+                    <div class="flex items-center gap-3 p-3 rounded-xl bg-[#1a160f] border border-[#3d3524] hover:border-[#524830] transition-all group">
+
+                      <!-- Type icon -->
+                      <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                           [class]="tipoInfo(creativo.tipo).bgClass">
+                        <span class="material-symbols-outlined text-sm"
+                              [class]="tipoInfo(creativo.tipo).iconColor">
+                          {{ tipoInfo(creativo.tipo).icono }}
+                        </span>
+                      </div>
+
+                      <!-- Info -->
+                      <div class="flex-1 min-w-0">
+                        <p class="text-xs font-semibold text-slate-200 truncate">{{ creativo.nombre }}</p>
+                        <p class="text-[10px] text-slate-600 mt-0.5">
+                          <span class="text-slate-500 font-medium">{{ creativo.extension?.toUpperCase() }}</span>
+                          @if (creativo.tamano) { · {{ tamano(creativo.tamano) }} }
+                          @if (!creativo.publico) { · <span class="text-amber-500">privado</span> }
+                        </p>
+                      </div>
+
+                      <!-- Delete -->
+                      <button (click)="eliminarCreativoEnModal(creativo)"
+                              class="opacity-0 group-hover:opacity-100 w-7 h-7 flex items-center justify-center rounded-lg text-slate-600 hover:text-red-400 hover:bg-red-500/10 transition-all shrink-0">
+                        <span class="material-symbols-outlined text-sm">delete</span>
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+          }
         </div>
       </div>
-      <div class="flex gap-3 mt-5">
-        <button (click)="mostrarModalProducto = false"
-          class="flex-1 py-2 border border-gray-300 text-gray-700 text-sm rounded-lg hover:bg-gray-50">
+    </div>
+  </div>
+}
+
+<!-- ══════════════════════════════════
+     MODAL: CONFIRMAR ELIMINAR
+══════════════════════════════════ -->
+@if (confirmandoEliminar()) {
+  <div class="fixed inset-0 z-[60] flex items-center justify-center p-4"
+       (click)="cancelarEliminar()">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+    <div class="relative w-full max-w-sm bg-[#18160f] border border-red-500/20 rounded-2xl shadow-2xl"
+         (click)="$event.stopPropagation()">
+      <div class="px-6 pt-8 pb-4 text-center">
+        <div class="w-14 h-14 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4">
+          <span class="material-symbols-outlined text-red-400 text-2xl">delete_forever</span>
+        </div>
+        <h3 class="text-slate-100 font-bold text-base mb-1">Eliminar producto</h3>
+        <p class="text-slate-400 text-sm">
+          ¿Eliminar <span class="text-slate-100 font-semibold">{{ confirmandoEliminar()?.nombre }}</span>?
+          Se eliminará el producto y todos sus creativos. Esta acción no se puede deshacer.
+        </p>
+      </div>
+      <div class="flex gap-3 px-6 pb-6">
+        <button (click)="cancelarEliminar()"
+                class="flex-1 px-4 py-2.5 rounded-xl text-sm text-slate-400 border border-[#3d3524] hover:text-slate-200 hover:bg-white/5 transition-all">
           Cancelar
         </button>
-        <button (click)="guardarProducto()" [disabled]="guardandoProducto"
-          class="flex-1 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 disabled:opacity-50">
-          {{ guardandoProducto ? 'Guardando…' : 'Crear producto' }}
+        <button (click)="eliminarProducto()"
+                class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold bg-red-500/20 text-red-300 border border-red-500/30 hover:bg-red-500/30 transition-all">
+          <span class="material-symbols-outlined text-base">delete</span>
+          Eliminar
         </button>
       </div>
     </div>

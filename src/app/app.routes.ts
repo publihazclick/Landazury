@@ -1,9 +1,12 @@
 import { Routes } from '@angular/router';
-import { authGuard, invitadoGuard, inventarioGuard, adminGuard } from './core/guards/auth.guard';
+import { authGuard, invitadoGuard, inventarioGuard, adminGuard, landingGuard, catalogoGuard } from './core/guards/auth.guard';
+import { DashboardLayoutComponent } from './shared/components/dashboard-layout/dashboard-layout.component';
 
 export const routes: Routes = [
   {
     path: '',
+    pathMatch: 'full',
+    canActivate: [landingGuard],
     loadComponent: () =>
       import('./features/home/home.component').then((m) => m.HomeComponent),
   },
@@ -26,28 +29,34 @@ export const routes: Routes = [
     ],
   },
   {
-    path: 'catalogo',
-    loadComponent: () =>
-      import('./features/catalogo/catalogo.component').then((m) => m.CatalogoComponent),
+    path: '',
+    component: DashboardLayoutComponent,
     canActivate: [authGuard],
-  },
-  {
-    path: 'perfil',
-    loadComponent: () =>
-      import('./features/perfil/perfil.component').then((m) => m.PerfilComponent),
-    canActivate: [authGuard],
-  },
-  {
-    path: 'inventario',
-    loadComponent: () =>
-      import('./features/inventario/inventario.component').then((m) => m.InventarioComponent),
-    canActivate: [inventarioGuard],
-  },
-  {
-    path: 'admin',
-    loadComponent: () =>
-      import('./features/admin/admin.component').then((m) => m.AdminComponent),
-    canActivate: [adminGuard],
+    children: [
+      {
+        path: 'catalogo',
+        canActivate: [catalogoGuard],
+        loadComponent: () =>
+          import('./features/catalogo/catalogo.component').then((m) => m.CatalogoComponent),
+      },
+      {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./features/perfil/perfil.component').then((m) => m.PerfilComponent),
+      },
+      {
+        path: 'inventario',
+        canActivate: [inventarioGuard],
+        loadComponent: () =>
+          import('./features/inventario/inventario.component').then((m) => m.InventarioComponent),
+      },
+      {
+        path: 'admin',
+        canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./features/admin/admin.component').then((m) => m.AdminComponent),
+      },
+    ],
   },
   { path: '**', redirectTo: '' },
 ];

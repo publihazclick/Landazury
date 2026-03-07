@@ -46,6 +46,11 @@ body {
   scrollbar-width: none;
 }
 
+@keyframes bgDrift {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-12%); }
+}
+
 .glass-card {
   background: rgba(18, 17, 13, 0.75);
   backdrop-filter: blur(20px);
@@ -61,6 +66,23 @@ body {
 
 .input-glow:focus-within {
   box-shadow: 0 0 15px rgba(224, 172, 41, 0.15);
+}
+
+.glass {
+  background: rgba(38, 33, 22, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(224, 172, 41, 0.1);
+}
+
+.drag-area {
+  border: 2px dashed #3d3524;
+  transition: all 0.3s ease;
+}
+
+.drag-area:hover {
+  border-color: #e0ac29;
+  background: rgba(224, 172, 41, 0.05);
 }
 
 .line-clamp-2 {

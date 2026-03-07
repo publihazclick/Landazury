@@ -1,0 +1,156 @@
+<!-- Backdrop -->
+<div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+     data-backdrop="1" (click)="onBackdrop($event)">
+  <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+
+  <!-- Modal panel -->
+  <div class="relative z-10 bg-[#1a160f] border border-[#3d3524] rounded-t-3xl sm:rounded-3xl w-full sm:max-w-2xl max-h-[92dvh] flex flex-col overflow-hidden shadow-2xl">
+
+    <!-- Header con imagen -->
+    <div class="relative h-56 sm:h-72 shrink-0 overflow-hidden">
+      @if (producto.imagenes.length) {
+        <img [src]="producto.imagenes[imagenActiva()]" [alt]="producto.nombre"
+             class="w-full h-full object-cover"/>
+      } @else {
+        <div class="w-full h-full bg-gradient-to-br from-[#2a2116] to-[#1a160f] flex items-center justify-center">
+          <span class="text-8xl font-black text-primary/10">{{ producto.nombre.charAt(0) }}</span>
+        </div>
+      }
+      <div class="absolute inset-0 bg-gradient-to-t from-[#1a160f] via-[#1a160f]/30 to-transparent"></div>
+
+      <!-- Miniaturas si hay varias imágenes -->
+      @if (producto.imagenes.length > 1) {
+        <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 px-4">
+          @for (img of producto.imagenes; track $index) {
+            <button (click)="imagenActiva.set($index)"
+                    class="w-10 h-10 rounded-lg overflow-hidden border-2 transition-all"
+                    [class]="imagenActiva() === $index ? 'border-primary' : 'border-white/20 opacity-60'">
+              <img [src]="img" class="w-full h-full object-cover"/>
+            </button>
+          }
+        </div>
+      }
+
+      <!-- Badges -->
+      <div class="absolute top-3 left-3 flex gap-2">
+        @if (producto.ganador) {
+          <span class="flex items-center gap-1 bg-primary text-[#0f0f0f] px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+            <span class="material-symbols-outlined text-[12px]">verified</span> Ganador
+          </span>
+        }
+        @if (producto.exclusivo) {
+          <span class="flex items-center gap-1 bg-purple-500/90 text-white px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+            <span class="material-symbols-outlined text-[12px]">diamond</span> Exclusivo
+          </span>
+        }
+      </div>
+
+      <!-- Cerrar -->
+      <button (click)="cerrar.emit()"
+              class="absolute top-3 right-3 w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-black/80 transition-all">
+        <span class="material-symbols-outlined text-lg">close</span>
+      </button>
+    </div>
+
+    <!-- Contenido scrolleable -->
+    <div class="overflow-y-auto flex-1 p-5 sm:p-6 space-y-5">
+
+      <!-- Nombre + categoria -->
+      <div>
+        @if (producto.categoria) {
+          <p class="text-[10px] font-bold uppercase tracking-widest text-primary/70 mb-1">
+            {{ producto.categoria.icono }} {{ producto.categoria.nombre }}
+          </p>
+        }
+        <h2 class="text-xl sm:text-2xl font-black text-slate-100 leading-tight">{{ producto.nombre }}</h2>
+        @if (producto.descripcion) {
+          <p class="text-slate-400 text-sm mt-2 leading-relaxed">{{ producto.descripcion }}</p>
+        }
+      </div>
+
+      <!-- Precios + margen -->
+      <div class="flex items-center gap-4 p-4 bg-white/4 border border-white/8 rounded-2xl">
+        <div>
+          <p class="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-0.5">Precio base</p>
+          <p class="text-lg font-black text-slate-200">{{ producto.precio_base | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
+        </div>
+        @if (producto.precio_sugerido) {
+          <span class="material-symbols-outlined text-slate-700">arrow_forward</span>
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-0.5">Precio sugerido</p>
+            <p class="text-lg font-black text-primary">{{ producto.precio_sugerido | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
+          </div>
+          @if (margen > 0) {
+            <div class="ml-auto text-center">
+              <p class="text-[10px] font-bold uppercase tracking-widest text-green-600 mb-0.5">Margen</p>
+              <p class="text-lg font-black text-green-400">+{{ margen }}%</p>
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Creativos -->
+      @if ((producto.creativos?.length ?? 0) > 0) {
+        <div>
+          <div class="flex items-center gap-2 mb-3">
+            <span class="material-symbols-outlined text-primary text-lg">photo_library</span>
+            <h3 class="text-sm font-bold text-slate-300 uppercase tracking-widest">
+              Creativos ({{ producto.creativos!.length }})
+            </h3>
+          </div>
+          <div class="space-y-2">
+            @for (creativo of producto.creativos!; track creativo.id) {
+              <div class="flex items-center gap-3 p-3 bg-white/4 border border-white/8 rounded-xl group hover:border-primary/30 transition-all">
+                <!-- Icono tipo -->
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border"
+                     [class]="chipClass(creativo.tipo)">
+                  <span class="material-symbols-outlined text-[18px]">{{ iconoMaterial(creativo.tipo) }}</span>
+                </div>
+                <!-- Info -->
+                <div class="flex-1 min-w-0">
+                  <p class="text-slate-200 text-sm font-semibold truncate">{{ creativo.nombre }}</p>
+                  <p class="text-slate-500 text-[11px]">
+                    {{ creativo.tipo | titlecase }}
+                    @if (creativo.tamano) { · {{ tamano(creativo.tamano) }} }
+                    @if (creativo.extension) { · {{ creativo.extension.toUpperCase() }} }
+                  </p>
+                </div>
+                <!-- Descargar -->
+                <button (click)="descargar(creativo)"
+                        [disabled]="estaDescargando(creativo.id)"
+                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0"
+                        [class]="estaDescargando(creativo.id)
+                          ? 'bg-primary/20 text-primary/50 cursor-wait'
+                          : 'bg-primary/10 border border-primary/20 text-primary hover:bg-primary/25'">
+                  @if (estaDescargando(creativo.id)) {
+                    <svg class="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                  } @else {
+                    <span class="material-symbols-outlined text-[14px]">download</span>
+                  }
+                  Descargar
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="flex flex-col items-center gap-2 py-8 text-center border border-white/8 rounded-2xl">
+          <span class="material-symbols-outlined text-4xl text-slate-700">cloud_upload</span>
+          <p class="text-slate-500 text-sm">Aún no hay creativos para este producto.</p>
+        </div>
+      }
+
+      <!-- Proveedor -->
+      @if (producto.proveedor) {
+        <div class="flex items-center gap-2 text-slate-600 text-xs border-t border-white/5 pt-4">
+          <span class="material-symbols-outlined text-[15px]">warehouse</span>
+          Proveedor: <span class="text-slate-400">{{ producto.proveedor }}</span>
+        </div>
+      }
+
+    </div>
+  </div>
+</div>

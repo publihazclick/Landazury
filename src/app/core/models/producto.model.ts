@@ -33,6 +33,8 @@ export interface Producto {
   categoria?: Categoria;
   proveedor?: string;
   disponible: boolean;
+  ganador: boolean;   // requiere migración SQL: ALTER TABLE productos ADD COLUMN ganador BOOLEAN DEFAULT false
+  exclusivo: boolean; // requiere migración SQL: ALTER TABLE productos ADD COLUMN exclusivo BOOLEAN DEFAULT false
   creado_en: string;
   creativos?: Creativo[];
 }

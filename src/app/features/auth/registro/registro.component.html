@@ -34,11 +34,28 @@
         </div>
       } @else {
 
+        <!-- Email ya registrado -->
+        @if (emailExiste()) {
+          <div class="mb-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl text-sm text-amber-300 flex gap-3">
+            <span class="material-symbols-outlined text-lg shrink-0 mt-0.5">person_check</span>
+            <div>
+              <p class="font-bold mb-0.5">Correo ya registrado</p>
+              <p class="text-amber-300/70 text-xs leading-relaxed">
+                Este correo ya tiene una cuenta.
+                <a routerLink="/auth/login" class="underline underline-offset-2 font-bold hover:text-amber-200 transition-colors">Inicia sesión aquí</a>.
+              </p>
+            </div>
+          </div>
+        }
+
         <!-- Error global -->
         @if (error()) {
-          <div class="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400 flex items-center gap-2">
-            <span class="material-symbols-outlined text-base shrink-0">error</span>
-            {{ error() }}
+          <div class="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400 flex items-start gap-3">
+            <span class="material-symbols-outlined text-lg shrink-0 mt-0.5">error</span>
+            <p class="flex-1 leading-relaxed">{{ error() }}</p>
+            <button type="button" (click)="cerrarError()" class="text-red-400/60 hover:text-red-400 transition-colors shrink-0">
+              <span class="material-symbols-outlined text-base">close</span>
+            </button>
           </div>
         }
 
@@ -93,6 +110,56 @@
               }
             </div>
 
+            <!-- Teléfono -->
+            <div class="space-y-2">
+              <label class="text-[11px] uppercase tracking-widest font-bold text-white/40 ml-1">Teléfono</label>
+              <div class="relative group input-glow rounded-xl">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors text-xl">phone</span>
+                <input formControlName="telefono" type="tel" placeholder="+57 300 000 000"
+                       class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-white/20 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-300"
+                       [class.border-red-500/50]="form.get('telefono')?.invalid && form.get('telefono')?.touched"/>
+              </div>
+              @if (form.get('telefono')?.invalid && form.get('telefono')?.touched) {
+                <p class="text-xs text-red-400 ml-1">Ingresa tu teléfono.</p>
+              }
+            </div>
+
+            <!-- Plataforma -->
+            <div class="space-y-2">
+              <label class="text-[11px] uppercase tracking-widest font-bold text-white/40 ml-1">Plataforma</label>
+              <div class="relative group input-glow rounded-xl">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors text-xl">storefront</span>
+                <select formControlName="plataforma"
+                        class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-300 appearance-none"
+                        [class.border-red-500/50]="form.get('plataforma')?.invalid && form.get('plataforma')?.touched">
+                  <option value="" style="background:#1A1A1A" disabled>Selecciona tu plataforma</option>
+                  <optgroup label="── Dropshipping" style="background:#1A1A1A; color:#D4AF37">
+                    <option style="background:#1A1A1A" value="Dropi">Dropi</option>
+                    <option style="background:#1A1A1A" value="DSers">DSers</option>
+                    <option style="background:#1A1A1A" value="AutoDS">AutoDS</option>
+                    <option style="background:#1A1A1A" value="Zendrop">Zendrop</option>
+                    <option style="background:#1A1A1A" value="CJdropshipping">CJdropshipping</option>
+                  </optgroup>
+                  <optgroup label="── E-commerce" style="background:#1A1A1A; color:#D4AF37">
+                    <option style="background:#1A1A1A" value="Shopify">Shopify</option>
+                    <option style="background:#1A1A1A" value="WooCommerce">WooCommerce</option>
+                    <option style="background:#1A1A1A" value="Wix eCommerce">Wix eCommerce</option>
+                    <option style="background:#1A1A1A" value="BigCommerce">BigCommerce</option>
+                  </optgroup>
+                  <optgroup label="── Marketplaces" style="background:#1A1A1A; color:#D4AF37">
+                    <option style="background:#1A1A1A" value="Amazon">Amazon</option>
+                    <option style="background:#1A1A1A" value="MercadoLibre">MercadoLibre</option>
+                    <option style="background:#1A1A1A" value="TikTok Shop">TikTok Shop</option>
+                    <option style="background:#1A1A1A" value="Instagram Shopping">Instagram Shopping</option>
+                  </optgroup>
+                  <option style="background:#1A1A1A" value="Otra">Otra</option>
+                </select>
+              </div>
+              @if (form.get('plataforma')?.invalid && form.get('plataforma')?.touched) {
+                <p class="text-xs text-red-400 ml-1">Selecciona tu plataforma.</p>
+              }
+            </div>
+
             <!-- Contraseña -->
             <div class="space-y-2">
               <label class="text-[11px] uppercase tracking-widest font-bold text-white/40 ml-1">Contraseña</label>
@@ -109,6 +176,20 @@
               </div>
               @if (form.get('contrasena')?.invalid && form.get('contrasena')?.touched) {
                 <p class="text-xs text-red-400 ml-1">Mínimo 6 caracteres.</p>
+              }
+              @if ((form.get('contrasena')?.value ?? '').length > 0) {
+                <div class="flex gap-1 mt-1">
+                  @for (i of [1,2,3,4]; track i) {
+                    <div class="h-1 flex-1 rounded-full transition-colors duration-300"
+                         [class]="i <= fuerzaContrasena.nivel ? fuerzaContrasena.color : 'bg-white/10'"></div>
+                  }
+                </div>
+                @if (fuerzaContrasena.label) {
+                  <p class="text-[10px] ml-1 mt-0.5 transition-colors"
+                     [class]="fuerzaContrasena.nivel <= 1 ? 'text-red-400' : fuerzaContrasena.nivel === 2 ? 'text-amber-400' : 'text-emerald-400'">
+                    Contraseña {{ fuerzaContrasena.label }}
+                  </p>
+                }
               }
             </div>
           </div>

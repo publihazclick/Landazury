@@ -8,6 +8,10 @@ export class CatalogoService {
   private readonly supabase = inject(SupabaseService);
   private readonly auth = inject(AuthService);
 
+  private normalizar(data: any[]): Producto[] {
+    return data.map(p => ({ ganador: false, exclusivo: false, ...p }));
+  }
+
   async obtenerProductos(filtros?: { categoriaId?: string; busqueda?: string }) {
     let query = this.supabase.cliente
       .from('productos')
@@ -20,14 +24,14 @@ export class CatalogoService {
 
     const { data, error } = await query;
     if (error) throw error;
-    return data as Producto[];
+    return this.normalizar(data);
   }
 
-  // Inventario/admin: obtiene todos incluso no disponibles
+  // Inventario/admin: obtiene todos incluso no disponibles, con creativos
   async obtenerTodosProductos(filtros?: { categoriaId?: string; busqueda?: string }) {
     let query = this.supabase.cliente
       .from('productos')
-      .select('*, categoria:categorias(*)')
+      .select('*, categoria:categorias(*), creativos(*)')
       .order('creado_en', { ascending: false });
 
     if (filtros?.categoriaId) query = query.eq('categoria_id', filtros.categoriaId);
@@ -35,7 +39,7 @@ export class CatalogoService {
 
     const { data, error } = await query;
     if (error) throw error;
-    return data as Producto[];
+    return this.normalizar(data);
   }
 
   async obtenerProducto(id: string) {
@@ -45,7 +49,7 @@ export class CatalogoService {
       .eq('id', id)
       .single();
     if (error) throw error;
-    return data as Producto;
+    return this.normalizar([data])[0];
   }
 
   async crearProducto(producto: Omit<Producto, 'id' | 'creado_en' | 'categoria' | 'creativos'>) {
@@ -75,6 +79,40 @@ export class CatalogoService {
       .order('nombre');
     if (error) throw error;
     return data as Categoria[];
+  }
+
+  async obtenerGanadores() {
+    const { data, error } = await this.supabase.cliente
+      .from('productos')
+      .select('*, categoria:categorias(*)')
+      .eq('ganador', true)
+      .eq('disponible', true)
+      .order('creado_en', { ascending: false })
+      .limit(4);
+    if (error) return []; // columna aún no existe → fallback vacío
+    return this.normalizar(data);
+  }
+
+  async obtenerExclusivos() {
+    const { data, error } = await this.supabase.cliente
+      .from('productos')
+      .select('*, categoria:categorias(*)')
+      .eq('exclusivo', true)
+      .eq('disponible', true)
+      .order('creado_en', { ascending: false })
+      .limit(12);
+    if (error) return []; // columna aún no existe → fallback vacío
+    return this.normalizar(data);
+  }
+
+  async toggleGanador(id: string, valor: boolean) {
+    const { error } = await this.supabase.cliente.from('productos').update({ ganador: valor }).eq('id', id);
+    if (error) throw error;
+  }
+
+  async toggleExclusivo(id: string, valor: boolean) {
+    const { error } = await this.supabase.cliente.from('productos').update({ exclusivo: valor }).eq('id', id);
+    if (error) throw error;
   }
 
   async obtenerFavoritos() {
