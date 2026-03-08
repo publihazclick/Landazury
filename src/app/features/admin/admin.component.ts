@@ -89,8 +89,11 @@ export class AdminComponent implements OnInit {
   readonly productoRevisando = signal<Producto | null>(null);
   readonly guardandoRevision = signal(false);
   readonly confirmandoEliminarProducto = signal<Producto | null>(null);
+  readonly editandoPreciosId = signal<string | null>(null);
+  readonly guardandoPrecios = signal(false);
   busquedaProductos = '';
   formRevision: FormRevision = { precio_base: 0, precio_sugerido: 0 };
+  precioFinalInput = 0;
 
   readonly chipsFiltroEstado = computed(() => [
     { valor: 'todos' as const,      etiqueta: 'Todos',     count: this.productos().length,                                       color: 'text-slate-300 border-slate-600',        colorActivo: 'bg-slate-600 text-white border-slate-500' },
@@ -287,6 +290,38 @@ export class AdminComponent implements OnInit {
     } catch {
       this.error.set('No se pudo rechazar el producto.');
     }
+  }
+
+  abrirEditorPrecios(producto: Producto, event: Event) {
+    event.stopPropagation();
+    this.precioFinalInput = producto.precio_sugerido ?? Math.ceil(producto.precio_base * 1.5);
+    this.editandoPreciosId.set(producto.id);
+  }
+
+  cerrarEditorPrecios() { this.editandoPreciosId.set(null); }
+
+  async guardarPrecioFinal(producto: Producto) {
+    const precio = Number(this.precioFinalInput);
+    if (!precio || precio <= 0) return;
+    this.guardandoPrecios.set(true);
+    try {
+      await this.catalogoService.actualizarProducto(producto.id, { precio_sugerido: precio });
+      this.productos.update(list => list.map(p =>
+        p.id === producto.id ? { ...p, precio_sugerido: precio } : p
+      ));
+      this.exito.set('Precio actualizado correctamente.');
+      setTimeout(() => this.exito.set(null), 2500);
+      this.editandoPreciosId.set(null);
+    } catch {
+      this.error.set('No se pudo guardar el precio.');
+    } finally {
+      this.guardandoPrecios.set(false);
+    }
+  }
+
+  ganancia(producto: Producto, precioOverride?: number): number {
+    const venta = precioOverride ?? producto.precio_sugerido ?? 0;
+    return venta - producto.precio_base;
   }
 
   async toggleGanador(producto: Producto, event: Event) {

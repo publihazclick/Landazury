@@ -319,25 +319,106 @@
                   }
                 </div>
 
-                <!-- Precios -->
-                <div class="flex items-center gap-4">
-                  <div>
-                    <p class="text-[9px] font-bold uppercase tracking-widest text-slate-600">Costo</p>
-                    <p class="text-sm font-bold text-slate-200">$ {{ producto.precio_base | number:'1.0-0' }}</p>
-                  </div>
-                  @if (producto.precio_sugerido) {
-                    <span class="material-symbols-outlined text-slate-700 text-sm">arrow_forward</span>
+                <!-- ── Sección de precios ── -->
+                @if (editandoPreciosId() === producto.id) {
+                  <!-- Editor de precio final -->
+                  <div class="bg-neutral-charcoal border border-primary/20 rounded-xl p-3 space-y-3">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-primary">Ajustar Precio Final</p>
+
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="text-slate-500">Costo bodega</span>
+                      <span class="font-semibold text-slate-300">$ {{ producto.precio_base | number:'1.0-0' }}</span>
+                    </div>
+
                     <div>
-                      <p class="text-[9px] font-bold uppercase tracking-widest text-slate-600">Venta</p>
-                      <p class="text-sm font-bold text-primary">$ {{ producto.precio_sugerido | number:'1.0-0' }}</p>
+                      <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500 block mb-1">Precio final usuario (COP)</label>
+                      <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-bold">$</span>
+                        <input [(ngModel)]="precioFinalInput" type="number" min="0" step="1000"
+                               class="w-full bg-[#0a0a08] border border-primary/30 text-primary font-bold text-sm rounded-lg pl-7 pr-3 py-2 outline-none focus:border-primary transition-all"/>
+                      </div>
                     </div>
-                    <div class="ml-auto">
-                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
-                        +{{ margen(producto) }}%
-                      </span>
+
+                    @if (precioFinalInput > producto.precio_base) {
+                      <div class="grid grid-cols-2 gap-2">
+                        <div class="bg-green-500/10 border border-green-500/20 rounded-lg p-2 text-center">
+                          <p class="text-[9px] font-bold uppercase tracking-widest text-green-600">Ganancia</p>
+                          <p class="text-sm font-black text-green-400">$ {{ (precioFinalInput - producto.precio_base) | number:'1.0-0' }}</p>
+                        </div>
+                        <div class="bg-primary/10 border border-primary/20 rounded-lg p-2 text-center">
+                          <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500">Margen</p>
+                          <p class="text-sm font-black text-primary">{{ ((precioFinalInput - producto.precio_base) / producto.precio_base * 100) | number:'1.0-0' }}%</p>
+                        </div>
+                      </div>
+                    } @else if (precioFinalInput > 0 && precioFinalInput <= producto.precio_base) {
+                      <p class="text-[11px] text-red-400 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">warning</span>
+                        El precio debe ser mayor al costo
+                      </p>
+                    }
+
+                    <div class="flex gap-2 pt-1">
+                      <button (click)="cerrarEditorPrecios()"
+                              class="flex-1 py-1.5 rounded-lg text-xs text-slate-400 border border-neutral-border hover:bg-white/5 transition-all">
+                        Cancelar
+                      </button>
+                      <button (click)="guardarPrecioFinal(producto)"
+                              [disabled]="guardandoPrecios() || precioFinalInput <= producto.precio_base"
+                              class="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-xs font-bold bg-primary text-[#0a0a08] hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                        @if (guardandoPrecios()) {
+                          <span class="w-3 h-3 border-2 border-[#0a0a08]/30 border-t-[#0a0a08] rounded-full animate-spin"></span>
+                        } @else {
+                          <span class="material-symbols-outlined text-sm">save</span>
+                        }
+                        Guardar
+                      </button>
                     </div>
-                  }
-                </div>
+                  </div>
+                } @else {
+                  <!-- Vista de precios + botón editar -->
+                  <div class="bg-neutral-charcoal/50 rounded-xl p-3 space-y-2">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-3">
+                        <div>
+                          <p class="text-[9px] font-bold uppercase tracking-widest text-slate-600">Costo bodega</p>
+                          <p class="text-sm font-bold text-slate-300">$ {{ producto.precio_base | number:'1.0-0' }}</p>
+                        </div>
+                        <span class="material-symbols-outlined text-slate-700 text-base">arrow_forward</span>
+                        <div>
+                          <p class="text-[9px] font-bold uppercase tracking-widest text-slate-600">Precio usuario</p>
+                          @if (producto.precio_sugerido) {
+                            <p class="text-sm font-black text-primary">$ {{ producto.precio_sugerido | number:'1.0-0' }}</p>
+                          } @else {
+                            <p class="text-sm font-bold text-amber-400 italic">Sin definir</p>
+                          }
+                        </div>
+                      </div>
+                      <button (click)="abrirEditorPrecios(producto, $event)"
+                              class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 hover:text-primary hover:bg-primary/10 border border-transparent hover:border-primary/20 transition-all shrink-0"
+                              title="Ajustar precio">
+                        <span class="material-symbols-outlined text-sm">edit</span>
+                      </button>
+                    </div>
+
+                    @if (producto.precio_sugerido && producto.precio_sugerido > producto.precio_base) {
+                      <div class="flex items-center gap-2 pt-1 border-t border-neutral-border/50">
+                        <div class="flex-1 flex items-center gap-1.5 text-xs text-green-400">
+                          <span class="material-symbols-outlined text-sm">trending_up</span>
+                          <span class="font-bold">+ $ {{ ganancia(producto) | number:'1.0-0' }}</span>
+                          <span class="text-slate-600">ganancia</span>
+                        </div>
+                        <span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                          {{ margen(producto) }}%
+                        </span>
+                      </div>
+                    } @else {
+                      <p class="text-[11px] text-amber-500/70 flex items-center gap-1 pt-1 border-t border-neutral-border/50">
+                        <span class="material-symbols-outlined text-sm">info</span>
+                        Define el precio para calcular la ganancia
+                      </p>
+                    }
+                  </div>
+                }
 
                 <!-- Métricas -->
                 <div class="flex items-center gap-3 text-[11px] text-slate-500">
