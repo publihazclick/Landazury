@@ -22,6 +22,25 @@ export class HomeComponent implements OnInit {
   readonly cargando = signal(false);
   readonly exclusivos = signal<Producto[]>([]);
   readonly ganadores = signal<Producto[]>([]);
+  readonly plataformaOtra = signal('');
+  readonly plataformaOtraError = signal(false);
+
+  readonly indicativosPais: Record<string, string> = {
+    'México': '+52', 'Colombia': '+57', 'Argentina': '+54',
+    'Chile': '+56', 'Perú': '+51', 'Venezuela': '+58',
+    'Ecuador': '+593', 'Bolivia': '+591', 'Paraguay': '+595',
+    'Uruguay': '+598', 'Guatemala': '+502', 'Honduras': '+504',
+    'El Salvador': '+503', 'Nicaragua': '+505', 'Costa Rica': '+506',
+    'Panamá': '+507', 'Cuba': '+53', 'República Dominicana': '+1',
+  };
+
+  get indicativoActual(): string {
+    return this.indicativosPais[this.form.get('pais')?.value ?? ''] ?? '';
+  }
+
+  get plataformaEsOtra(): boolean {
+    return this.form.get('plataforma')?.value === 'Otra';
+  }
 
   async ngOnInit() {
     this.seo.setPage({
@@ -106,6 +125,14 @@ export class HomeComponent implements OnInit {
 
   async onSubmit() {
     this.form.markAllAsTouched();
+
+    if (this.plataformaEsOtra && !this.plataformaOtra().trim()) {
+      this.plataformaOtraError.set(true);
+      if (this.form.invalid || this.cargando()) return;
+      return;
+    }
+    this.plataformaOtraError.set(false);
+
     if (this.form.invalid || this.cargando()) return;
 
     this.cargando.set(true);
@@ -113,11 +140,18 @@ export class HomeComponent implements OnInit {
     this.emailExiste.set(false);
     const { nombre, email, pais, telefono, plataforma, contrasena } = this.form.value;
 
+    const whatsapp = telefono
+      ? (this.indicativoActual ? `${this.indicativoActual} ${telefono}` : telefono)
+      : undefined;
+    const plataformaFinal = this.plataformaEsOtra
+      ? (this.plataformaOtra().trim() || undefined)
+      : (plataforma ?? undefined);
+
     try {
       const data = await this.auth.registrar(email!, contrasena!, nombre!, {
         pais: pais ?? undefined,
-        telefono: telefono ?? undefined,
-        plataforma: plataforma ?? undefined,
+        telefono: whatsapp,
+        plataforma: plataformaFinal,
       });
 
       if (data.session) {

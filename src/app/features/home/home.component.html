@@ -56,10 +56,12 @@
       <!-- Título -->
       <div class="text-center mb-4 md:mb-7">
         <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold leading-tight mb-2 text-white tracking-tight">
-          Domina el arte del <span class="text-primary">Dropshipping</span> con mentoría experta
+          Accede al catálogo de los productos más ganadores y con mayor margen,
+          <span class="text-primary">escala tu negocio hoy mismo.</span>
         </h1>
-        <p class="text-white/60 text-sm md:text-base font-light leading-relaxed">
-          Accede al catálogo de productos con mayor margen y escala tu negocio hoy mismo.
+        <p class="text-primary/80 text-xs sm:text-sm font-medium leading-relaxed mt-2">
+          Estamos disponibles como proveedor en todas las plataformas de dropshipping,
+          <span class="text-primary font-bold">ve a buscarnos.</span>
         </p>
       </div>
 
@@ -154,22 +156,35 @@
               }
             </div>
 
-            <!-- Teléfono -->
+            <!-- WhatsApp con indicativo automático -->
             <div class="space-y-1">
-              <label for="reg-telefono" class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">Teléfono</label>
-              <input id="reg-telefono" formControlName="telefono" type="tel" placeholder="+57 300 000 000"
-                     autocomplete="tel"
-                     class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white text-sm placeholder:text-white/20 focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none"
-                     [class.border-red-500]="form.get('telefono')?.invalid && form.get('telefono')?.touched"
-                     [attr.aria-invalid]="form.get('telefono')?.invalid && form.get('telefono')?.touched ? 'true' : null"/>
+              <label for="reg-telefono" class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[11px] text-green-400">chat</span>
+                WhatsApp
+              </label>
+              <div class="flex rounded-xl overflow-hidden border transition-all"
+                   [class]="form.get('telefono')?.invalid && form.get('telefono')?.touched ? 'border-red-500' : 'border-white/10 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary'">
+                <!-- Indicativo de país -->
+                <span class="flex items-center px-3 bg-white/8 border-r border-white/10 text-primary text-sm font-bold whitespace-nowrap min-w-[52px] justify-center select-none">
+                  {{ indicativoActual || '🌎' }}
+                </span>
+                <input id="reg-telefono" formControlName="telefono" type="tel"
+                       [placeholder]="indicativoActual ? '300 000 0000' : 'Ej: 300 000 0000'"
+                       autocomplete="tel-national"
+                       class="flex-1 bg-white/5 py-3 px-3 text-white text-sm placeholder:text-white/20 outline-none"
+                       [attr.aria-invalid]="form.get('telefono')?.invalid && form.get('telefono')?.touched ? 'true' : null"/>
+              </div>
               @if (form.get('telefono')?.invalid && form.get('telefono')?.touched) {
-                <p class="text-[10px] text-red-400 ml-1" role="alert">Ingresa tu teléfono.</p>
+                <p class="text-[10px] text-red-400 ml-1" role="alert">Ingresa tu WhatsApp.</p>
+              }
+              @if (indicativoActual) {
+                <p class="text-[10px] text-white/30 ml-1">Indicativo {{ indicativoActual }} detectado automáticamente</p>
               }
             </div>
 
             <!-- Plataforma -->
             <div class="space-y-1">
-              <label for="reg-plataforma" class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">Plataforma</label>
+              <label for="reg-plataforma" class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">¿Qué plataforma usas?</label>
               <select id="reg-plataforma" formControlName="plataforma"
                       class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white text-sm focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none"
                       [class.border-red-500]="form.get('plataforma')?.invalid && form.get('plataforma')?.touched"
@@ -194,10 +209,24 @@
                   <option style="background:#1A1A1A" value="TikTok Shop">TikTok Shop</option>
                   <option style="background:#1A1A1A" value="Instagram Shopping">Instagram Shopping</option>
                 </optgroup>
-                <option style="background:#1A1A1A" value="Otra">Otra</option>
+                <option style="background:#1A1A1A" value="Otra">Otra (escribe aquí)</option>
               </select>
               @if (form.get('plataforma')?.invalid && form.get('plataforma')?.touched) {
-                <p class="text-[10px] text-red-400 ml-1">Selecciona tu plataforma.</p>
+                <p class="text-[10px] text-red-400 ml-1" role="alert">Selecciona tu plataforma.</p>
+              }
+              <!-- Campo libre cuando elige "Otra" -->
+              @if (plataformaEsOtra) {
+                <div class="mt-1.5">
+                  <input type="text" placeholder="Escribe tu plataforma..."
+                         [value]="plataformaOtra()"
+                         (input)="plataformaOtra.set($any($event.target).value); plataformaOtraError.set(false)"
+                         class="w-full bg-white/5 border rounded-xl py-2.5 px-4 text-white text-sm placeholder:text-white/20 outline-none transition-all"
+                         [class]="plataformaOtraError() ? 'border-red-500 focus:ring-1 focus:ring-red-500' : 'border-primary/40 focus:ring-1 focus:ring-primary focus:border-primary'"
+                         aria-label="Escribe el nombre de tu plataforma"/>
+                  @if (plataformaOtraError()) {
+                    <p class="text-[10px] text-red-400 ml-1 mt-0.5" role="alert">Escribe el nombre de tu plataforma.</p>
+                  }
+                </div>
               }
             </div>
 
