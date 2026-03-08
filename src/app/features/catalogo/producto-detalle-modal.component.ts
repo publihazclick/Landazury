@@ -18,9 +18,9 @@ export class ProductoDetalleModalComponent {
   readonly imagenActiva = signal(0);
 
   get margen(): number {
-    const { precio_base, precio_sugerido } = this.producto;
-    if (!precio_sugerido || precio_base === 0) return 0;
-    return Math.round(((precio_sugerido - precio_base) / precio_base) * 100);
+    const { precio_base, precio_final } = this.producto;
+    if (!precio_final || precio_base === 0) return 0;
+    return Math.round(((precio_final - precio_base) / precio_base) * 100);
   }
 
   iconoMaterial(tipo: TipoCreativo): string {

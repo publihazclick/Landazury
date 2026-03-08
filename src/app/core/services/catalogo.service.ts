@@ -82,10 +82,10 @@ export class CatalogoService {
 
   // ── Flujo de aprobación ─────────────────────────────────────────────────────
 
-  async aprobarProducto(id: string, precios?: { precio_base?: number; precio_sugerido?: number }) {
+  async aprobarProducto(id: string, precios?: { precio_base?: number; precio_final?: number }) {
     const cambios: any = { estado: 'aprobado', disponible: true };
     if (precios?.precio_base) cambios.precio_base = precios.precio_base;
-    if (precios?.precio_sugerido) cambios.precio_sugerido = precios.precio_sugerido;
+    if (precios?.precio_final) cambios.precio_final = precios.precio_final;
     const { error } = await this.supabase.cliente.from('productos').update(cambios).eq('id', id);
     if (error) throw error;
   }

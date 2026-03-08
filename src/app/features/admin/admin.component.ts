@@ -16,7 +16,7 @@ interface FormEdicion {
 
 interface FormRevision {
   precio_base: number;
-  precio_sugerido: number;
+  precio_final: number;
 }
 
 @Component({
@@ -92,7 +92,7 @@ export class AdminComponent implements OnInit {
   readonly editandoPreciosId = signal<string | null>(null);
   readonly guardandoPrecios = signal(false);
   busquedaProductos = '';
-  formRevision: FormRevision = { precio_base: 0, precio_sugerido: 0 };
+  formRevision: FormRevision = { precio_base: 0, precio_final: 0 };
   precioFinalInput = 0;
 
   readonly chipsFiltroEstado = computed(() => [
@@ -245,7 +245,7 @@ export class AdminComponent implements OnInit {
   abrirRevision(producto: Producto) {
     this.formRevision = {
       precio_base: producto.precio_base,
-      precio_sugerido: producto.precio_sugerido ?? 0,
+      precio_final: producto.precio_final ?? 0,
     };
     this.productoRevisando.set(producto);
   }
@@ -259,13 +259,13 @@ export class AdminComponent implements OnInit {
     try {
       await this.catalogoService.aprobarProducto(producto.id, {
         precio_base: Number(this.formRevision.precio_base) || undefined,
-        precio_sugerido: Number(this.formRevision.precio_sugerido) || undefined,
+        precio_final: Number(this.formRevision.precio_final) || undefined,
       });
       this.productos.update(list => list.map(p =>
         p.id === producto.id
           ? { ...p, estado: 'aprobado' as EstadoProducto, disponible: true,
               precio_base: Number(this.formRevision.precio_base) || p.precio_base,
-              precio_sugerido: Number(this.formRevision.precio_sugerido) || p.precio_sugerido }
+              precio_final: Number(this.formRevision.precio_final) || p.precio_final }
           : p
       ));
       this.exito.set(`"${producto.nombre}" aprobado y publicado.`);
@@ -294,7 +294,7 @@ export class AdminComponent implements OnInit {
 
   abrirEditorPrecios(producto: Producto, event: Event) {
     event.stopPropagation();
-    this.precioFinalInput = producto.precio_sugerido ?? Math.ceil(producto.precio_base * 1.5);
+    this.precioFinalInput = producto.precio_final ?? producto.precio_sugerido ?? Math.ceil(producto.precio_base * 1.5);
     this.editandoPreciosId.set(producto.id);
   }
 
@@ -305,9 +305,9 @@ export class AdminComponent implements OnInit {
     if (!precio || precio <= 0) return;
     this.guardandoPrecios.set(true);
     try {
-      await this.catalogoService.actualizarProducto(producto.id, { precio_sugerido: precio });
+      await this.catalogoService.actualizarProducto(producto.id, { precio_final: precio });
       this.productos.update(list => list.map(p =>
-        p.id === producto.id ? { ...p, precio_sugerido: precio } : p
+        p.id === producto.id ? { ...p, precio_final: precio } : p
       ));
       this.exito.set('Precio actualizado correctamente.');
       setTimeout(() => this.exito.set(null), 2500);
@@ -319,9 +319,8 @@ export class AdminComponent implements OnInit {
     }
   }
 
-  ganancia(producto: Producto, precioOverride?: number): number {
-    const venta = precioOverride ?? producto.precio_sugerido ?? 0;
-    return venta - producto.precio_base;
+  ganancia(producto: Producto): number {
+    return (producto.precio_final ?? 0) - producto.precio_base;
   }
 
   async toggleGanador(producto: Producto, event: Event) {
@@ -422,8 +421,8 @@ export class AdminComponent implements OnInit {
   }
 
   margen(producto: Producto): number {
-    if (!producto.precio_sugerido || producto.precio_base === 0) return 0;
-    return Math.round(((producto.precio_sugerido - producto.precio_base) / producto.precio_base) * 100);
+    if (!producto.precio_final || producto.precio_base === 0) return 0;
+    return Math.round(((producto.precio_final - producto.precio_base) / producto.precio_base) * 100);
   }
 
   formatearFecha(fecha: string): string {

@@ -130,6 +130,6 @@ export class CatalogoComponent implements OnInit {
 }
 
 function calcularMargen(producto: Producto): number {
-  if (!producto.precio_sugerido || producto.precio_sugerido === 0) return 0;
-  return Math.round(((producto.precio_sugerido - producto.precio_base) / producto.precio_base) * 100);
+  if (!producto.precio_final || producto.precio_final === 0) return 0;
+  return Math.round(((producto.precio_final - producto.precio_base) / producto.precio_base) * 100);
 }

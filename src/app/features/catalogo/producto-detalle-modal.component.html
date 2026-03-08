@@ -74,11 +74,11 @@
           <p class="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-0.5">Precio base</p>
           <p class="text-lg font-black text-slate-200">{{ producto.precio_base | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
         </div>
-        @if (producto.precio_sugerido) {
+        @if (producto.precio_final) {
           <span class="material-symbols-outlined text-slate-700">arrow_forward</span>
           <div>
-            <p class="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-0.5">Precio sugerido</p>
-            <p class="text-lg font-black text-primary">{{ producto.precio_sugerido | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-0.5">Precio de venta</p>
+            <p class="text-lg font-black text-primary">{{ producto.precio_final | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
           </div>
           @if (margen > 0) {
             <div class="ml-auto text-center">
