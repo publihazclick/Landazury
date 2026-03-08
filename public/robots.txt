@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Rutas privadas (requieren autenticación)
+Disallow: /catalogo
+Disallow: /inventario
+Disallow: /admin
+Disallow: /perfil
+Disallow: /auth/
+
+# Sitemap
+Sitemap: https://landazury.vercel.app/sitemap.xml

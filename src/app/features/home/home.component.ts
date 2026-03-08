@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { CatalogoService } from '../../core/services/catalogo.service';
+import { SeoService } from '../../core/services/seo.service';
 import type { Producto } from '../../core/models/producto.model';
 
 @Component({
@@ -16,12 +17,19 @@ export class HomeComponent implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly catalogoService = inject(CatalogoService);
+  private readonly seo = inject(SeoService);
 
   readonly cargando = signal(false);
   readonly exclusivos = signal<Producto[]>([]);
   readonly ganadores = signal<Producto[]>([]);
 
   async ngOnInit() {
+    this.seo.setPage({
+      title: 'Dropshipping Elite para LATAM',
+      description:
+        'Accede al catálogo de productos exclusivos con alto margen para dropshipping en Latinoamérica. Mentoría experta, tendencias en tiempo real y máxima rentabilidad.',
+      canonical: '/',
+    });
     const [excl, gan] = await Promise.allSettled([
       this.catalogoService.obtenerExclusivos(),
       this.catalogoService.obtenerGanadores(),

@@ -1,5 +1,10 @@
+<!-- Skip navigation -->
+<a href="#contenido-principal" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-[#0F0F0F] focus:font-bold focus:rounded-lg">
+  Saltar al contenido principal
+</a>
+
 <!-- ===================== HERO ===================== -->
-<section class="-mt-20 h-screen min-h-[700px] flex items-center justify-center overflow-hidden bg-background-dark relative">
+<section class="-mt-20 h-screen min-h-[700px] flex items-center justify-center overflow-hidden bg-background-dark relative" aria-label="Registro y acceso a Landazury">
 
   <!-- Background: columnas de productos con drift animation -->
   <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
@@ -45,7 +50,7 @@
   </div>
 
   <!-- Card centrado — scrollable en móvil -->
-  <div class="relative z-10 w-full max-w-2xl px-4 pt-20 pb-4 md:py-0 h-full md:h-auto flex items-center overflow-y-auto md:overflow-visible">
+  <div id="contenido-principal" class="relative z-10 w-full max-w-2xl px-4 pt-20 pb-4 md:py-0 h-full md:h-auto flex items-center overflow-y-auto md:overflow-visible">
     <div class="ultra-glass rounded-2xl md:rounded-[2rem] p-5 sm:p-8 md:p-12 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] w-full my-auto">
 
       <!-- Título -->
@@ -76,87 +81,99 @@
         </div>
       } @else {
 
-        <!-- Email ya registrado -->
-        @if (emailExiste()) {
-          <div class="mb-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-300 flex gap-2">
-            <span class="material-symbols-outlined text-base shrink-0 mt-0.5">person_check</span>
-            <div>
-              <span class="font-bold">Correo ya registrado. </span>
-              <a routerLink="/auth/login" class="underline underline-offset-2 hover:text-amber-200 transition-colors">Inicia sesión aquí</a>.
+        <!-- Mensajes de estado (live region para accesibilidad) -->
+        <div aria-live="polite" aria-atomic="true">
+          <!-- Email ya registrado -->
+          @if (emailExiste()) {
+            <div class="mb-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-300 flex gap-2" role="alert">
+              <span class="material-symbols-outlined text-base shrink-0 mt-0.5" aria-hidden="true">person_check</span>
+              <div>
+                <span class="font-bold">Correo ya registrado. </span>
+                <a routerLink="/auth/login" class="underline underline-offset-2 hover:text-amber-200 transition-colors">Inicia sesión aquí</a>.
+              </div>
             </div>
-          </div>
-        }
+          }
 
-        <!-- Error -->
-        @if (error()) {
-          <div class="mb-3 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-400 flex items-start gap-2">
-            <span class="material-symbols-outlined text-base shrink-0 mt-0.5">error</span>
-            <p class="flex-1 leading-relaxed">{{ error() }}</p>
-            <button type="button" (click)="cerrarError()" class="text-red-400/60 hover:text-red-400 transition-colors shrink-0">
-              <span class="material-symbols-outlined text-sm">close</span>
-            </button>
-          </div>
-        }
+          <!-- Error -->
+          @if (error()) {
+            <div class="mb-3 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-400 flex items-start gap-2" role="alert">
+              <span class="material-symbols-outlined text-base shrink-0 mt-0.5" aria-hidden="true">error</span>
+              <p class="flex-1 leading-relaxed">{{ error() }}</p>
+              <button type="button" (click)="cerrarError()" class="text-red-400/60 hover:text-red-400 transition-colors shrink-0" aria-label="Cerrar mensaje de error">
+                <span class="material-symbols-outlined text-sm" aria-hidden="true">close</span>
+              </button>
+            </div>
+          }
+        </div>
 
         <!-- Formulario -->
-        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-3">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-3" aria-label="Formulario de registro">
           <div class="grid grid-cols-2 gap-3">
 
             <!-- Nombre -->
             <div class="space-y-1">
-              <label class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">Nombre</label>
-              <input formControlName="nombre" type="text" placeholder="Juan García"
+              <label for="reg-nombre" class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">Nombre</label>
+              <input id="reg-nombre" formControlName="nombre" type="text" placeholder="Juan García"
+                     autocomplete="given-name"
                      class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white text-sm placeholder:text-white/20 focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none"
-                     [class.border-red-500]="form.get('nombre')?.invalid && form.get('nombre')?.touched"/>
+                     [class.border-red-500]="form.get('nombre')?.invalid && form.get('nombre')?.touched"
+                     [attr.aria-invalid]="form.get('nombre')?.invalid && form.get('nombre')?.touched ? 'true' : null"/>
               @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
-                <p class="text-[10px] text-red-400 ml-1">Ingresa tu nombre.</p>
+                <p class="text-[10px] text-red-400 ml-1" role="alert">Ingresa tu nombre.</p>
               }
             </div>
 
             <!-- Email -->
             <div class="space-y-1">
-              <label class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">Email</label>
-              <input formControlName="email" type="email" placeholder="tu@correo.com"
+              <label for="reg-email" class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">Email</label>
+              <input id="reg-email" formControlName="email" type="email" placeholder="tu@correo.com"
+                     autocomplete="email"
                      class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white text-sm placeholder:text-white/20 focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none"
-                     [class.border-red-500]="form.get('email')?.invalid && form.get('email')?.touched"/>
+                     [class.border-red-500]="form.get('email')?.invalid && form.get('email')?.touched"
+                     [attr.aria-invalid]="form.get('email')?.invalid && form.get('email')?.touched ? 'true' : null"/>
               @if (form.get('email')?.invalid && form.get('email')?.touched) {
-                <p class="text-[10px] text-red-400 ml-1">Correo válido requerido.</p>
+                <p class="text-[10px] text-red-400 ml-1" role="alert">Correo válido requerido.</p>
               }
             </div>
 
             <!-- País -->
             <div class="space-y-1">
-              <label class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">País</label>
-              <select formControlName="pais"
+              <label for="reg-pais" class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">País</label>
+              <select id="reg-pais" formControlName="pais"
+                      autocomplete="country-name"
                       class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white text-sm focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none appearance-none"
-                      [class.border-red-500]="form.get('pais')?.invalid && form.get('pais')?.touched">
+                      [class.border-red-500]="form.get('pais')?.invalid && form.get('pais')?.touched"
+                      [attr.aria-invalid]="form.get('pais')?.invalid && form.get('pais')?.touched ? 'true' : null">
                 <option value="" style="background:#1A1A1A" disabled>Selecciona</option>
                 @for (pais of paises; track pais) {
                   <option [value]="pais" style="background:#1A1A1A">{{ pais }}</option>
                 }
               </select>
               @if (form.get('pais')?.invalid && form.get('pais')?.touched) {
-                <p class="text-[10px] text-red-400 ml-1">Selecciona tu país.</p>
+                <p class="text-[10px] text-red-400 ml-1" role="alert">Selecciona tu país.</p>
               }
             </div>
 
             <!-- Teléfono -->
             <div class="space-y-1">
-              <label class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">Teléfono</label>
-              <input formControlName="telefono" type="tel" placeholder="+57 300 000 000"
+              <label for="reg-telefono" class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">Teléfono</label>
+              <input id="reg-telefono" formControlName="telefono" type="tel" placeholder="+57 300 000 000"
+                     autocomplete="tel"
                      class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white text-sm placeholder:text-white/20 focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none"
-                     [class.border-red-500]="form.get('telefono')?.invalid && form.get('telefono')?.touched"/>
+                     [class.border-red-500]="form.get('telefono')?.invalid && form.get('telefono')?.touched"
+                     [attr.aria-invalid]="form.get('telefono')?.invalid && form.get('telefono')?.touched ? 'true' : null"/>
               @if (form.get('telefono')?.invalid && form.get('telefono')?.touched) {
-                <p class="text-[10px] text-red-400 ml-1">Ingresa tu teléfono.</p>
+                <p class="text-[10px] text-red-400 ml-1" role="alert">Ingresa tu teléfono.</p>
               }
             </div>
 
             <!-- Plataforma -->
             <div class="space-y-1">
-              <label class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">Plataforma</label>
-              <select formControlName="plataforma"
+              <label for="reg-plataforma" class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">Plataforma</label>
+              <select id="reg-plataforma" formControlName="plataforma"
                       class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white text-sm focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none"
-                      [class.border-red-500]="form.get('plataforma')?.invalid && form.get('plataforma')?.touched">
+                      [class.border-red-500]="form.get('plataforma')?.invalid && form.get('plataforma')?.touched"
+                      [attr.aria-invalid]="form.get('plataforma')?.invalid && form.get('plataforma')?.touched ? 'true' : null">
                 <option value="" style="background:#1A1A1A" disabled>Selecciona</option>
                 <optgroup label="── Dropshipping" style="background:#1A1A1A; color:#D4AF37">
                   <option style="background:#1A1A1A" value="Dropi">Dropi</option>
@@ -186,15 +203,18 @@
 
             <!-- Contraseña -->
             <div class="space-y-1">
-              <label class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">Contraseña</label>
+              <label for="reg-contrasena" class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">Contraseña</label>
               <div class="relative">
-                <input formControlName="contrasena" [type]="mostrarContrasena() ? 'text' : 'password'"
+                <input id="reg-contrasena" formControlName="contrasena" [type]="mostrarContrasena() ? 'text' : 'password'"
                        placeholder="••••••••"
+                       autocomplete="new-password"
                        class="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-4 pr-10 text-white text-sm placeholder:text-white/20 focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none"
-                       [class.border-red-500]="form.get('contrasena')?.invalid && form.get('contrasena')?.touched"/>
+                       [class.border-red-500]="form.get('contrasena')?.invalid && form.get('contrasena')?.touched"
+                       [attr.aria-invalid]="form.get('contrasena')?.invalid && form.get('contrasena')?.touched ? 'true' : null"/>
                 <button type="button" (click)="mostrarContrasena.update(v => !v)"
+                        [attr.aria-label]="mostrarContrasena() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
                         class="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
-                  <span class="material-symbols-outlined text-lg">{{ mostrarContrasena() ? 'visibility_off' : 'visibility' }}</span>
+                  <span class="material-symbols-outlined text-lg" aria-hidden="true">{{ mostrarContrasena() ? 'visibility_off' : 'visibility' }}</span>
                 </button>
               </div>
               @if (form.get('contrasena')?.invalid && form.get('contrasena')?.touched) {
@@ -239,31 +259,33 @@
 </section>
 
 <!-- ===================== SELECCIÓN EXCLUSIVA ===================== -->
-<section class="py-14 md:py-24 bg-background-dark border-y border-primary/10">
+<section class="py-14 md:py-24 bg-background-dark border-y border-primary/10" aria-label="Selección exclusiva de productos">
   <div class="max-w-7xl mx-auto px-4 md:px-6">
     <div class="flex items-end justify-between mb-8 md:mb-16">
       <div class="max-w-xl">
         <h2 class="text-2xl md:text-4xl font-black text-white tracking-tight mb-2 md:mb-4">Selección Exclusiva</h2>
         <p class="text-white/50 text-sm md:text-lg font-light">Tendencias de alta rotación analizadas por nuestro equipo.</p>
       </div>
-      <div class="flex gap-3">
-        <button (click)="scrollCarrusel(-1)"
+      <div class="flex gap-3" role="group" aria-label="Controles del carrusel">
+        <button (click)="scrollCarrusel(-1)" aria-label="Anterior producto"
                 class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full border border-white/10 text-white hover:bg-white/5 active:bg-white/10 transition-all">
-          <span class="material-symbols-outlined text-xl">west</span>
+          <span class="material-symbols-outlined text-xl" aria-hidden="true">west</span>
         </button>
-        <button (click)="scrollCarrusel(1)"
+        <button (click)="scrollCarrusel(1)" aria-label="Siguiente producto"
                 class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full border border-white/10 text-white hover:bg-white/5 active:bg-white/10 transition-all">
-          <span class="material-symbols-outlined text-xl">east</span>
+          <span class="material-symbols-outlined text-xl" aria-hidden="true">east</span>
         </button>
       </div>
     </div>
 
-    <div id="carrusel" class="flex gap-4 md:gap-8 overflow-x-auto pb-6 snap-x snap-mandatory no-scrollbar scroll-smooth -mx-4 px-4 md:mx-0 md:px-0">
+    <div id="carrusel" class="flex gap-4 md:gap-8 overflow-x-auto pb-6 snap-x snap-mandatory no-scrollbar scroll-smooth -mx-4 px-4 md:mx-0 md:px-0"
+         role="list" aria-label="Productos exclusivos">
       @for (producto of exclusivosVisibles; track producto.id) {
-        <div class="w-[78vw] max-w-[300px] md:min-w-[340px] md:w-auto flex-shrink-0 snap-start">
+        <div class="w-[78vw] max-w-[300px] md:min-w-[340px] md:w-auto flex-shrink-0 snap-start" role="listitem">
           <div class="relative aspect-[4/5] rounded-2xl md:rounded-[2rem] overflow-hidden mb-4 group">
             @if (producto.imagenes.length) {
               <img [src]="producto.imagenes[0]" [alt]="producto.nombre"
+                   loading="lazy" decoding="async"
                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
             } @else {
               <div class="w-full h-full bg-gradient-to-br from-[#2a2116] to-[#1a160f] flex items-center justify-center">
@@ -303,7 +325,7 @@
 </section>
 
 <!-- ===================== PRODUCTOS GANADORES ===================== -->
-<section id="ganadores" class="py-14 md:py-24 bg-[#111008] relative overflow-hidden">
+<section id="ganadores" class="py-14 md:py-24 bg-[#111008] relative overflow-hidden" aria-label="Productos ganadores">
 
   <!-- Gold glow background -->
   <div class="absolute inset-0 pointer-events-none">
@@ -332,15 +354,17 @@
     </div>
 
     <!-- Grid 2x2 (desktop) / 2 cols (mobile) -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5" role="list" aria-label="Ranking de productos ganadores">
       @for (producto of ganadoresVisibles; track producto.id; let i = $index) {
         <div class="relative rounded-2xl md:rounded-3xl overflow-hidden group cursor-pointer"
+             role="listitem"
              [class]="i === 0 ? 'md:col-span-2 md:row-span-2' : ''">
 
           <!-- Image -->
           <div [class]="i === 0 ? 'aspect-square md:aspect-auto md:h-full min-h-[240px]' : 'aspect-square'">
             @if (producto.imagenes.length) {
               <img [src]="producto.imagenes[0]" [alt]="producto.nombre"
+                   loading="lazy" decoding="async"
                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"/>
             } @else {
               <div class="w-full h-full bg-gradient-to-br from-[#2a2116] to-[#111008] flex items-center justify-center">
@@ -435,7 +459,7 @@
 <footer class="bg-background-dark border-t border-primary/10 py-8 md:py-12">
   <div class="max-w-7xl mx-auto px-4 md:px-6">
     <div class="flex flex-col md:flex-row justify-between items-center gap-6 md:gap-12 pb-6 md:pb-12">
-      <img src="/logo.png" alt="Landazury Importaciones" class="h-10 md:h-14 w-auto object-contain"/>
+      <img src="/logo.png" alt="Landazury Importaciones" width="120" height="56" loading="lazy" decoding="async" class="h-10 md:h-14 w-auto object-contain"/>
       <div class="flex gap-8 text-[11px] uppercase tracking-[0.2em] font-bold text-white/40">
         <a href="#" class="hover:text-primary transition-colors">Términos</a>
         <a href="#" class="hover:text-primary transition-colors">Privacidad</a>

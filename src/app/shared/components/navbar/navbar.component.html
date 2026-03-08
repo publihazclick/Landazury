@@ -2,8 +2,8 @@
   <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
 
     <!-- Logo -->
-    <a routerLink="/">
-      <img src="/logo.png" alt="Landazury Importaciones" class="h-24 w-auto object-contain"/>
+    <a routerLink="/" aria-label="Landazury Importaciones — Ir al inicio">
+      <img src="/logo.png" alt="Landazury Importaciones" width="96" height="96" fetchpriority="high" decoding="async" class="h-24 w-auto object-contain"/>
     </a>
 
     <!-- Nav desktop -->
@@ -36,6 +36,7 @@
         }
         <button (click)="auth.cerrarSesion()"
                 [disabled]="auth.cerrandoSesion()"
+                [attr.aria-label]="auth.cerrandoSesion() ? 'Cerrando sesión…' : 'Cerrar sesión'"
                 class="px-5 py-2 text-sm font-bold text-slate-100 hover:text-primary transition-colors disabled:opacity-40 disabled:cursor-wait">
           {{ auth.cerrandoSesion() ? 'Saliendo…' : 'Salir' }}
         </button>
@@ -71,30 +72,31 @@
       </div>
     } @else {
       <div class="flex md:hidden items-center gap-2">
-        <a routerLink="/catalogo" routerLinkActive="text-primary"
+        <a routerLink="/catalogo" routerLinkActive="text-primary" aria-label="Catálogo"
            class="flex flex-col items-center text-slate-400 hover:text-primary transition-colors">
-          <span class="material-symbols-outlined text-[22px]">grid_view</span>
+          <span class="material-symbols-outlined text-[22px]" aria-hidden="true">grid_view</span>
         </a>
         @if (auth.esInventario()) {
-          <a routerLink="/inventario" routerLinkActive="text-primary"
+          <a routerLink="/inventario" routerLinkActive="text-primary" aria-label="Inventario"
              class="flex flex-col items-center text-slate-400 hover:text-primary transition-colors ml-1">
-            <span class="material-symbols-outlined text-[22px]">inventory_2</span>
+            <span class="material-symbols-outlined text-[22px]" aria-hidden="true">inventory_2</span>
           </a>
         }
         @if (auth.esAdmin()) {
-          <a routerLink="/admin" routerLinkActive="text-primary"
+          <a routerLink="/admin" routerLinkActive="text-primary" aria-label="Administración"
              class="flex flex-col items-center text-slate-400 hover:text-primary transition-colors ml-1">
-            <span class="material-symbols-outlined text-[22px]">admin_panel_settings</span>
+            <span class="material-symbols-outlined text-[22px]" aria-hidden="true">admin_panel_settings</span>
           </a>
         }
-        <a routerLink="/perfil" routerLinkActive="text-primary"
+        <a routerLink="/perfil" routerLinkActive="text-primary" aria-label="Mi perfil"
            class="flex flex-col items-center text-slate-400 hover:text-primary transition-colors ml-1">
-          <span class="material-symbols-outlined text-[22px]">person</span>
+          <span class="material-symbols-outlined text-[22px]" aria-hidden="true">person</span>
         </a>
         <button (click)="auth.cerrarSesion()"
                 [disabled]="auth.cerrandoSesion()"
+                [attr.aria-label]="auth.cerrandoSesion() ? 'Cerrando sesión…' : 'Cerrar sesión'"
                 class="flex flex-col items-center text-slate-500 hover:text-red-400 transition-colors ml-1 disabled:opacity-40 disabled:cursor-wait">
-          <span class="material-symbols-outlined text-[22px]">{{ auth.cerrandoSesion() ? 'hourglass_empty' : 'logout' }}</span>
+          <span class="material-symbols-outlined text-[22px]" aria-hidden="true">{{ auth.cerrandoSesion() ? 'hourglass_empty' : 'logout' }}</span>
         </button>
       </div>
     }
