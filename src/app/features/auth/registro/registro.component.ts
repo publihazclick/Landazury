@@ -37,6 +37,19 @@ export class RegistroComponent {
     'El Salvador', 'Nicaragua', 'Costa Rica', 'Panamá', 'Cuba', 'República Dominicana',
   ];
 
+  readonly indicativosPais: Record<string, string> = {
+    'México': '+52', 'Colombia': '+57', 'Argentina': '+54',
+    'Chile': '+56', 'Perú': '+51', 'Venezuela': '+58',
+    'Ecuador': '+593', 'Bolivia': '+591', 'Paraguay': '+595',
+    'Uruguay': '+598', 'Guatemala': '+502', 'Honduras': '+504',
+    'El Salvador': '+503', 'Nicaragua': '+505', 'Costa Rica': '+506',
+    'Panamá': '+507', 'Cuba': '+53', 'República Dominicana': '+1',
+  };
+
+  get indicativoActual(): string {
+    return this.indicativosPais[this.form.get('pais')?.value ?? ''] ?? '';
+  }
+
   get fuerzaContrasena(): { nivel: number; label: string; color: string } {
     const v = this.form.get('contrasena')?.value ?? '';
     let nivel = 0;
@@ -75,9 +88,12 @@ export class RegistroComponent {
 
     try {
       const { email, contrasena, nombre, pais, telefono, plataforma } = this.form.value;
+      const whatsapp = telefono
+        ? (this.indicativoActual ? `${this.indicativoActual} ${telefono}` : telefono)
+        : undefined;
       await this.auth.registrar(email!, contrasena!, nombre!, {
         pais: pais ?? undefined,
-        telefono: telefono ?? undefined,
+        telefono: whatsapp,
         plataforma: plataforma ?? undefined,
       });
       this.exitoso.set(true);
