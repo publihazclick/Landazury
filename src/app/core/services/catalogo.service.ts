@@ -10,9 +10,13 @@ export class CatalogoService {
 
   private normalizar(data: any[]): Producto[] {
     return data.map(p => ({
-      ganador: false, exclusivo: false,
-      estado: 'aprobado', vistas: 0, descargas: 0,
+      ganador: false, exclusivo: false, estado: 'aprobado',
       ...p,
+      precio_base: Number(p.precio_base) || 0,
+      precio_sugerido: p.precio_sugerido != null ? Number(p.precio_sugerido) : undefined,
+      precio_final: p.precio_final != null ? Number(p.precio_final) : undefined,
+      vistas: Number(p.vistas) || 0,
+      descargas: Number(p.descargas) || 0,
     }));
   }
 
