@@ -139,9 +139,11 @@
                 <span class="material-symbols-outlined text-[18px]">favorite</span>
               </button>
               <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                <span class="text-slate-100 font-bold text-sm">{{ producto.precio_base | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-                @if (calcularMargen(producto) > 0) {
-                  <span class="text-green-400 text-[10px] font-bold">+{{ calcularMargen(producto) }}% margen</span>
+                @if (producto.precio_final) {
+                  <span class="text-primary font-black text-sm">{{ producto.precio_final | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                  @if (calcularMargen(producto) > 0) {
+                    <span class="text-green-400 text-[10px] font-bold">+{{ calcularMargen(producto) }}% margen</span>
+                  }
                 }
               </div>
             </div>
