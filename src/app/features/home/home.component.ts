@@ -22,9 +22,6 @@ export class HomeComponent implements OnInit {
   readonly cargando = signal(false);
   readonly exclusivos = signal<Producto[]>([]);
   readonly ganadores = signal<Producto[]>([]);
-  readonly plataformaOtra = signal('');
-  readonly plataformaOtraError = signal(false);
-
   readonly indicativosPais: Record<string, string> = {
     'México': '+52', 'Colombia': '+57', 'Argentina': '+54',
     'Chile': '+56', 'Perú': '+51', 'Venezuela': '+58',
@@ -36,10 +33,6 @@ export class HomeComponent implements OnInit {
 
   get indicativoActual(): string {
     return this.indicativosPais[this.form.get('pais')?.value ?? ''] ?? '';
-  }
-
-  get plataformaEsOtra(): boolean {
-    return this.form.get('plataforma')?.value === 'Otra';
   }
 
   async ngOnInit() {
@@ -126,13 +119,6 @@ export class HomeComponent implements OnInit {
   async onSubmit() {
     this.form.markAllAsTouched();
 
-    if (this.plataformaEsOtra && !this.plataformaOtra().trim()) {
-      this.plataformaOtraError.set(true);
-      if (this.form.invalid || this.cargando()) return;
-      return;
-    }
-    this.plataformaOtraError.set(false);
-
     if (this.form.invalid || this.cargando()) return;
 
     this.cargando.set(true);
@@ -143,15 +129,12 @@ export class HomeComponent implements OnInit {
     const whatsapp = telefono
       ? (this.indicativoActual ? `${this.indicativoActual} ${telefono}` : telefono)
       : undefined;
-    const plataformaFinal = this.plataformaEsOtra
-      ? (this.plataformaOtra().trim() || undefined)
-      : (plataforma ?? undefined);
 
     try {
       const data = await this.auth.registrar(email!, contrasena!, nombre!, {
         pais: pais ?? undefined,
         telefono: whatsapp,
-        plataforma: plataformaFinal,
+        plataforma: plataforma ?? undefined,
       });
 
       if (data.session) {

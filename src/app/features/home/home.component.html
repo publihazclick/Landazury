@@ -55,13 +55,19 @@
 
       <!-- Título -->
       <div class="text-center mb-4 md:mb-7">
-        <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold leading-tight mb-2 text-white tracking-tight">
-          Accede al catálogo de los productos más ganadores y con mayor margen,
-          <span class="text-primary">escala tu negocio hoy mismo.</span>
+        <h1 class="text-xl sm:text-2xl md:text-3xl font-black leading-tight mb-3 text-white tracking-tight uppercase">
+          ¡Únete a <span class="text-primary">Landazury Importaciones!</span>
+          <span class="block text-lg sm:text-xl md:text-2xl font-extrabold normal-case mt-1">
+            mentoría experta y gratuita para que vendas <span class="text-primary">¡YA!</span> nuestros productos top
+          </span>
         </h1>
-        <p class="text-primary/80 text-sm sm:text-base font-medium leading-relaxed mt-2">
+        <p class="text-white/70 text-sm sm:text-sm font-medium leading-relaxed mt-2">
+          Accede al catálogo de los productos más ganadores y con mayor margen,
+          escala tu negocio hoy mismo.
+        </p>
+        <p class="text-emerald-400/80 text-xs sm:text-sm font-medium leading-relaxed mt-1.5">
           Estamos disponibles como proveedor en todas las plataformas de dropshipping,
-          <span class="text-primary font-bold">ve a buscarnos.</span>
+          <span class="text-emerald-400 font-bold">ve a buscarnos.</span>
         </p>
       </div>
 
@@ -187,48 +193,13 @@
             <!-- Plataforma -->
             <div class="space-y-1">
               <label for="reg-plataforma" class="text-[10px] uppercase tracking-widest font-bold text-white/40 ml-1">¿Qué plataforma usas?</label>
-              <select id="reg-plataforma" formControlName="plataforma"
-                      class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white text-sm focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none"
-                      [class.border-red-500]="form.get('plataforma')?.invalid && form.get('plataforma')?.touched"
-                      [attr.aria-invalid]="form.get('plataforma')?.invalid && form.get('plataforma')?.touched ? 'true' : null">
-                <option value="" style="background:#1A1A1A" disabled>Selecciona</option>
-                <optgroup label="── Dropshipping" style="background:#1A1A1A; color:#D4AF37">
-                  <option style="background:#1A1A1A" value="Dropi">Dropi</option>
-                  <option style="background:#1A1A1A" value="DSers">DSers</option>
-                  <option style="background:#1A1A1A" value="AutoDS">AutoDS</option>
-                  <option style="background:#1A1A1A" value="Zendrop">Zendrop</option>
-                  <option style="background:#1A1A1A" value="CJdropshipping">CJdropshipping</option>
-                </optgroup>
-                <optgroup label="── E-commerce" style="background:#1A1A1A; color:#D4AF37">
-                  <option style="background:#1A1A1A" value="Shopify">Shopify</option>
-                  <option style="background:#1A1A1A" value="WooCommerce">WooCommerce</option>
-                  <option style="background:#1A1A1A" value="Wix eCommerce">Wix eCommerce</option>
-                  <option style="background:#1A1A1A" value="BigCommerce">BigCommerce</option>
-                </optgroup>
-                <optgroup label="── Marketplaces" style="background:#1A1A1A; color:#D4AF37">
-                  <option style="background:#1A1A1A" value="Amazon">Amazon</option>
-                  <option style="background:#1A1A1A" value="MercadoLibre">MercadoLibre</option>
-                  <option style="background:#1A1A1A" value="TikTok Shop">TikTok Shop</option>
-                  <option style="background:#1A1A1A" value="Instagram Shopping">Instagram Shopping</option>
-                </optgroup>
-                <option style="background:#1A1A1A" value="Otra">Otra (escribe aquí)</option>
-              </select>
+              <input id="reg-plataforma" formControlName="plataforma" type="text"
+                     placeholder="Ej: Shopify, Dropi, TikTok..."
+                     class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white text-sm placeholder:text-white/20 focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none"
+                     [class.border-red-500]="form.get('plataforma')?.invalid && form.get('plataforma')?.touched"
+                     [attr.aria-invalid]="form.get('plataforma')?.invalid && form.get('plataforma')?.touched ? 'true' : null"/>
               @if (form.get('plataforma')?.invalid && form.get('plataforma')?.touched) {
-                <p class="text-[10px] text-red-400 ml-1" role="alert">Selecciona tu plataforma.</p>
-              }
-              <!-- Campo libre cuando elige "Otra" -->
-              @if (plataformaEsOtra) {
-                <div class="mt-1.5">
-                  <input type="text" placeholder="Escribe tu plataforma..."
-                         [value]="plataformaOtra()"
-                         (input)="plataformaOtra.set($any($event.target).value); plataformaOtraError.set(false)"
-                         class="w-full bg-white/5 border rounded-xl py-2.5 px-4 text-white text-sm placeholder:text-white/20 outline-none transition-all"
-                         [class]="plataformaOtraError() ? 'border-red-500 focus:ring-1 focus:ring-red-500' : 'border-primary/40 focus:ring-1 focus:ring-primary focus:border-primary'"
-                         aria-label="Escribe el nombre de tu plataforma"/>
-                  @if (plataformaOtraError()) {
-                    <p class="text-[10px] text-red-400 ml-1 mt-0.5" role="alert">Escribe el nombre de tu plataforma.</p>
-                  }
-                </div>
+                <p class="text-[10px] text-red-400 ml-1" role="alert">Escribe tu plataforma.</p>
               }
             </div>
 
