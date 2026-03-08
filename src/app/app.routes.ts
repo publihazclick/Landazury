@@ -1,5 +1,8 @@
 import { Routes } from '@angular/router';
-import { authGuard, invitadoGuard, inventarioGuard, adminGuard, landingGuard, catalogoGuard } from './core/guards/auth.guard';
+import {
+  authGuard, invitadoGuard, inventarioGuard, adminGuard,
+  landingGuard, catalogoGuard, bodegaGuard, invitadoBodegaGuard,
+} from './core/guards/auth.guard';
 import { DashboardLayoutComponent } from './shared/components/dashboard-layout/dashboard-layout.component';
 
 export const routes: Routes = [
@@ -29,6 +32,12 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'op',
+    loadComponent: () =>
+      import('./features/auth/bodega/bodega.component').then((m) => m.BodegaComponent),
+    canActivate: [invitadoBodegaGuard],
+  },
+  {
     path: '',
     component: DashboardLayoutComponent,
     canActivate: [authGuard],
@@ -46,7 +55,7 @@ export const routes: Routes = [
       },
       {
         path: 'inventario',
-        canActivate: [inventarioGuard],
+        canActivate: [bodegaGuard],
         loadComponent: () =>
           import('./features/inventario/inventario.component').then((m) => m.InventarioComponent),
       },

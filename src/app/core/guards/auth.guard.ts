@@ -85,3 +85,26 @@ export const adminGuard: CanActivateFn = () => {
     return auth.perfil()?.rol === 'admin' ? true : rutaPorRol(auth);
   });
 };
+
+/** Guard para /inventario: redirige a /op (portal bodega) si no está autenticado */
+export const bodegaGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  return whenReady(auth, router, () => {
+    if (!auth.estaAutenticado()) return '/op';
+    const rol = auth.perfil()?.rol;
+    return (rol === 'inventario' || rol === 'admin') ? true : rutaPorRol(auth);
+  });
+};
+
+/** Guard para /op: si ya está autenticado como operador, va directo a /inventario */
+export const invitadoBodegaGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  return whenReady(auth, router, () => {
+    if (!auth.estaAutenticado()) return true;
+    const rol = auth.perfil()?.rol;
+    if (rol === 'inventario' || rol === 'admin') return '/inventario';
+    return '/catalogo';
+  });
+};

@@ -1,0 +1,94 @@
+<div class="min-h-screen flex items-center justify-center p-4 bg-[#0a0a08]">
+
+  <main class="w-full max-w-[420px]">
+    <div class="glass-card rounded-2xl p-8 md:p-10">
+
+      <!-- Header mínimo — sin logo ni marca -->
+      <div class="mb-8 text-center">
+        <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-4">
+          <span class="material-symbols-outlined text-2xl text-amber-400">inventory_2</span>
+        </div>
+        <h1 class="text-lg font-bold text-slate-200">Portal de Operaciones</h1>
+        <p class="text-slate-500 text-sm mt-1">Ingresa tus credenciales de acceso</p>
+      </div>
+
+      <!-- Acceso denegado -->
+      @if (accesoDenegado()) {
+        <div class="mb-5 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400 flex gap-3">
+          <span class="material-symbols-outlined text-lg shrink-0 mt-0.5">block</span>
+          <p>No tienes acceso a este portal. Contacta al administrador.</p>
+        </div>
+      }
+
+      <!-- Error -->
+      @if (error()) {
+        <div class="mb-5 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400 flex items-start gap-3">
+          <span class="material-symbols-outlined text-lg shrink-0 mt-0.5">error</span>
+          <p class="flex-1 leading-relaxed">{{ error() }}</p>
+          <button type="button" (click)="cerrarError()" class="text-red-400/60 hover:text-red-400 transition-colors shrink-0">
+            <span class="material-symbols-outlined text-base">close</span>
+          </button>
+        </div>
+      }
+
+      <!-- Formulario -->
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
+
+        <!-- Email -->
+        <div class="space-y-2">
+          <label for="bodega-email" class="text-sm font-semibold text-slate-300 ml-1">Correo electrónico</label>
+          <div class="relative group input-glow rounded-xl">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors text-xl" aria-hidden="true">mail</span>
+            <input id="bodega-email" formControlName="email" type="email" placeholder="operador@empresa.com"
+                   autocomplete="email"
+                   class="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                   [class.border-red-500\/50]="form.get('email')?.invalid && form.get('email')?.touched"/>
+          </div>
+          @if (form.get('email')?.invalid && form.get('email')?.touched) {
+            <p class="text-xs text-red-400 ml-1" role="alert">Ingresa un correo válido.</p>
+          }
+        </div>
+
+        <!-- Contraseña -->
+        <div class="space-y-2">
+          <label for="bodega-contrasena" class="text-sm font-semibold text-slate-300 ml-1">Contraseña</label>
+          <div class="relative group input-glow rounded-xl">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors text-xl" aria-hidden="true">lock</span>
+            <input id="bodega-contrasena" formControlName="contrasena"
+                   [type]="mostrarContrasena() ? 'text' : 'password'"
+                   placeholder="••••••••"
+                   autocomplete="current-password"
+                   class="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-12 pr-12 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                   [class.border-red-500\/50]="form.get('contrasena')?.invalid && form.get('contrasena')?.touched"/>
+            <button type="button" (click)="mostrarContrasena.update(v => !v)"
+                    [attr.aria-label]="mostrarContrasena() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
+              <span class="material-symbols-outlined text-xl" aria-hidden="true">{{ mostrarContrasena() ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+          @if (form.get('contrasena')?.invalid && form.get('contrasena')?.touched) {
+            <p class="text-xs text-red-400 ml-1" role="alert">Mínimo 6 caracteres.</p>
+          }
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" [disabled]="cargando()"
+                class="w-full gold-gradient hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-[#0a0a08] py-4 rounded-xl transition-all flex items-center justify-center gap-2 mt-2 uppercase tracking-widest text-xs font-extrabold">
+          @if (cargando()) {
+            <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+            Ingresando...
+          } @else {
+            <span>Ingresar</span>
+            <span class="material-symbols-outlined text-base" aria-hidden="true">arrow_right_alt</span>
+          }
+        </button>
+
+      </form>
+
+    </div>
+  </main>
+
+</div>

@@ -2,7 +2,7 @@ import { Component, inject, signal, effect } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
 
-const RUTAS_SIN_NAVBAR = ['/auth/', '/catalogo', '/admin', '/inventario', '/perfil'];
+const RUTAS_SIN_NAVBAR = ['/auth/', '/catalogo', '/admin', '/inventario', '/perfil', '/op'];
 
 @Component({
   selector: 'app-root',
