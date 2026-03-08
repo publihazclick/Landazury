@@ -171,14 +171,15 @@
   <div class="flex-1 lg:ml-64 flex flex-col min-h-screen">
 
     <!-- Mobile topbar -->
-    <header class="lg:hidden sticky top-0 z-20 flex items-center gap-3 px-4 py-3 border-b border-white/5 bg-[#0a0a08]/90 backdrop-blur-xl">
+    <header class="lg:hidden sticky top-0 z-20 flex items-center px-4 py-2 border-b border-white/5 bg-[#0a0a08]/90 backdrop-blur-xl">
       <button (click)="menuAbierto.set(true)"
-              class="text-slate-400 hover:text-slate-200 transition-colors">
+              class="text-slate-400 hover:text-slate-200 transition-colors shrink-0">
         <span class="material-symbols-outlined">menu</span>
       </button>
-      <img src="/logo.png" class="h-9 w-auto object-contain" alt="Landazury"/>
-      <div class="flex-1"></div>
-      <div class="w-8 h-8 rounded-full gold-gradient flex items-center justify-center text-xs font-extrabold text-[#0a0a08]">
+      <div class="flex-1 flex justify-center">
+        <img src="/logo.png" class="h-16 w-auto object-contain" alt="Landazury"/>
+      </div>
+      <div class="w-8 h-8 rounded-full gold-gradient flex items-center justify-center text-xs font-extrabold text-[#0a0a08] shrink-0">
         {{ auth.usuario()?.email?.[0]?.toUpperCase() }}
       </div>
     </header>
