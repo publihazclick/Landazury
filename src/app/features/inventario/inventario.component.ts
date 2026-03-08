@@ -11,6 +11,7 @@ interface FormProducto {
   descripcion: string;
   precio_base: number;
   precio_sugerido: number;
+  precio_final: number;
   proveedor: string;
   categoria_id: string;
   disponible: boolean;
@@ -104,6 +105,7 @@ export class InventarioComponent implements OnInit {
       descripcion: producto.descripcion ?? '',
       precio_base: producto.precio_base,
       precio_sugerido: producto.precio_sugerido ?? 0,
+      precio_final: producto.precio_final ?? 0,
       proveedor: producto.proveedor ?? '',
       categoria_id: producto.categoria_id ?? '',
       disponible: producto.disponible,
@@ -150,6 +152,7 @@ export class InventarioComponent implements OnInit {
         descripcion: this.formProducto.descripcion || undefined,
         precio_base: Number(this.formProducto.precio_base),
         precio_sugerido: Number(this.formProducto.precio_sugerido) || undefined,
+        precio_final: esAdmin && Number(this.formProducto.precio_final) ? Number(this.formProducto.precio_final) : undefined,
         proveedor: this.formProducto.proveedor || undefined,
         categoria_id: this.formProducto.categoria_id || undefined,
         disponible: esAdmin ? this.formProducto.disponible : false, // inventario no controla visibilidad
@@ -316,7 +319,7 @@ export class InventarioComponent implements OnInit {
   // ── Helpers ────────────────────────────────────────
 
   formVacio(): FormProducto {
-    return { nombre: '', descripcion: '', precio_base: 0, precio_sugerido: 0, proveedor: '', categoria_id: '', disponible: false };
+    return { nombre: '', descripcion: '', precio_base: 0, precio_sugerido: 0, precio_final: 0, proveedor: '', categoria_id: '', disponible: false };
   }
 
   limpiarArchivoModal() {
