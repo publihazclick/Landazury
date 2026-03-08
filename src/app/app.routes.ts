@@ -38,6 +38,21 @@ export const routes: Routes = [
     canActivate: [invitadoBodegaGuard],
   },
   {
+    path: 'terminos',
+    loadComponent: () =>
+      import('./features/legal/terminos/terminos.component').then((m) => m.TerminosComponent),
+  },
+  {
+    path: 'privacidad',
+    loadComponent: () =>
+      import('./features/legal/privacidad/privacidad.component').then((m) => m.PrivacidadComponent),
+  },
+  {
+    path: 'contacto',
+    loadComponent: () =>
+      import('./features/legal/contacto/contacto.component').then((m) => m.ContactoComponent),
+  },
+  {
     path: '',
     component: DashboardLayoutComponent,
     canActivate: [authGuard],
