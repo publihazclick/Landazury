@@ -79,6 +79,31 @@ export class CatalogoService {
     if (error) throw error;
   }
 
+  // ── Imágenes de producto ────────────────────────────────────────────────────
+
+  private readonly BUCKET_IMAGENES = 'imagenes-productos';
+
+  async subirImagenProducto(file: File): Promise<string> {
+    const usuario = this.auth.usuario();
+    if (!usuario) throw new Error('Debes iniciar sesión');
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg';
+    const path = `productos/${usuario.id}/${Date.now()}.${ext}`;
+    const { error } = await this.supabase.cliente.storage
+      .from(this.BUCKET_IMAGENES)
+      .upload(path, file, { upsert: false, contentType: file.type });
+    if (error) throw error;
+    const { data } = this.supabase.cliente.storage.from(this.BUCKET_IMAGENES).getPublicUrl(path);
+    return data.publicUrl;
+  }
+
+  async eliminarImagenProducto(url: string): Promise<void> {
+    const marker = `/storage/v1/object/public/${this.BUCKET_IMAGENES}/`;
+    const idx = url.indexOf(marker);
+    if (idx === -1) return;
+    const path = url.slice(idx + marker.length);
+    await this.supabase.cliente.storage.from(this.BUCKET_IMAGENES).remove([path]);
+  }
+
   async eliminarProducto(id: string) {
     const { error } = await this.supabase.cliente.from('productos').delete().eq('id', id);
     if (error) throw error;

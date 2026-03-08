@@ -28,8 +28,9 @@ export interface Producto {
   id: string;
   nombre: string;
   descripcion?: string;
-  precio_base: number;
-  precio_sugerido?: number;
+  precio_base: number;        // Costo fijado por la bodega
+  precio_sugerido?: number;   // Estimado de la bodega (referencia)
+  precio_final?: number;      // Precio final fijado por el admin → lo que ve el usuario
   imagenes: string[];
   categoria_id?: string;
   categoria?: Categoria;

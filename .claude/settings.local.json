@@ -7,7 +7,17 @@
       "Read(//c/Users/Victor/AppData/Roaming/Claude/**)",
       "Bash(\"C:\\\\Users\\\\Victor\\\\Documents\\\\landazury\\\\.gitignore\":*)",
       "Skill(supabase-schema-sync)",
-      "Bash(npx supabase:*)"
+      "Bash(npx supabase:*)",
+      "Bash(git remote:*)",
+      "mcp__supabase__apply_migration",
+      "Bash(npx ng:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "mcp__supabase__execute_sql"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "supabase"
+  ]
 }

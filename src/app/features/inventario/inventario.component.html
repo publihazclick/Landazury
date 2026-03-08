@@ -346,6 +346,53 @@
                       class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-100 placeholder:text-slate-600 px-4 py-3 outline-none transition-all text-sm resize-none"></textarea>
           </div>
 
+          <!-- ── Imágenes del producto ── -->
+          <div class="space-y-2.5">
+            <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-sm">photo_library</span>
+              Imágenes del producto
+            </label>
+
+            <!-- Grid de imágenes actuales -->
+            @if (imagenesEnModal.length > 0) {
+              <div class="grid grid-cols-3 gap-2">
+                @for (img of imagenesEnModal; track img; let i = $index) {
+                  <div class="relative group aspect-square rounded-xl overflow-hidden border border-[#3d3524]">
+                    <img [src]="img" class="w-full h-full object-cover"/>
+                    <!-- Overlay: principal badge + delete -->
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
+                      @if (i === 0) {
+                        <span class="absolute top-1.5 left-1.5 text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full bg-primary text-[#0a0a08]">Principal</span>
+                      }
+                      <button type="button" (click)="quitarImagen(i)"
+                              class="w-8 h-8 rounded-full bg-red-500/80 hover:bg-red-500 text-white flex items-center justify-center transition-all">
+                        <span class="material-symbols-outlined text-[16px]">delete</span>
+                      </button>
+                    </div>
+                    @if (i === 0) {
+                      <span class="absolute top-1.5 left-1.5 text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full bg-primary text-[#0a0a08] group-hover:opacity-0 transition-opacity">Principal</span>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Zona de upload -->
+            <label class="flex flex-col items-center justify-center gap-2 p-4 border-2 border-dashed rounded-xl cursor-pointer transition-all"
+                   [class]="subiendoImagen() ? 'border-primary/40 bg-primary/5' : 'border-[#3d3524] hover:border-primary/40 hover:bg-primary/5'">
+              @if (subiendoImagen()) {
+                <span class="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></span>
+                <span class="text-xs text-primary font-semibold">Subiendo...</span>
+              } @else {
+                <span class="material-symbols-outlined text-slate-500 text-2xl">add_photo_alternate</span>
+                <span class="text-xs text-slate-500 text-center">Haz clic para subir imágenes<br/><span class="text-[10px] text-slate-600">JPG, PNG, WEBP · máx. 5 MB</span></span>
+              }
+              <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple
+                     class="hidden" [disabled]="subiendoImagen()"
+                     (change)="subirImagen($event)"/>
+            </label>
+          </div>
+
           <!-- Disponible toggle -->
           <label class="flex items-center gap-3.5 cursor-pointer p-3.5 rounded-xl border border-[#3d3524] hover:border-primary/20 transition-all">
             <div class="relative shrink-0">

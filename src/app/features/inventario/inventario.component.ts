@@ -40,8 +40,13 @@ export class InventarioComponent implements OnInit {
   readonly creativosEnModal = signal<Creativo[]>([]);
   readonly guardandoProducto = signal(false);
   readonly subiendoCreativo = signal(false);
+  readonly subiendoImagen = signal(false);
   readonly cargandoModal = signal(false);
   readonly confirmandoEliminar = signal<Producto | null>(null);
+
+  // Imágenes del producto (edición local antes de guardar)
+  imagenesEnModal: string[] = [];
+  urlsAEliminar: string[] = [];
 
   // Forms
   formProducto: FormProducto = this.formVacio();
@@ -95,6 +100,8 @@ export class InventarioComponent implements OnInit {
     this.formProducto = this.formVacio();
     this.productoEnModal.set(null);
     this.creativosEnModal.set([]);
+    this.imagenesEnModal = [];
+    this.urlsAEliminar = [];
     this.limpiarArchivoModal();
     this.mostrarModal.set(true);
   }
@@ -112,6 +119,8 @@ export class InventarioComponent implements OnInit {
     };
     this.productoEnModal.set(producto);
     this.creativosEnModal.set(producto.creativos ?? []);
+    this.imagenesEnModal = [...(producto.imagenes ?? [])];
+    this.urlsAEliminar = [];
     this.limpiarArchivoModal();
     this.mostrarModal.set(true);
     this.cargandoModal.set(true);
@@ -158,7 +167,7 @@ export class InventarioComponent implements OnInit {
         disponible: esAdmin ? this.formProducto.disponible : false, // inventario no controla visibilidad
         ganador: existente?.ganador ?? false,
         exclusivo: existente?.exclusivo ?? false,
-        imagenes: existente?.imagenes ?? [] as string[],
+        imagenes: this.imagenesEnModal,
         estado: existente ? (esAdmin ? existente.estado : 'pendiente' as EstadoProducto) : estadoNuevo,
         bodega_id: existente?.bodega_id ?? userId,
         vistas: existente?.vistas ?? 0,
@@ -180,6 +189,11 @@ export class InventarioComponent implements OnInit {
         this.productoEnModal.set(productoConDatos);
         this.exito.set(esAdmin ? 'Producto creado y aprobado.' : 'Producto enviado a revisión. Ahora agrega los creativos.');
       }
+      // Limpiar imágenes eliminadas del storage en background
+      for (const url of this.urlsAEliminar) {
+        this.catalogoService.eliminarImagenProducto(url).catch(() => {});
+      }
+      this.urlsAEliminar = [];
       setTimeout(() => this.exito.set(null), 3000);
     } catch (e: any) {
       this.error.set(e?.message ?? 'Error al guardar el producto.');
@@ -314,6 +328,36 @@ export class InventarioComponent implements OnInit {
     } catch {
       this.error.set('No se pudo eliminar el producto.');
     }
+  }
+
+  // ── Imágenes del producto ──────────────────────────
+
+  async subirImagen(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const files = input.files;
+    if (!files || files.length === 0) return;
+    this.subiendoImagen.set(true);
+    this.error.set(null);
+    try {
+      for (const file of Array.from(files)) {
+        const url = await this.catalogoService.subirImagenProducto(file);
+        this.imagenesEnModal = [...this.imagenesEnModal, url];
+      }
+    } catch {
+      this.error.set('Error al subir la imagen.');
+    } finally {
+      this.subiendoImagen.set(false);
+      input.value = '';
+    }
+  }
+
+  quitarImagen(index: number) {
+    const url = this.imagenesEnModal[index];
+    // Solo marcar para eliminar si es una URL de nuestro storage
+    if (url.includes('imagenes-productos')) {
+      this.urlsAEliminar = [...this.urlsAEliminar, url];
+    }
+    this.imagenesEnModal = this.imagenesEnModal.filter((_, i) => i !== index);
   }
 
   // ── Helpers ────────────────────────────────────────
