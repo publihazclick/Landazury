@@ -174,27 +174,28 @@ export class InventarioComponent implements OnInit {
         descargas: existente?.descargas ?? 0,
       };
 
+      let mensaje: string;
       if (existente) {
         await this.catalogoService.actualizarProducto(existente.id, payload);
         const cat = this.categorias().find(c => c.id === payload.categoria_id);
         this.productos.update(list => list.map(p =>
           p.id === existente.id ? { ...p, ...payload, categoria: cat } : p
         ));
-        this.exito.set(esAdmin ? 'Producto actualizado.' : 'Producto actualizado y enviado a revisión.');
+        mensaje = esAdmin ? 'Producto actualizado correctamente.' : 'Producto actualizado y enviado a revisión.';
       } else {
         const creado = await this.catalogoService.crearProducto(payload);
         const cat = this.categorias().find(c => c.id === payload.categoria_id);
-        const productoConDatos = { ...creado, categoria: cat, creativos: [] as Creativo[] };
-        this.productos.update(list => [productoConDatos, ...list]);
-        this.productoEnModal.set(productoConDatos);
-        this.exito.set(esAdmin ? 'Producto creado y aprobado.' : 'Producto enviado a revisión. Ahora agrega los creativos.');
+        this.productos.update(list => [{ ...creado, categoria: cat, creativos: [] as Creativo[] }, ...list]);
+        mensaje = esAdmin ? 'Producto creado y aprobado.' : 'Producto enviado a revisión.';
       }
       // Limpiar imágenes eliminadas del storage en background
       for (const url of this.urlsAEliminar) {
         this.catalogoService.eliminarImagenProducto(url).catch(() => {});
       }
       this.urlsAEliminar = [];
-      setTimeout(() => this.exito.set(null), 3000);
+      this.cerrarModal();
+      this.exito.set(mensaje);
+      setTimeout(() => this.exito.set(null), 4000);
     } catch (e: any) {
       this.error.set(e?.message ?? 'Error al guardar el producto.');
     } finally {
