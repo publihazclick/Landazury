@@ -214,11 +214,18 @@
           <input [(ngModel)]="busquedaProductos" type="text" placeholder="Buscar productos…"
                  class="bg-transparent text-slate-100 text-sm placeholder:text-slate-600 py-2.5 px-3 outline-none w-full"/>
         </div>
-        <a routerLink="/inventario"
-           class="self-start sm:self-auto flex items-center gap-2 bg-primary text-[#0a0a08] px-5 py-2.5 rounded-xl text-sm font-black hover:brightness-110 transition-all uppercase tracking-wider">
-          <span class="material-symbols-outlined text-base">add</span>
-          Crear Producto
-        </a>
+        <div class="flex items-center gap-2 self-start sm:self-auto">
+          <button (click)="cargarProductos()"
+                  class="flex items-center gap-2 bg-neutral-surface border border-neutral-border px-4 py-2.5 rounded-xl text-sm text-slate-300 hover:border-primary/40 transition-all">
+            <span class="material-symbols-outlined text-[18px]">refresh</span>
+            Actualizar
+          </button>
+          <a routerLink="/inventario"
+             class="flex items-center gap-2 bg-primary text-[#0a0a08] px-5 py-2.5 rounded-xl text-sm font-black hover:brightness-110 transition-all uppercase tracking-wider">
+            <span class="material-symbols-outlined text-base">add</span>
+            Crear Producto
+          </a>
+        </div>
       </div>
 
       <!-- Filter chips -->
@@ -312,137 +319,148 @@
 
               <!-- Body -->
               <div class="p-4 space-y-3">
-                <div>
-                  <h3 class="font-bold text-slate-100 text-sm line-clamp-1">{{ producto.nombre }}</h3>
-                  @if (producto.proveedor) {
-                    <p class="text-xs text-slate-500 mt-0.5">{{ producto.proveedor }}</p>
-                  }
+                <!-- Nombre + proveedor + métricas -->
+                <div class="flex items-start justify-between gap-2">
+                  <div class="flex-1 min-w-0">
+                    <h3 class="font-bold text-slate-100 text-sm line-clamp-1">{{ producto.nombre }}</h3>
+                    @if (producto.proveedor) {
+                      <p class="text-xs text-slate-500 mt-0.5">{{ producto.proveedor }}</p>
+                    }
+                  </div>
+                  <div class="flex items-center gap-2 text-[11px] text-slate-600 shrink-0">
+                    <span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-[13px]">visibility</span>{{ producto.vistas }}</span>
+                    <span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-[13px]">download</span>{{ producto.descargas }}</span>
+                  </div>
                 </div>
 
-                <!-- ── Sección de precios ── -->
+                <!-- ══ SECCIÓN PRECIO USUARIO ══ -->
                 @if (editandoPreciosId() === producto.id) {
-                  <!-- Editor de precio final -->
-                  <div class="bg-neutral-charcoal border border-primary/20 rounded-xl p-3 space-y-3">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-primary">Ajustar Precio Final</p>
 
-                    <div class="flex items-center justify-between text-xs">
-                      <span class="text-slate-500">Costo bodega</span>
-                      <span class="font-semibold text-slate-300">$ {{ producto.precio_base | number:'1.0-0' }}</span>
+                  <!-- ── Editor activo ── -->
+                  <div class="border border-primary/30 rounded-xl overflow-hidden">
+                    <div class="bg-primary/10 px-3 py-2 flex items-center gap-2">
+                      <span class="material-symbols-outlined text-primary text-base">sell</span>
+                      <p class="text-xs font-black uppercase tracking-widest text-primary">Precio Final para el Usuario</p>
                     </div>
-
-                    <div>
-                      <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500 block mb-1">Precio final usuario (COP)</label>
-                      <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-bold">$</span>
-                        <input [(ngModel)]="precioFinalInput" type="number" min="0" step="1000"
-                               class="w-full bg-[#0a0a08] border border-primary/30 text-primary font-bold text-sm rounded-lg pl-7 pr-3 py-2 outline-none focus:border-primary transition-all"/>
+                    <div class="p-3 space-y-3 bg-neutral-charcoal">
+                      <!-- Costo referencia -->
+                      <div class="flex items-center justify-between text-xs">
+                        <span class="text-slate-500">Costo bodega (referencia)</span>
+                        <span class="font-bold text-slate-400">$ {{ producto.precio_base | number:'1.0-0' }}</span>
                       </div>
-                    </div>
-
-                    @if (precioFinalInput > producto.precio_base) {
-                      <div class="grid grid-cols-2 gap-2">
-                        <div class="bg-green-500/10 border border-green-500/20 rounded-lg p-2 text-center">
-                          <p class="text-[9px] font-bold uppercase tracking-widest text-green-600">Ganancia</p>
-                          <p class="text-sm font-black text-green-400">$ {{ (precioFinalInput - producto.precio_base) | number:'1.0-0' }}</p>
-                        </div>
-                        <div class="bg-primary/10 border border-primary/20 rounded-lg p-2 text-center">
-                          <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500">Margen</p>
-                          <p class="text-sm font-black text-primary">{{ ((precioFinalInput - producto.precio_base) / producto.precio_base * 100) | number:'1.0-0' }}%</p>
+                      <!-- Input precio -->
+                      <div>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-1.5">Precio que verá el usuario (COP)</label>
+                        <div class="relative">
+                          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-primary text-sm font-black">$</span>
+                          <input [(ngModel)]="precioFinalInput" type="number" min="0" step="1000"
+                                 class="w-full bg-[#0a0a08] border border-primary/40 text-primary font-black text-lg rounded-xl pl-8 pr-4 py-3 outline-none focus:border-primary transition-all placeholder:text-slate-700"
+                                 placeholder="0"/>
                         </div>
                       </div>
-                    } @else if (precioFinalInput > 0 && precioFinalInput <= producto.precio_base) {
-                      <p class="text-[11px] text-red-400 flex items-center gap-1">
-                        <span class="material-symbols-outlined text-sm">warning</span>
-                        El precio debe ser mayor al costo
-                      </p>
-                    }
-
-                    <div class="flex gap-2 pt-1">
-                      <button (click)="cerrarEditorPrecios()"
-                              class="flex-1 py-1.5 rounded-lg text-xs text-slate-400 border border-neutral-border hover:bg-white/5 transition-all">
-                        Cancelar
-                      </button>
-                      <button (click)="guardarPrecioFinal(producto)"
-                              [disabled]="guardandoPrecios() || precioFinalInput <= producto.precio_base"
-                              class="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-xs font-bold bg-primary text-[#0a0a08] hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
-                        @if (guardandoPrecios()) {
-                          <span class="w-3 h-3 border-2 border-[#0a0a08]/30 border-t-[#0a0a08] rounded-full animate-spin"></span>
-                        } @else {
-                          <span class="material-symbols-outlined text-sm">save</span>
-                        }
-                        Guardar
-                      </button>
+                      <!-- Cálculo en tiempo real -->
+                      @if (precioFinalInput > producto.precio_base) {
+                        <div class="grid grid-cols-2 gap-2">
+                          <div class="bg-green-500/10 border border-green-500/20 rounded-xl p-3 text-center">
+                            <p class="text-[9px] font-bold uppercase tracking-widest text-green-600 mb-1">Tu Ganancia</p>
+                            <p class="text-base font-black text-green-400">$ {{ (precioFinalInput - producto.precio_base) | number:'1.0-0' }}</p>
+                          </div>
+                          <div class="bg-primary/10 border border-primary/20 rounded-xl p-3 text-center">
+                            <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500 mb-1">Margen</p>
+                            <p class="text-base font-black text-primary">{{ ((precioFinalInput - producto.precio_base) / producto.precio_base * 100) | number:'1.0-0' }}%</p>
+                          </div>
+                        </div>
+                      } @else if (precioFinalInput > 0) {
+                        <p class="text-[11px] text-red-400 flex items-center gap-1">
+                          <span class="material-symbols-outlined text-sm">warning</span>
+                          El precio debe superar el costo ($ {{ producto.precio_base | number:'1.0-0' }})
+                        </p>
+                      }
+                      <!-- Botones -->
+                      <div class="flex gap-2">
+                        <button (click)="cerrarEditorPrecios()"
+                                class="flex-1 py-2 rounded-xl text-xs text-slate-400 border border-neutral-border hover:bg-white/5 transition-all">
+                          Cancelar
+                        </button>
+                        <button (click)="guardarPrecioFinal(producto)"
+                                [disabled]="guardandoPrecios() || precioFinalInput <= producto.precio_base"
+                                class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-black bg-primary text-[#0a0a08] hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                          @if (guardandoPrecios()) {
+                            <span class="w-3.5 h-3.5 border-2 border-[#0a0a08]/30 border-t-[#0a0a08] rounded-full animate-spin"></span>
+                            Guardando…
+                          } @else {
+                            <span class="material-symbols-outlined text-sm">check</span>
+                            Guardar precio
+                          }
+                        </button>
+                      </div>
                     </div>
                   </div>
+
                 } @else {
-                  <!-- Vista de precios + botón editar -->
-                  <div class="bg-neutral-charcoal/50 rounded-xl p-3 space-y-2">
-                    <div class="flex items-center justify-between">
+
+                  <!-- ── Vista de precios (siempre visible) ── -->
+                  <div class="border border-neutral-border rounded-xl overflow-hidden">
+                    <!-- Header -->
+                    <div class="bg-neutral-charcoal px-3 py-2 flex items-center justify-between">
+                      <div class="flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-slate-500 text-base">sell</span>
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Precio para el Usuario</p>
+                      </div>
+                      <button (click)="abrirEditorPrecios(producto, $event)"
+                              class="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold text-primary bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-all">
+                        <span class="material-symbols-outlined text-sm">edit</span>
+                        Editar
+                      </button>
+                    </div>
+                    <!-- Precios -->
+                    <div class="p-3 space-y-2 bg-neutral-surface/50">
                       <div class="flex items-center gap-3">
-                        <div>
+                        <div class="flex-1">
                           <p class="text-[9px] font-bold uppercase tracking-widest text-slate-600">Costo bodega</p>
-                          <p class="text-sm font-bold text-slate-300">$ {{ producto.precio_base | number:'1.0-0' }}</p>
+                          <p class="text-sm font-bold text-slate-400">$ {{ producto.precio_base | number:'1.0-0' }}</p>
                         </div>
-                        <span class="material-symbols-outlined text-slate-700 text-base">arrow_forward</span>
-                        <div>
+                        <span class="material-symbols-outlined text-slate-700">arrow_forward</span>
+                        <div class="flex-1 text-right">
                           <p class="text-[9px] font-bold uppercase tracking-widest text-slate-600">Precio usuario</p>
                           @if (producto.precio_sugerido) {
-                            <p class="text-sm font-black text-primary">$ {{ producto.precio_sugerido | number:'1.0-0' }}</p>
+                            <p class="text-lg font-black text-primary">$ {{ producto.precio_sugerido | number:'1.0-0' }}</p>
                           } @else {
-                            <p class="text-sm font-bold text-amber-400 italic">Sin definir</p>
+                            <button (click)="abrirEditorPrecios(producto, $event)"
+                                    class="text-sm font-bold text-amber-400 underline underline-offset-2 hover:text-amber-300 transition-colors">
+                              Sin definir →
+                            </button>
                           }
                         </div>
                       </div>
-                      <button (click)="abrirEditorPrecios(producto, $event)"
-                              class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 hover:text-primary hover:bg-primary/10 border border-transparent hover:border-primary/20 transition-all shrink-0"
-                              title="Ajustar precio">
-                        <span class="material-symbols-outlined text-sm">edit</span>
-                      </button>
-                    </div>
 
-                    @if (producto.precio_sugerido && producto.precio_sugerido > producto.precio_base) {
-                      <div class="flex items-center gap-2 pt-1 border-t border-neutral-border/50">
-                        <div class="flex-1 flex items-center gap-1.5 text-xs text-green-400">
-                          <span class="material-symbols-outlined text-sm">trending_up</span>
-                          <span class="font-bold">+ $ {{ ganancia(producto) | number:'1.0-0' }}</span>
-                          <span class="text-slate-600">ganancia</span>
+                      @if (producto.precio_sugerido && producto.precio_sugerido > producto.precio_base) {
+                        <div class="flex items-center gap-2 pt-2 border-t border-neutral-border/50">
+                          <span class="material-symbols-outlined text-green-400 text-base">trending_up</span>
+                          <span class="text-xs font-black text-green-400">+ $ {{ ganancia(producto) | number:'1.0-0' }}</span>
+                          <span class="text-xs text-slate-600">ganancia</span>
+                          <span class="ml-auto text-[11px] font-black px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                            {{ margen(producto) }}%
+                          </span>
                         </div>
-                        <span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-                          {{ margen(producto) }}%
-                        </span>
-                      </div>
-                    } @else {
-                      <p class="text-[11px] text-amber-500/70 flex items-center gap-1 pt-1 border-t border-neutral-border/50">
-                        <span class="material-symbols-outlined text-sm">info</span>
-                        Define el precio para calcular la ganancia
-                      </p>
-                    }
+                      } @else if (!producto.precio_sugerido) {
+                        <p class="text-[11px] text-amber-500/80 flex items-center gap-1 pt-1 border-t border-neutral-border/50">
+                          <span class="material-symbols-outlined text-sm">info</span>
+                          Define el precio para mostrar la ganancia
+                        </p>
+                      }
+                    </div>
                   </div>
+
                 }
 
-                <!-- Métricas -->
-                <div class="flex items-center gap-3 text-[11px] text-slate-500">
-                  <span class="flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[14px]">visibility</span>
-                    {{ producto.vistas }}
-                  </span>
-                  <span class="flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[14px]">download</span>
-                    {{ producto.descargas }}
-                  </span>
-                </div>
-
-                <!-- Acciones -->
-                <div class="flex items-center gap-2 pt-2 border-t border-neutral-border">
+                <!-- Acciones de aprobación -->
+                <div class="flex items-center gap-2 pt-1 border-t border-neutral-border">
                   @if (producto.estado === 'pendiente') {
                     <button (click)="abrirRevision(producto)"
                             class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold bg-amber-500/10 border border-amber-500/20 text-amber-300 hover:bg-amber-500/20 transition-all">
                       <span class="material-symbols-outlined text-[14px]">rate_review</span>
-                      Revisar
-                    </button>
-                    <button (click)="rechazarProducto(producto)"
-                            class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-600 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all">
-                      <span class="material-symbols-outlined text-base">thumb_down</span>
+                      Aprobar / Rechazar
                     </button>
                   } @else if (producto.estado === 'aprobado') {
                     <span class="flex items-center gap-1.5 text-xs text-green-400 flex-1">
@@ -450,17 +468,14 @@
                       Aprobado y publicado
                     </span>
                   } @else {
-                    <span class="flex items-center gap-1.5 text-xs text-red-400 flex-1">
-                      <span class="material-symbols-outlined text-[14px]">cancel</span>
-                      Rechazado
-                    </span>
                     <button (click)="abrirRevision(producto)"
-                            class="px-3 py-1.5 rounded-lg text-xs font-bold text-primary border border-primary/20 hover:bg-primary/10 transition-all">
+                            class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold text-amber-300 border border-amber-500/20 hover:bg-amber-500/10 transition-all">
+                      <span class="material-symbols-outlined text-[14px]">replay</span>
                       Re-revisar
                     </button>
                   }
                   <button (click)="confirmarEliminarProducto(producto)"
-                          class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-600 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all">
+                          class="w-8 h-8 flex items-center justify-center rounded-xl text-slate-600 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all">
                     <span class="material-symbols-outlined text-base">delete</span>
                   </button>
                 </div>
