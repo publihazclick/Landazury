@@ -22,6 +22,8 @@ export interface Creativo {
   creado_en: string;
 }
 
+export type EstadoProducto = 'pendiente' | 'aprobado' | 'rechazado';
+
 export interface Producto {
   id: string;
   nombre: string;
@@ -33,8 +35,12 @@ export interface Producto {
   categoria?: Categoria;
   proveedor?: string;
   disponible: boolean;
-  ganador: boolean;   // requiere migración SQL: ALTER TABLE productos ADD COLUMN ganador BOOLEAN DEFAULT false
-  exclusivo: boolean; // requiere migración SQL: ALTER TABLE productos ADD COLUMN exclusivo BOOLEAN DEFAULT false
+  ganador: boolean;
+  exclusivo: boolean;
+  estado: EstadoProducto;
+  bodega_id?: string;
+  vistas: number;
+  descargas: number;
   creado_en: string;
   creativos?: Creativo[];
 }

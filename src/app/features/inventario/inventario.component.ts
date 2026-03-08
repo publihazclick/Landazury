@@ -3,7 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { CreativosService } from '../../core/services/creativos.service';
 import { CatalogoService } from '../../core/services/catalogo.service';
-import type { Creativo, Producto, TipoCreativo, Categoria } from '../../core/models/producto.model';
+import { AuthService } from '../../core/services/auth.service';
+import type { Creativo, Producto, TipoCreativo, Categoria, EstadoProducto } from '../../core/models/producto.model';
 
 interface FormProducto {
   nombre: string;
@@ -24,6 +25,7 @@ interface FormProducto {
 export class InventarioComponent implements OnInit {
   private readonly creativosService = inject(CreativosService);
   private readonly catalogoService = inject(CatalogoService);
+  readonly auth = inject(AuthService);
 
   readonly productos = signal<Producto[]>([]);
   readonly categorias = signal<Categoria[]>([]);
@@ -49,7 +51,8 @@ export class InventarioComponent implements OnInit {
 
   // Stats
   readonly totalProductos = computed(() => this.productos().length);
-  readonly productosPublicados = computed(() => this.productos().filter(p => p.disponible).length);
+  readonly productosPendientes = computed(() => this.productos().filter(p => p.estado === 'pendiente').length);
+  readonly productosPublicados = computed(() => this.productos().filter(p => p.estado === 'aprobado' && p.disponible).length);
   readonly totalCreativos = computed(() => this.productos().reduce((acc, p) => acc + (p.creativos?.length ?? 0), 0));
 
   readonly tiposConfig: { valor: TipoCreativo; icono: string; label: string; iconColor: string; bgClass: string; chipClass: string }[] = [
@@ -67,7 +70,9 @@ export class InventarioComponent implements OnInit {
   async cargarProductos() {
     this.cargando.set(true);
     try {
-      const data = await this.catalogoService.obtenerTodosProductos();
+      // Inventario solo ve sus propios productos; admin ve todos
+      const bodegaId = this.auth.esInventario() ? (this.auth.usuario()?.id ?? undefined) : undefined;
+      const data = await this.catalogoService.obtenerTodosProductos({ bodegaId });
       this.productos.set(data);
     } catch {
       this.error.set('No se pudieron cargar los productos.');
@@ -107,7 +112,6 @@ export class InventarioComponent implements OnInit {
     this.creativosEnModal.set(producto.creativos ?? []);
     this.limpiarArchivoModal();
     this.mostrarModal.set(true);
-    // Refresh creativos from DB
     this.cargandoModal.set(true);
     try {
       const creativos = await this.creativosService.obtenerCreativos({ productoId: producto.id });
@@ -135,6 +139,12 @@ export class InventarioComponent implements OnInit {
     this.error.set(null);
     try {
       const existente = this.productoEnModal();
+      const esAdmin = this.auth.esAdmin();
+      const userId = this.auth.usuario()?.id;
+
+      // Estado: admin auto-aprueba; inventario → pendiente (o vuelve a pendiente si edita)
+      const estadoNuevo: EstadoProducto = esAdmin ? 'aprobado' : 'pendiente';
+
       const payload = {
         nombre: this.formProducto.nombre.trim(),
         descripcion: this.formProducto.descripcion || undefined,
@@ -142,26 +152,30 @@ export class InventarioComponent implements OnInit {
         precio_sugerido: Number(this.formProducto.precio_sugerido) || undefined,
         proveedor: this.formProducto.proveedor || undefined,
         categoria_id: this.formProducto.categoria_id || undefined,
-        disponible: this.formProducto.disponible,
-        // Preserve ganador/exclusivo from existing product; defaults false for new ones
+        disponible: esAdmin ? this.formProducto.disponible : false, // inventario no controla visibilidad
         ganador: existente?.ganador ?? false,
         exclusivo: existente?.exclusivo ?? false,
         imagenes: existente?.imagenes ?? [] as string[],
+        estado: existente ? (esAdmin ? existente.estado : 'pendiente' as EstadoProducto) : estadoNuevo,
+        bodega_id: existente?.bodega_id ?? userId,
+        vistas: existente?.vistas ?? 0,
+        descargas: existente?.descargas ?? 0,
       };
+
       if (existente) {
         await this.catalogoService.actualizarProducto(existente.id, payload);
         const cat = this.categorias().find(c => c.id === payload.categoria_id);
         this.productos.update(list => list.map(p =>
           p.id === existente.id ? { ...p, ...payload, categoria: cat } : p
         ));
-        this.exito.set('Producto actualizado.');
+        this.exito.set(esAdmin ? 'Producto actualizado.' : 'Producto actualizado y enviado a revisión.');
       } else {
         const creado = await this.catalogoService.crearProducto(payload);
         const cat = this.categorias().find(c => c.id === payload.categoria_id);
         const productoConDatos = { ...creado, categoria: cat, creativos: [] as Creativo[] };
         this.productos.update(list => [productoConDatos, ...list]);
         this.productoEnModal.set(productoConDatos);
-        this.exito.set('Producto creado. Ahora agrega los creativos.');
+        this.exito.set(esAdmin ? 'Producto creado y aprobado.' : 'Producto enviado a revisión. Ahora agrega los creativos.');
       }
       setTimeout(() => this.exito.set(null), 3000);
     } catch (e: any) {
@@ -229,6 +243,7 @@ export class InventarioComponent implements OnInit {
 
   async toggleDisponible(producto: Producto, event: Event) {
     event.stopPropagation();
+    if (!this.auth.esAdmin()) return; // solo admin controla visibilidad
     try {
       await this.catalogoService.actualizarProducto(producto.id, { disponible: !producto.disponible });
       this.productos.update(list => list.map(p =>
@@ -301,7 +316,7 @@ export class InventarioComponent implements OnInit {
   // ── Helpers ────────────────────────────────────────
 
   formVacio(): FormProducto {
-    return { nombre: '', descripcion: '', precio_base: 0, precio_sugerido: 0, proveedor: '', categoria_id: '', disponible: true };
+    return { nombre: '', descripcion: '', precio_base: 0, precio_sugerido: 0, proveedor: '', categoria_id: '', disponible: false };
   }
 
   limpiarArchivoModal() {
@@ -333,5 +348,23 @@ export class InventarioComponent implements OnInit {
 
   tamano(bytes?: number) {
     return this.creativosService.formatearTamano(bytes);
+  }
+
+  badgeEstado(estado: string): string {
+    const clases: Record<string, string> = {
+      pendiente: 'bg-amber-500/20 border-amber-500/40 text-amber-300',
+      aprobado:  'bg-green-500/20 border-green-500/40 text-green-300',
+      rechazado: 'bg-red-500/20 border-red-500/40 text-red-300',
+    };
+    return clases[estado] ?? clases['pendiente'];
+  }
+
+  iconoEstado(estado: string): string {
+    const iconos: Record<string, string> = {
+      pendiente: 'schedule',
+      aprobado:  'check_circle',
+      rechazado: 'cancel',
+    };
+    return iconos[estado] ?? 'schedule';
   }
 }

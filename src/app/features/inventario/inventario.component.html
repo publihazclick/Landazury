@@ -29,10 +29,14 @@
   }
 
   <!-- Stats -->
-  <div class="grid grid-cols-3 gap-4 mb-8">
+  <div class="grid grid-cols-4 gap-4 mb-8">
     <div class="glass rounded-2xl p-4 text-center">
       <p class="text-2xl font-black text-slate-100">{{ totalProductos() }}</p>
-      <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-0.5">Productos</p>
+      <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-0.5">Total</p>
+    </div>
+    <div class="glass rounded-2xl p-4 text-center">
+      <p class="text-2xl font-black text-amber-300">{{ productosPendientes() }}</p>
+      <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-0.5">Pendientes</p>
     </div>
     <div class="glass rounded-2xl p-4 text-center">
       <p class="text-2xl font-black text-green-300">{{ productosPublicados() }}</p>
@@ -88,35 +92,59 @@
 
             <!-- Status badges -->
             <div class="absolute top-3 right-3 flex flex-col items-end gap-1.5">
-              <button (click)="toggleDisponible(producto, $event)"
-                      class="text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider backdrop-blur-sm transition-all border"
-                      [class]="producto.disponible
-                        ? 'bg-green-500/20 border-green-500/40 text-green-300 hover:bg-green-500/30'
-                        : 'bg-black/40 border-white/10 text-slate-400 hover:bg-black/60'">
-                <span class="inline-block w-1.5 h-1.5 rounded-full mr-1 align-middle"
-                      [class]="producto.disponible ? 'bg-green-400' : 'bg-slate-600'"></span>
-                {{ producto.disponible ? 'Publicado' : 'Oculto' }}
-              </button>
+              <!-- Estado de aprobación -->
+              <span class="text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider backdrop-blur-sm border flex items-center gap-1"
+                    [class]="badgeEstado(producto.estado)">
+                <span class="material-symbols-outlined text-[11px]">{{ iconoEstado(producto.estado) }}</span>
+                {{ producto.estado }}
+              </span>
+              <!-- Disponible (solo admin lo puede cambiar) -->
+              @if (auth.esAdmin() && producto.estado === 'aprobado') {
+                <button (click)="toggleDisponible(producto, $event)"
+                        class="text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider backdrop-blur-sm transition-all border"
+                        [class]="producto.disponible
+                          ? 'bg-green-500/20 border-green-500/40 text-green-300 hover:bg-green-500/30'
+                          : 'bg-black/40 border-white/10 text-slate-400 hover:bg-black/60'">
+                  <span class="inline-block w-1.5 h-1.5 rounded-full mr-1 align-middle"
+                        [class]="producto.disponible ? 'bg-green-400' : 'bg-slate-600'"></span>
+                  {{ producto.disponible ? 'Visible' : 'Oculto' }}
+                </button>
+              }
             </div>
 
-            <!-- Ganador / Exclusivo badges top-left -->
+            <!-- Ganador / Exclusivo badges top-left (solo visual para inventario, editables para admin) -->
             <div class="absolute top-3 left-3 flex flex-col gap-1.5">
-              <button (click)="toggleGanador(producto, $event)"
-                      class="flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider backdrop-blur-sm border transition-all"
-                      [class]="producto.ganador
-                        ? 'bg-primary/90 border-primary text-[#0f0f0f]'
-                        : 'bg-black/40 border-white/10 text-slate-500 hover:border-primary/30 hover:text-primary/60'">
-                <span class="material-symbols-outlined text-[11px]">verified</span>
-                Ganador
-              </button>
-              <button (click)="toggleExclusivo(producto, $event)"
-                      class="flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider backdrop-blur-sm border transition-all"
-                      [class]="producto.exclusivo
-                        ? 'bg-purple-500/90 border-purple-400 text-white'
-                        : 'bg-black/40 border-white/10 text-slate-500 hover:border-purple-400/30 hover:text-purple-400/60'">
-                <span class="material-symbols-outlined text-[11px]">diamond</span>
-                Exclusivo
-              </button>
+              @if (auth.esAdmin()) {
+                <button (click)="toggleGanador(producto, $event)"
+                        class="flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider backdrop-blur-sm border transition-all"
+                        [class]="producto.ganador
+                          ? 'bg-primary/90 border-primary text-[#0f0f0f]'
+                          : 'bg-black/40 border-white/10 text-slate-500 hover:border-primary/30 hover:text-primary/60'">
+                  <span class="material-symbols-outlined text-[11px]">verified</span>
+                  Ganador
+                </button>
+                <button (click)="toggleExclusivo(producto, $event)"
+                        class="flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider backdrop-blur-sm border transition-all"
+                        [class]="producto.exclusivo
+                          ? 'bg-purple-500/90 border-purple-400 text-white'
+                          : 'bg-black/40 border-white/10 text-slate-500 hover:border-purple-400/30 hover:text-purple-400/60'">
+                  <span class="material-symbols-outlined text-[11px]">diamond</span>
+                  Exclusivo
+                </button>
+              } @else {
+                @if (producto.ganador) {
+                  <span class="flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider backdrop-blur-sm border bg-primary/90 border-primary text-[#0f0f0f]">
+                    <span class="material-symbols-outlined text-[11px]">verified</span>
+                    Ganador
+                  </span>
+                }
+                @if (producto.exclusivo) {
+                  <span class="flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider backdrop-blur-sm border bg-purple-500/90 border-purple-400 text-white">
+                    <span class="material-symbols-outlined text-[11px]">diamond</span>
+                    Exclusivo
+                  </span>
+                }
+              }
             </div>
 
             <!-- Category badge -->

@@ -28,7 +28,11 @@ export class CatalogoComponent implements OnInit {
 
   busqueda = '';
 
-  abrirModal(producto: Producto) { this.productoModal.set(producto); }
+  abrirModal(producto: Producto) {
+    this.productoModal.set(producto);
+    // Registrar vista en background (sin bloquear UI)
+    this.catalogoService.registrarVista(producto.id).catch(() => {});
+  }
   cerrarModal() { this.productoModal.set(null); }
 
   readonly productosFiltrados = computed(() => {
@@ -108,6 +112,10 @@ export class CatalogoComponent implements OnInit {
       a.href = url;
       a.download = creativo.nombre;
       a.click();
+      // Registrar descarga
+      if (creativo.producto_id) {
+        this.catalogoService.registrarDescarga(creativo.producto_id).catch(() => {});
+      }
     } catch { /* silencioso */ }
   }
 

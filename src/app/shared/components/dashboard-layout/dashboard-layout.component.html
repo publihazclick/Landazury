@@ -36,6 +36,30 @@
       <!-- ══ ROL: ADMIN ══ -->
       @if (auth.esAdmin()) {
         <p class="text-[10px] font-bold uppercase tracking-widest text-slate-600 px-3 pt-2 pb-1">Administración</p>
+        <a [routerLink]="['/admin']" [queryParams]="{}"
+           [class.bg-primary\/10]="esRutaActiva('/admin') && !esRutaActiva('/admin','estadisticas') && !esRutaActiva('/admin','productos')"
+           [class.text-primary]="esRutaActiva('/admin') && !esRutaActiva('/admin','estadisticas') && !esRutaActiva('/admin','productos')"
+           [class.border-primary\/20]="esRutaActiva('/admin') && !esRutaActiva('/admin','estadisticas') && !esRutaActiva('/admin','productos')"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 border border-transparent hover:bg-white/5 hover:text-slate-200 transition-all">
+          <span class="material-symbols-outlined text-xl">group</span>
+          Usuarios
+        </a>
+        <a [routerLink]="['/admin']" [queryParams]="{tab:'productos'}"
+           [class.bg-primary\/10]="esRutaActiva('/admin','productos')"
+           [class.text-primary]="esRutaActiva('/admin','productos')"
+           [class.border-primary\/20]="esRutaActiva('/admin','productos')"
+           class="relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 border border-transparent hover:bg-white/5 hover:text-slate-200 transition-all">
+          <span class="material-symbols-outlined text-xl">inventory</span>
+          Productos
+        </a>
+        <a [routerLink]="['/inventario']"
+           [class.bg-primary\/10]="esRutaActiva('/inventario')"
+           [class.text-primary]="esRutaActiva('/inventario')"
+           [class.border-primary\/20]="esRutaActiva('/inventario')"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 border border-transparent hover:bg-white/5 hover:text-slate-200 transition-all">
+          <span class="material-symbols-outlined text-xl">add_box</span>
+          Crear Producto
+        </a>
         <a [routerLink]="['/admin']" [queryParams]="{tab:'estadisticas'}"
            [class.bg-primary\/10]="esRutaActiva('/admin','estadisticas')"
            [class.text-primary]="esRutaActiva('/admin','estadisticas')"
@@ -43,14 +67,6 @@
            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 border border-transparent hover:bg-white/5 hover:text-slate-200 transition-all">
           <span class="material-symbols-outlined text-xl">bar_chart</span>
           Estadísticas
-        </a>
-        <a [routerLink]="['/admin']" [queryParams]="{}"
-           [class.bg-primary\/10]="esRutaActiva('/admin') && !esRutaActiva('/admin','estadisticas')"
-           [class.text-primary]="esRutaActiva('/admin') && !esRutaActiva('/admin','estadisticas')"
-           [class.border-primary\/20]="esRutaActiva('/admin') && !esRutaActiva('/admin','estadisticas')"
-           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 border border-transparent hover:bg-white/5 hover:text-slate-200 transition-all">
-          <span class="material-symbols-outlined text-xl">group</span>
-          Gestión de Usuarios
         </a>
       }
 

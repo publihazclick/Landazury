@@ -262,7 +262,7 @@
       @for (producto of exclusivosVisibles; track producto.id) {
         <div class="w-[78vw] max-w-[300px] md:min-w-[340px] md:w-auto flex-shrink-0 snap-start">
           <div class="relative aspect-[4/5] rounded-2xl md:rounded-[2rem] overflow-hidden mb-4 group">
-            @if (producto.imagenes?.length) {
+            @if (producto.imagenes.length) {
               <img [src]="producto.imagenes[0]" [alt]="producto.nombre"
                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
             } @else {
@@ -339,7 +339,7 @@
 
           <!-- Image -->
           <div [class]="i === 0 ? 'aspect-square md:aspect-auto md:h-full min-h-[240px]' : 'aspect-square'">
-            @if (producto.imagenes?.length) {
+            @if (producto.imagenes.length) {
               <img [src]="producto.imagenes[0]" [alt]="producto.nombre"
                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"/>
             } @else {

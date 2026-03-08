@@ -1,8 +1,12 @@
 import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DecimalPipe, TitleCasePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { SupabaseService } from '../../core/services/supabase.service';
+import { CatalogoService } from '../../core/services/catalogo.service';
+import { AuthService } from '../../core/services/auth.service';
 import type { Perfil, Rol } from '../../core/models/usuario.model';
+import type { Producto, Categoria, EstadoProducto } from '../../core/models/producto.model';
 
 interface FormEdicion {
   nombre: string;
@@ -10,21 +14,29 @@ interface FormEdicion {
   telefono: string;
 }
 
+interface FormRevision {
+  precio_base: number;
+  precio_sugerido: number;
+}
+
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, DecimalPipe, TitleCasePipe, RouterLink],
   templateUrl: './admin.component.html',
 })
 export class AdminComponent implements OnInit {
   private readonly supabase = inject(SupabaseService);
+  private readonly catalogoService = inject(CatalogoService);
+  readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
 
+  // ── Usuarios ────────────────────────────────────────
   readonly usuarios = signal<Perfil[]>([]);
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
   readonly exito = signal<string | null>(null);
-  readonly tabActivo = signal<'usuarios' | 'estadisticas'>('usuarios');
+  readonly tabActivo = signal<'usuarios' | 'productos' | 'estadisticas'>('usuarios');
   readonly filtroRol = signal<Rol | 'todos'>('todos');
   readonly usuarioEditando = signal<Perfil | null>(null);
   readonly confirmandoEliminar = signal<Perfil | null>(null);
@@ -43,10 +55,10 @@ export class AdminComponent implements OnInit {
   readonly totalUsuarios = computed(() => this.usuarios().length);
 
   readonly filtroChips = computed(() => [
-    { valor: 'todos' as const,     etiqueta: 'Todos',      count: this.usuarios().length,        icono: 'group' },
-    { valor: 'admin' as const,     etiqueta: 'Admin',      count: this.contarRol('admin'),       icono: 'shield_person' },
-    { valor: 'inventario' as const, etiqueta: 'Inventario', count: this.contarRol('inventario'), icono: 'inventory_2' },
-    { valor: 'usuario' as const,   etiqueta: 'Usuario',    count: this.contarRol('usuario'),     icono: 'person' },
+    { valor: 'todos' as const,      etiqueta: 'Todos',      count: this.usuarios().length,         icono: 'group' },
+    { valor: 'admin' as const,      etiqueta: 'Admin',      count: this.contarRol('admin'),        icono: 'shield_person' },
+    { valor: 'inventario' as const, etiqueta: 'Inventario', count: this.contarRol('inventario'),   icono: 'inventory_2' },
+    { valor: 'usuario' as const,    etiqueta: 'Usuario',    count: this.contarRol('usuario'),      icono: 'person' },
   ]);
 
   readonly distribucion = computed(() =>
@@ -69,12 +81,54 @@ export class AdminComponent implements OnInit {
     });
   }
 
+  // ── Productos ────────────────────────────────────────
+  readonly productos = signal<Producto[]>([]);
+  readonly categorias = signal<Categoria[]>([]);
+  readonly cargandoProductos = signal(false);
+  readonly filtroEstado = signal<'todos' | EstadoProducto>('pendiente');
+  readonly productoRevisando = signal<Producto | null>(null);
+  readonly guardandoRevision = signal(false);
+  readonly confirmandoEliminarProducto = signal<Producto | null>(null);
+  busquedaProductos = '';
+  formRevision: FormRevision = { precio_base: 0, precio_sugerido: 0 };
+
+  readonly chipsFiltroEstado = computed(() => [
+    { valor: 'todos' as const,      etiqueta: 'Todos',     count: this.productos().length,                                       color: 'text-slate-300 border-slate-600',        colorActivo: 'bg-slate-600 text-white border-slate-500' },
+    { valor: 'pendiente' as const,  etiqueta: 'Pendiente', count: this.contarEstado('pendiente'),  color: 'text-amber-400 border-amber-700/40',  colorActivo: 'bg-amber-500/20 text-amber-300 border-amber-500/50' },
+    { valor: 'aprobado' as const,   etiqueta: 'Aprobado',  count: this.contarEstado('aprobado'),   color: 'text-green-400 border-green-700/40',  colorActivo: 'bg-green-500/20 text-green-300 border-green-500/50' },
+    { valor: 'rechazado' as const,  etiqueta: 'Rechazado', count: this.contarEstado('rechazado'),  color: 'text-red-400 border-red-700/40',      colorActivo: 'bg-red-500/20 text-red-300 border-red-500/50' },
+  ]);
+
+  readonly productosFiltrados = computed(() => {
+    let list = this.productos();
+    const estado = this.filtroEstado();
+    if (estado !== 'todos') list = list.filter(p => p.estado === estado);
+    const q = this.busquedaProductos.toLowerCase().trim();
+    if (q) list = list.filter(p => p.nombre.toLowerCase().includes(q));
+    return list;
+  });
+
+  readonly totalPendientes = computed(() => this.contarEstado('pendiente'));
+
+  // ── Estadísticas de productos ────────────────────────
+  readonly topVistas = signal<Producto[]>([]);
+  readonly topDescargas = signal<Producto[]>([]);
+  readonly topFavoritos = signal<{ producto_id: string; total: number }[]>([]);
+  readonly cargandoStats = signal(false);
+
   async ngOnInit() {
     this.route.queryParams.subscribe((params) => {
-      this.tabActivo.set(params['tab'] === 'estadisticas' ? 'estadisticas' : 'usuarios');
+      const tab = params['tab'];
+      if (tab === 'estadisticas') this.tabActivo.set('estadisticas');
+      else if (tab === 'productos') this.tabActivo.set('productos');
+      else this.tabActivo.set('usuarios');
     });
     await this.cargarUsuarios();
+    this.cargarProductos();
+    this.cargarCategorias();
   }
+
+  // ── Métodos usuarios ─────────────────────────────────
 
   async cargarUsuarios() {
     this.cargando.set(true);
@@ -117,9 +171,7 @@ export class AdminComponent implements OnInit {
     this.usuarioEditando.set(u);
   }
 
-  cancelarEdicion() {
-    this.usuarioEditando.set(null);
-  }
+  cancelarEdicion() { this.usuarioEditando.set(null); }
 
   async guardarEdicion() {
     const u = this.usuarioEditando();
@@ -145,13 +197,8 @@ export class AdminComponent implements OnInit {
     }
   }
 
-  confirmarEliminar(u: Perfil) {
-    this.confirmandoEliminar.set(u);
-  }
-
-  cancelarEliminar() {
-    this.confirmandoEliminar.set(null);
-  }
+  confirmarEliminar(u: Perfil) { this.confirmandoEliminar.set(u); }
+  cancelarEliminar() { this.confirmandoEliminar.set(null); }
 
   async eliminarUsuario() {
     const u = this.confirmandoEliminar();
@@ -171,6 +218,144 @@ export class AdminComponent implements OnInit {
     }
   }
 
+  // ── Métodos productos ─────────────────────────────────
+
+  async cargarProductos() {
+    this.cargandoProductos.set(true);
+    try {
+      const data = await this.catalogoService.obtenerTodosProductos();
+      this.productos.set(data);
+    } catch {
+      this.error.set('No se pudieron cargar los productos.');
+    } finally {
+      this.cargandoProductos.set(false);
+    }
+  }
+
+  async cargarCategorias() {
+    try {
+      const data = await this.catalogoService.obtenerCategorias();
+      this.categorias.set(data);
+    } catch {}
+  }
+
+  abrirRevision(producto: Producto) {
+    this.formRevision = {
+      precio_base: producto.precio_base,
+      precio_sugerido: producto.precio_sugerido ?? 0,
+    };
+    this.productoRevisando.set(producto);
+  }
+
+  cerrarRevision() { this.productoRevisando.set(null); }
+
+  async aprobarProducto() {
+    const producto = this.productoRevisando();
+    if (!producto) return;
+    this.guardandoRevision.set(true);
+    try {
+      await this.catalogoService.aprobarProducto(producto.id, {
+        precio_base: Number(this.formRevision.precio_base) || undefined,
+        precio_sugerido: Number(this.formRevision.precio_sugerido) || undefined,
+      });
+      this.productos.update(list => list.map(p =>
+        p.id === producto.id
+          ? { ...p, estado: 'aprobado' as EstadoProducto, disponible: true,
+              precio_base: Number(this.formRevision.precio_base) || p.precio_base,
+              precio_sugerido: Number(this.formRevision.precio_sugerido) || p.precio_sugerido }
+          : p
+      ));
+      this.exito.set(`"${producto.nombre}" aprobado y publicado.`);
+      setTimeout(() => this.exito.set(null), 3000);
+      this.productoRevisando.set(null);
+    } catch {
+      this.error.set('No se pudo aprobar el producto.');
+    } finally {
+      this.guardandoRevision.set(false);
+    }
+  }
+
+  async rechazarProducto(producto: Producto) {
+    try {
+      await this.catalogoService.rechazarProducto(producto.id);
+      this.productos.update(list => list.map(p =>
+        p.id === producto.id ? { ...p, estado: 'rechazado' as EstadoProducto, disponible: false } : p
+      ));
+      this.exito.set(`"${producto.nombre}" rechazado.`);
+      setTimeout(() => this.exito.set(null), 3000);
+      if (this.productoRevisando()?.id === producto.id) this.productoRevisando.set(null);
+    } catch {
+      this.error.set('No se pudo rechazar el producto.');
+    }
+  }
+
+  async toggleGanador(producto: Producto, event: Event) {
+    event.stopPropagation();
+    try {
+      await this.catalogoService.toggleGanador(producto.id, !producto.ganador);
+      this.productos.update(list => list.map(p =>
+        p.id === producto.id ? { ...p, ganador: !p.ganador } : p
+      ));
+    } catch {
+      this.error.set('No se pudo actualizar ganador.');
+    }
+  }
+
+  async toggleExclusivo(producto: Producto, event: Event) {
+    event.stopPropagation();
+    try {
+      await this.catalogoService.toggleExclusivo(producto.id, !producto.exclusivo);
+      this.productos.update(list => list.map(p =>
+        p.id === producto.id ? { ...p, exclusivo: !p.exclusivo } : p
+      ));
+    } catch {
+      this.error.set('No se pudo actualizar exclusivo.');
+    }
+  }
+
+  confirmarEliminarProducto(producto: Producto) { this.confirmandoEliminarProducto.set(producto); }
+  cancelarEliminarProducto() { this.confirmandoEliminarProducto.set(null); }
+
+  async eliminarProducto() {
+    const p = this.confirmandoEliminarProducto();
+    if (!p) return;
+    try {
+      await this.catalogoService.eliminarProducto(p.id);
+      this.productos.update(list => list.filter(x => x.id !== p.id));
+      this.exito.set(`"${p.nombre}" eliminado.`);
+      setTimeout(() => this.exito.set(null), 3000);
+      this.confirmandoEliminarProducto.set(null);
+    } catch {
+      this.error.set('No se pudo eliminar el producto.');
+    }
+  }
+
+  // ── Estadísticas ─────────────────────────────────────
+
+  async cargarEstadisticas() {
+    if (this.topVistas().length > 0) return; // ya cargadas
+    this.cargandoStats.set(true);
+    try {
+      const [vistas, descargas, favoritos] = await Promise.all([
+        this.catalogoService.obtenerTopProductos('vistas', 5),
+        this.catalogoService.obtenerTopProductos('descargas', 5),
+        this.catalogoService.obtenerTopFavoritos(5),
+      ]);
+      this.topVistas.set(vistas);
+      this.topDescargas.set(descargas);
+      this.topFavoritos.set(favoritos);
+    } catch {} finally {
+      this.cargandoStats.set(false);
+    }
+  }
+
+  setTab(tab: 'usuarios' | 'productos' | 'estadisticas') {
+    this.tabActivo.set(tab);
+    if (tab === 'estadisticas') this.cargarEstadisticas();
+  }
+
+  // ── Helpers ───────────────────────────────────────────
+
   badgeRol(rol: Rol): string {
     const clases: Record<Rol, string> = {
       admin:      'bg-red-900/40 text-red-300 border border-red-700/30',
@@ -180,8 +365,30 @@ export class AdminComponent implements OnInit {
     return clases[rol];
   }
 
+  badgeEstado(estado: string): string {
+    const clases: Record<string, string> = {
+      pendiente: 'bg-amber-500/20 border border-amber-500/40 text-amber-300',
+      aprobado:  'bg-green-500/20 border border-green-500/40 text-green-300',
+      rechazado: 'bg-red-500/20 border border-red-500/40 text-red-300',
+    };
+    return clases[estado] ?? clases['pendiente'];
+  }
+
+  iconoEstado(estado: string): string {
+    return { pendiente: 'schedule', aprobado: 'check_circle', rechazado: 'cancel' }[estado] ?? 'schedule';
+  }
+
   contarRol(rol: Rol): number {
     return this.usuarios().filter((u) => u.rol === rol).length;
+  }
+
+  contarEstado(estado: EstadoProducto): number {
+    return this.productos().filter(p => p.estado === estado).length;
+  }
+
+  margen(producto: Producto): number {
+    if (!producto.precio_sugerido || producto.precio_base === 0) return 0;
+    return Math.round(((producto.precio_sugerido - producto.precio_base) / producto.precio_base) * 100);
   }
 
   formatearFecha(fecha: string): string {

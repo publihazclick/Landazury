@@ -9,14 +9,20 @@ export class CatalogoService {
   private readonly auth = inject(AuthService);
 
   private normalizar(data: any[]): Producto[] {
-    return data.map(p => ({ ganador: false, exclusivo: false, ...p }));
+    return data.map(p => ({
+      ganador: false, exclusivo: false,
+      estado: 'aprobado', vistas: 0, descargas: 0,
+      ...p,
+    }));
   }
 
+  // Usuarios: solo productos aprobados y disponibles
   async obtenerProductos(filtros?: { categoriaId?: string; busqueda?: string }) {
     let query = this.supabase.cliente
       .from('productos')
       .select('*, categoria:categorias(*), creativos(*)')
       .eq('disponible', true)
+      .eq('estado', 'aprobado')
       .order('creado_en', { ascending: false });
 
     if (filtros?.categoriaId) query = query.eq('categoria_id', filtros.categoriaId);
@@ -27,8 +33,8 @@ export class CatalogoService {
     return this.normalizar(data);
   }
 
-  // Inventario/admin: obtiene todos incluso no disponibles, con creativos
-  async obtenerTodosProductos(filtros?: { categoriaId?: string; busqueda?: string }) {
+  // Admin/inventario: todos los productos; filtro opcional por bodega
+  async obtenerTodosProductos(filtros?: { categoriaId?: string; busqueda?: string; bodegaId?: string; estado?: string }) {
     let query = this.supabase.cliente
       .from('productos')
       .select('*, categoria:categorias(*), creativos(*)')
@@ -36,6 +42,8 @@ export class CatalogoService {
 
     if (filtros?.categoriaId) query = query.eq('categoria_id', filtros.categoriaId);
     if (filtros?.busqueda) query = query.ilike('nombre', `%${filtros.busqueda}%`);
+    if (filtros?.bodegaId) query = query.eq('bodega_id', filtros.bodegaId);
+    if (filtros?.estado) query = query.eq('estado', filtros.estado);
 
     const { data, error } = await query;
     if (error) throw error;
@@ -72,6 +80,64 @@ export class CatalogoService {
     if (error) throw error;
   }
 
+  // ── Flujo de aprobación ─────────────────────────────────────────────────────
+
+  async aprobarProducto(id: string, precios?: { precio_base?: number; precio_sugerido?: number }) {
+    const cambios: any = { estado: 'aprobado', disponible: true };
+    if (precios?.precio_base) cambios.precio_base = precios.precio_base;
+    if (precios?.precio_sugerido) cambios.precio_sugerido = precios.precio_sugerido;
+    const { error } = await this.supabase.cliente.from('productos').update(cambios).eq('id', id);
+    if (error) throw error;
+  }
+
+  async rechazarProducto(id: string) {
+    const { error } = await this.supabase.cliente
+      .from('productos')
+      .update({ estado: 'rechazado', disponible: false })
+      .eq('id', id);
+    if (error) throw error;
+  }
+
+  // ── Estadísticas / tracking ─────────────────────────────────────────────────
+
+  async registrarVista(productoId: string) {
+    await this.supabase.cliente.rpc('incrementar_vistas', { producto_uuid: productoId });
+  }
+
+  async registrarDescarga(productoId: string) {
+    await this.supabase.cliente.rpc('incrementar_descargas', { producto_uuid: productoId });
+  }
+
+  async obtenerTopProductos(tipo: 'vistas' | 'descargas', limit = 5): Promise<Producto[]> {
+    const { data, error } = await this.supabase.cliente
+      .from('productos')
+      .select('*, categoria:categorias(*)')
+      .eq('estado', 'aprobado')
+      .order(tipo, { ascending: false })
+      .limit(limit);
+    if (error) return [];
+    return this.normalizar(data);
+  }
+
+  async obtenerTopFavoritos(limit = 5): Promise<{ producto_id: string; total: number; producto?: Producto }[]> {
+    const { data, error } = await this.supabase.cliente
+      .from('favoritos')
+      .select('producto_id')
+      .order('producto_id');
+    if (error) return [];
+    // Contar por producto_id
+    const conteo: Record<string, number> = {};
+    for (const f of data) {
+      conteo[f.producto_id] = (conteo[f.producto_id] ?? 0) + 1;
+    }
+    return Object.entries(conteo)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, limit)
+      .map(([producto_id, total]) => ({ producto_id, total }));
+  }
+
+  // ── Categorías ──────────────────────────────────────────────────────────────
+
   async obtenerCategorias() {
     const { data, error } = await this.supabase.cliente
       .from('categorias')
@@ -87,9 +153,10 @@ export class CatalogoService {
       .select('*, categoria:categorias(*)')
       .eq('ganador', true)
       .eq('disponible', true)
+      .eq('estado', 'aprobado')
       .order('creado_en', { ascending: false })
       .limit(4);
-    if (error) return []; // columna aún no existe → fallback vacío
+    if (error) return [];
     return this.normalizar(data);
   }
 
@@ -99,9 +166,10 @@ export class CatalogoService {
       .select('*, categoria:categorias(*)')
       .eq('exclusivo', true)
       .eq('disponible', true)
+      .eq('estado', 'aprobado')
       .order('creado_en', { ascending: false })
       .limit(12);
-    if (error) return []; // columna aún no existe → fallback vacío
+    if (error) return [];
     return this.normalizar(data);
   }
 
@@ -114,6 +182,8 @@ export class CatalogoService {
     const { error } = await this.supabase.cliente.from('productos').update({ exclusivo: valor }).eq('id', id);
     if (error) throw error;
   }
+
+  // ── Favoritos ───────────────────────────────────────────────────────────────
 
   async obtenerFavoritos() {
     const usuario = this.auth.usuario();

@@ -9,14 +9,16 @@
         </div>
         <div>
           <h1 class="text-xl font-extrabold text-slate-100 tracking-tight">Panel de Administración</h1>
-          <p class="text-slate-500 text-xs">{{ totalUsuarios() }} usuarios registrados en el sistema</p>
+          <p class="text-slate-500 text-xs">
+            {{ totalUsuarios() }} usuarios ·
+            @if (totalPendientes() > 0) {
+              <span class="text-amber-400 font-bold">{{ totalPendientes() }} productos pendientes</span>
+            } @else {
+              Sin productos pendientes
+            }
+          </p>
         </div>
       </div>
-      <button (click)="cargarUsuarios()"
-              class="self-start sm:self-auto flex items-center gap-2 bg-neutral-surface border border-neutral-border px-4 py-2.5 rounded-xl text-sm text-slate-200 hover:border-primary/40 transition-all">
-        <span class="material-symbols-outlined text-[18px]">refresh</span>
-        Actualizar
-      </button>
     </div>
 
     <!-- Alertas -->
@@ -35,17 +37,31 @@
     }
 
     <!-- ── TABS ── -->
-    <div class="flex gap-1 p-1 bg-neutral-surface border border-neutral-border rounded-xl w-fit">
-      <a [routerLink]="['/admin']" [queryParams]="{}"
+    <div class="flex flex-wrap gap-1 p-1 bg-neutral-surface border border-neutral-border rounded-xl w-fit">
+      <button (click)="setTab('usuarios')"
          class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all"
          [class.bg-primary]="tabActivo() === 'usuarios'"
          [class.text-\[#0a0a08\]]="tabActivo() === 'usuarios'"
          [class.text-slate-400]="tabActivo() !== 'usuarios'"
          [class.hover\:text-slate-200]="tabActivo() !== 'usuarios'">
         <span class="material-symbols-outlined text-base">group</span>
-        Gestión de Usuarios
-      </a>
-      <a [routerLink]="['/admin']" [queryParams]="{tab:'estadisticas'}"
+        Usuarios
+      </button>
+      <button (click)="setTab('productos')"
+         class="relative flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all"
+         [class.bg-primary]="tabActivo() === 'productos'"
+         [class.text-\[#0a0a08\]]="tabActivo() === 'productos'"
+         [class.text-slate-400]="tabActivo() !== 'productos'"
+         [class.hover\:text-slate-200]="tabActivo() !== 'productos'">
+        <span class="material-symbols-outlined text-base">inventory</span>
+        Productos
+        @if (totalPendientes() > 0) {
+          <span class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-500 text-[#0a0a08] text-[10px] font-black flex items-center justify-center">
+            {{ totalPendientes() }}
+          </span>
+        }
+      </button>
+      <button (click)="setTab('estadisticas')"
          class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all"
          [class.bg-primary]="tabActivo() === 'estadisticas'"
          [class.text-\[#0a0a08\]]="tabActivo() === 'estadisticas'"
@@ -53,7 +69,7 @@
          [class.hover\:text-slate-200]="tabActivo() !== 'estadisticas'">
         <span class="material-symbols-outlined text-base">bar_chart</span>
         Estadísticas
-      </a>
+      </button>
     </div>
 
     <!-- ══════════════════════════════════
@@ -63,7 +79,7 @@
 
       <div class="bg-neutral-surface border border-neutral-border rounded-2xl overflow-hidden">
 
-        <!-- Toolbar: search -->
+        <!-- Toolbar -->
         <div class="p-5 border-b border-neutral-border flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
           <h2 class="text-sm font-bold text-slate-300 uppercase tracking-widest shrink-0">Usuarios del sistema</h2>
           <div class="flex items-stretch rounded-lg bg-neutral-charcoal border border-neutral-border focus-within:border-primary/50 transition-all w-full sm:w-64">
@@ -103,7 +119,6 @@
           }
         </div>
 
-        <!-- Skeleton -->
         @if (cargando()) {
           <div class="p-6 space-y-3">
             @for (_ of [1,2,3,4,5]; track $index) {
@@ -159,13 +174,11 @@
                     </td>
                     <td class="px-5 py-4">
                       <div class="flex items-center justify-end gap-1.5">
-                        <button (click)="editarUsuario(usuario)"
-                                title="Editar perfil"
+                        <button (click)="editarUsuario(usuario)" title="Editar perfil"
                                 class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-primary hover:bg-primary/10 border border-transparent hover:border-primary/20 transition-all">
                           <span class="material-symbols-outlined text-base">edit</span>
                         </button>
-                        <button (click)="confirmarEliminar(usuario)"
-                                title="Eliminar usuario"
+                        <button (click)="confirmarEliminar(usuario)" title="Eliminar usuario"
                                 class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all">
                           <span class="material-symbols-outlined text-base">delete</span>
                         </button>
@@ -188,11 +201,203 @@
     }
 
     <!-- ══════════════════════════════════
+         TAB: PRODUCTOS
+    ══════════════════════════════════ -->
+    @if (tabActivo() === 'productos') {
+
+      <!-- Header productos -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-stretch rounded-lg bg-neutral-surface border border-neutral-border focus-within:border-primary/50 transition-all w-full sm:w-72">
+          <div class="flex items-center pl-3 text-slate-500">
+            <span class="material-symbols-outlined text-xl">search</span>
+          </div>
+          <input [(ngModel)]="busquedaProductos" type="text" placeholder="Buscar productos…"
+                 class="bg-transparent text-slate-100 text-sm placeholder:text-slate-600 py-2.5 px-3 outline-none w-full"/>
+        </div>
+        <a routerLink="/inventario"
+           class="self-start sm:self-auto flex items-center gap-2 bg-primary text-[#0a0a08] px-5 py-2.5 rounded-xl text-sm font-black hover:brightness-110 transition-all uppercase tracking-wider">
+          <span class="material-symbols-outlined text-base">add</span>
+          Crear Producto
+        </a>
+      </div>
+
+      <!-- Filter chips -->
+      <div class="flex flex-wrap gap-2">
+        @for (chip of chipsFiltroEstado(); track chip.valor) {
+          <button (click)="filtroEstado.set(chip.valor)"
+                  class="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold border transition-all"
+                  [class]="filtroEstado() === chip.valor ? chip.colorActivo : chip.color">
+            {{ chip.etiqueta }}
+            <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-white/10">{{ chip.count }}</span>
+          </button>
+        }
+      </div>
+
+      <!-- Productos list -->
+      @if (cargandoProductos()) {
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          @for (_ of [1,2,3,4,5,6]; track $index) {
+            <div class="bg-neutral-surface border border-neutral-border rounded-2xl overflow-hidden">
+              <div class="h-32 bg-neutral-border/30 animate-pulse"></div>
+              <div class="p-4 space-y-2">
+                <div class="h-4 bg-neutral-border/50 rounded animate-pulse w-3/4"></div>
+                <div class="h-3 bg-neutral-border/30 rounded animate-pulse w-1/2"></div>
+              </div>
+            </div>
+          }
+        </div>
+      } @else if (productosFiltrados().length === 0) {
+        <div class="py-16 text-center bg-neutral-surface border border-neutral-border rounded-2xl">
+          <span class="material-symbols-outlined text-5xl text-slate-600 block mb-3">inventory_2</span>
+          <p class="text-slate-400 text-sm">No hay productos con este filtro.</p>
+        </div>
+      } @else {
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          @for (producto of productosFiltrados(); track producto.id) {
+            <div class="bg-neutral-surface border border-neutral-border rounded-2xl overflow-hidden hover:border-primary/20 transition-all">
+
+              <!-- Image -->
+              <div class="relative h-36 bg-neutral-border/20">
+                @if (producto.imagenes.length > 0) {
+                  <img [src]="producto.imagenes[0]" [alt]="producto.nombre" class="w-full h-full object-cover"/>
+                } @else if (producto.creativos && producto.creativos.length > 0) {
+                  @if (producto.creativos[0].tipo === 'imagen') {
+                    <img [src]="producto.creativos[0].archivo_url" [alt]="producto.nombre" class="w-full h-full object-cover"/>
+                  } @else {
+                    <div class="w-full h-full flex items-center justify-center">
+                      <span class="text-5xl font-black text-slate-700">{{ producto.nombre.charAt(0).toUpperCase() }}</span>
+                    </div>
+                  }
+                } @else {
+                  <div class="w-full h-full flex items-center justify-center">
+                    <span class="text-5xl font-black text-slate-700">{{ producto.nombre.charAt(0).toUpperCase() }}</span>
+                  </div>
+                }
+                <!-- Estado badge -->
+                <div class="absolute top-2 left-2 flex flex-col gap-1">
+                  <span class="flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full font-bold backdrop-blur-sm border"
+                        [class]="badgeEstado(producto.estado)">
+                    <span class="material-symbols-outlined text-[11px]">{{ iconoEstado(producto.estado) }}</span>
+                    {{ producto.estado | titlecase }}
+                  </span>
+                </div>
+                <!-- Ganador / Exclusivo (solo admin) -->
+                <div class="absolute bottom-2 left-2 flex flex-col gap-1">
+                  <button (click)="toggleGanador(producto, $event)"
+                          class="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider backdrop-blur-sm border transition-all"
+                          [class]="producto.ganador
+                            ? 'bg-primary/90 border-primary text-[#0f0f0f]'
+                            : 'bg-black/50 border-white/10 text-slate-500 hover:border-primary/30 hover:text-primary/60'">
+                    <span class="material-symbols-outlined text-[11px]">verified</span>
+                    Ganador
+                  </button>
+                  <button (click)="toggleExclusivo(producto, $event)"
+                          class="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider backdrop-blur-sm border transition-all"
+                          [class]="producto.exclusivo
+                            ? 'bg-purple-500/90 border-purple-400 text-white'
+                            : 'bg-black/50 border-white/10 text-slate-500 hover:border-purple-400/30 hover:text-purple-400/60'">
+                    <span class="material-symbols-outlined text-[11px]">diamond</span>
+                    Exclusivo
+                  </button>
+                </div>
+                <!-- Creativos count -->
+                @if ((producto.creativos?.length ?? 0) > 0) {
+                  <div class="absolute top-2 right-2">
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-black/60 text-slate-300 border border-white/10 backdrop-blur-sm">
+                      {{ producto.creativos!.length }} creativos
+                    </span>
+                  </div>
+                }
+              </div>
+
+              <!-- Body -->
+              <div class="p-4 space-y-3">
+                <div>
+                  <h3 class="font-bold text-slate-100 text-sm line-clamp-1">{{ producto.nombre }}</h3>
+                  @if (producto.proveedor) {
+                    <p class="text-xs text-slate-500 mt-0.5">{{ producto.proveedor }}</p>
+                  }
+                </div>
+
+                <!-- Precios -->
+                <div class="flex items-center gap-4">
+                  <div>
+                    <p class="text-[9px] font-bold uppercase tracking-widest text-slate-600">Costo</p>
+                    <p class="text-sm font-bold text-slate-200">$ {{ producto.precio_base | number:'1.0-0' }}</p>
+                  </div>
+                  @if (producto.precio_sugerido) {
+                    <span class="material-symbols-outlined text-slate-700 text-sm">arrow_forward</span>
+                    <div>
+                      <p class="text-[9px] font-bold uppercase tracking-widest text-slate-600">Venta</p>
+                      <p class="text-sm font-bold text-primary">$ {{ producto.precio_sugerido | number:'1.0-0' }}</p>
+                    </div>
+                    <div class="ml-auto">
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
+                        +{{ margen(producto) }}%
+                      </span>
+                    </div>
+                  }
+                </div>
+
+                <!-- Métricas -->
+                <div class="flex items-center gap-3 text-[11px] text-slate-500">
+                  <span class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px]">visibility</span>
+                    {{ producto.vistas }}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px]">download</span>
+                    {{ producto.descargas }}
+                  </span>
+                </div>
+
+                <!-- Acciones -->
+                <div class="flex items-center gap-2 pt-2 border-t border-neutral-border">
+                  @if (producto.estado === 'pendiente') {
+                    <button (click)="abrirRevision(producto)"
+                            class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold bg-amber-500/10 border border-amber-500/20 text-amber-300 hover:bg-amber-500/20 transition-all">
+                      <span class="material-symbols-outlined text-[14px]">rate_review</span>
+                      Revisar
+                    </button>
+                    <button (click)="rechazarProducto(producto)"
+                            class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-600 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all">
+                      <span class="material-symbols-outlined text-base">thumb_down</span>
+                    </button>
+                  } @else if (producto.estado === 'aprobado') {
+                    <span class="flex items-center gap-1.5 text-xs text-green-400 flex-1">
+                      <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                      Aprobado y publicado
+                    </span>
+                  } @else {
+                    <span class="flex items-center gap-1.5 text-xs text-red-400 flex-1">
+                      <span class="material-symbols-outlined text-[14px]">cancel</span>
+                      Rechazado
+                    </span>
+                    <button (click)="abrirRevision(producto)"
+                            class="px-3 py-1.5 rounded-lg text-xs font-bold text-primary border border-primary/20 hover:bg-primary/10 transition-all">
+                      Re-revisar
+                    </button>
+                  }
+                  <button (click)="confirmarEliminarProducto(producto)"
+                          class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-600 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all">
+                    <span class="material-symbols-outlined text-base">delete</span>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          }
+        </div>
+      }
+
+    }
+
+    <!-- ══════════════════════════════════
          TAB: ESTADÍSTICAS
     ══════════════════════════════════ -->
     @if (tabActivo() === 'estadisticas') {
 
-      <!-- KPI cards -->
+      <!-- KPI usuarios -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5">
           <div class="flex items-center justify-between mb-3">
@@ -216,7 +421,7 @@
             <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Inventario</span>
           </div>
           <p class="text-3xl font-black text-amber-300">{{ contarRol('inventario') }}</p>
-          <p class="text-xs text-slate-500 mt-1">Gestores de stock</p>
+          <p class="text-xs text-slate-500 mt-1">Bodegas activas</p>
         </div>
         <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5">
           <div class="flex items-center justify-between mb-3">
@@ -228,7 +433,116 @@
         </div>
       </div>
 
-      <!-- Distribución por rol (barras) -->
+      <!-- KPI productos -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="material-symbols-outlined text-primary text-2xl">inventory</span>
+            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Productos</span>
+          </div>
+          <p class="text-3xl font-black text-primary">{{ productos().length }}</p>
+          <p class="text-xs text-slate-500 mt-1">Total en catálogo</p>
+        </div>
+        <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="material-symbols-outlined text-amber-400 text-2xl">schedule</span>
+            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Pendientes</span>
+          </div>
+          <p class="text-3xl font-black text-amber-300">{{ contarEstado('pendiente') }}</p>
+          <p class="text-xs text-slate-500 mt-1">Esperando revisión</p>
+        </div>
+        <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="material-symbols-outlined text-green-400 text-2xl">check_circle</span>
+            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Aprobados</span>
+          </div>
+          <p class="text-3xl font-black text-green-300">{{ contarEstado('aprobado') }}</p>
+          <p class="text-xs text-slate-500 mt-1">Visibles a usuarios</p>
+        </div>
+        <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="material-symbols-outlined text-red-400 text-2xl">cancel</span>
+            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Rechazados</span>
+          </div>
+          <p class="text-3xl font-black text-red-300">{{ contarEstado('rechazado') }}</p>
+          <p class="text-xs text-slate-500 mt-1">No publicados</p>
+        </div>
+      </div>
+
+      <!-- Top productos -->
+      @if (cargandoStats()) {
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          @for (_ of [1,2,3]; track $index) {
+            <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5 h-48 animate-pulse"></div>
+          }
+        </div>
+      } @else {
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+          <!-- Top vistas -->
+          <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5">
+            <h3 class="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base text-sky-400">visibility</span>
+              Más Vistos
+            </h3>
+            @if (topVistas().length === 0) {
+              <p class="text-slate-600 text-xs text-center py-4">Sin datos todavía</p>
+            }
+            @for (p of topVistas(); track p.id; let i = $index) {
+              <div class="flex items-center gap-3 py-2 border-b border-neutral-border/50 last:border-0">
+                <span class="w-5 text-[11px] font-black text-slate-600">{{ i + 1 }}</span>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-semibold text-slate-200 truncate">{{ p.nombre }}</p>
+                </div>
+                <span class="text-xs font-bold text-sky-400">{{ p.vistas }}</span>
+              </div>
+            }
+          </div>
+
+          <!-- Top descargas -->
+          <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5">
+            <h3 class="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base text-purple-400">download</span>
+              Más Descargados
+            </h3>
+            @if (topDescargas().length === 0) {
+              <p class="text-slate-600 text-xs text-center py-4">Sin datos todavía</p>
+            }
+            @for (p of topDescargas(); track p.id; let i = $index) {
+              <div class="flex items-center gap-3 py-2 border-b border-neutral-border/50 last:border-0">
+                <span class="w-5 text-[11px] font-black text-slate-600">{{ i + 1 }}</span>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-semibold text-slate-200 truncate">{{ p.nombre }}</p>
+                </div>
+                <span class="text-xs font-bold text-purple-400">{{ p.descargas }}</span>
+              </div>
+            }
+          </div>
+
+          <!-- Top me gusta -->
+          <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5">
+            <h3 class="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base text-red-400">favorite</span>
+              Más Me Gusta
+            </h3>
+            @if (topFavoritos().length === 0) {
+              <p class="text-slate-600 text-xs text-center py-4">Sin datos todavía</p>
+            }
+            @for (f of topFavoritos(); track f.producto_id; let i = $index) {
+              <div class="flex items-center gap-3 py-2 border-b border-neutral-border/50 last:border-0">
+                <span class="w-5 text-[11px] font-black text-slate-600">{{ i + 1 }}</span>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-semibold text-slate-400 truncate font-mono">{{ f.producto_id.substring(0, 8) }}…</p>
+                </div>
+                <span class="text-xs font-bold text-red-400">{{ f.total }}</span>
+              </div>
+            }
+          </div>
+
+        </div>
+      }
+
+      <!-- Distribución por rol -->
       <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-6">
         <h2 class="text-sm font-bold uppercase tracking-widest text-slate-400 mb-5 flex items-center gap-2">
           <span class="material-symbols-outlined text-base text-primary">pie_chart</span>
@@ -242,9 +556,7 @@
                   <span class="material-symbols-outlined text-base"
                         [class.text-red-400]="item.valor === 'admin'"
                         [class.text-amber-400]="item.valor === 'inventario'"
-                        [class.text-slate-400]="item.valor === 'usuario'">
-                    {{ item.icono }}
-                  </span>
+                        [class.text-slate-400]="item.valor === 'usuario'">{{ item.icono }}</span>
                   <span class="text-sm font-semibold text-slate-200">{{ item.etiqueta }}</span>
                 </div>
                 <div class="flex items-center gap-3">
@@ -252,9 +564,7 @@
                   <span class="text-sm font-bold"
                         [class.text-red-300]="item.valor === 'admin'"
                         [class.text-amber-300]="item.valor === 'inventario'"
-                        [class.text-slate-300]="item.valor === 'usuario'">
-                    {{ item.cantidad }}
-                  </span>
+                        [class.text-slate-300]="item.valor === 'usuario'">{{ item.cantidad }}</span>
                 </div>
               </div>
               <div class="h-2 rounded-full bg-white/5 overflow-hidden">
@@ -270,76 +580,95 @@
         </div>
       </div>
 
-      <!-- Leyenda roles -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        @for (rol of roles; track rol.valor) {
-          <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5 flex items-center gap-4">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                 [class.bg-red-900\/30]="rol.valor === 'admin'"
-                 [class.border]="true"
-                 [class.border-red-700\/20]="rol.valor === 'admin'"
-                 [class.bg-amber-900\/30]="rol.valor === 'inventario'"
-                 [class.border-amber-700\/20]="rol.valor === 'inventario'"
-                 [class.bg-slate-700\/30]="rol.valor === 'usuario'"
-                 [class.border-slate-600\/20]="rol.valor === 'usuario'">
-              <span class="material-symbols-outlined text-xl"
-                    [class.text-red-400]="rol.valor === 'admin'"
-                    [class.text-amber-400]="rol.valor === 'inventario'"
-                    [class.text-slate-400]="rol.valor === 'usuario'">
-                {{ rol.icono }}
-              </span>
-            </div>
-            <div class="flex-1">
-              <p class="text-slate-100 font-bold text-sm">{{ rol.etiqueta }}</p>
-              <p class="text-slate-500 text-xs mt-0.5">{{ rol.descripcion }}</p>
-            </div>
-            <div class="text-2xl font-black"
-                 [class.text-red-300]="rol.valor === 'admin'"
-                 [class.text-amber-300]="rol.valor === 'inventario'"
-                 [class.text-slate-300]="rol.valor === 'usuario'">
-              {{ contarRol(rol.valor) }}
-            </div>
-          </div>
-        }
-      </div>
-
-      <!-- Efficiency banner -->
-      <div class="bg-neutral-surface border border-primary/10 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-        <div class="flex items-center gap-4">
-          <div class="relative w-16 h-16 shrink-0">
-            <svg class="w-16 h-16 -rotate-90" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#3d382e" stroke-width="3"/>
-              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e0ac29" stroke-width="3"
-                      stroke-dasharray="82 18" stroke-linecap="round"/>
-            </svg>
-            <span class="absolute inset-0 flex items-center justify-center text-sm font-black text-primary">82%</span>
-          </div>
-          <div>
-            <p class="text-slate-100 font-bold">Eficiencia del Sistema</p>
-            <p class="text-slate-500 text-xs mt-1 max-w-xs">Los roles están correctamente asignados. El equipo opera un 12% más rápido que el mes anterior.</p>
-          </div>
-        </div>
-        <button class="bg-white/5 border border-white/10 text-slate-100 px-6 py-2.5 rounded-xl text-xs font-bold hover:bg-white/10 transition-all uppercase tracking-wider whitespace-nowrap">
-          Generar Reporte
-        </button>
-      </div>
-
     }
 
   </div>
 </div>
 
-<!-- ══════════════════════════════════
-     MODAL: EDITAR USUARIO
-══════════════════════════════════ -->
+<!-- ══ MODAL: REVISAR PRODUCTO (Aprobar/Rechazar) ══ -->
+@if (productoRevisando()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4"
+       (click)="cerrarRevision()">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+    <div class="relative w-full max-w-md bg-[#18160f] border border-white/10 rounded-2xl shadow-2xl"
+         (click)="$event.stopPropagation()">
+
+      <div class="flex items-center justify-between px-6 py-5 border-b border-white/8">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+            <span class="material-symbols-outlined text-amber-400 text-base">rate_review</span>
+          </div>
+          <div>
+            <h3 class="text-slate-100 font-bold text-sm">Revisar Producto</h3>
+            <p class="text-slate-500 text-[11px] truncate max-w-56">{{ productoRevisando()?.nombre }}</p>
+          </div>
+        </div>
+        <button (click)="cerrarRevision()" class="text-slate-500 hover:text-slate-300 transition-colors">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="px-6 py-5 space-y-4">
+        <p class="text-xs text-slate-500">Ajusta los precios antes de aprobar. El precio de venta sugerido define el margen para los dropshippers.</p>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5">Precio Costo (COP)</label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">$</span>
+              <input [(ngModel)]="formRevision.precio_base" type="number" min="0" step="100"
+                     class="w-full bg-neutral-charcoal border border-neutral-border text-slate-100 text-sm rounded-xl pl-7 pr-3 py-2.5 outline-none focus:border-primary/50 transition-all"/>
+            </div>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5">Precio Venta (COP)</label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">$</span>
+              <input [(ngModel)]="formRevision.precio_sugerido" type="number" min="0" step="100"
+                     class="w-full bg-neutral-charcoal border border-neutral-border text-slate-100 text-sm rounded-xl pl-7 pr-3 py-2.5 outline-none focus:border-primary/50 transition-all"/>
+            </div>
+          </div>
+        </div>
+
+        @if (formRevision.precio_base > 0 && formRevision.precio_sugerido > formRevision.precio_base) {
+          <div class="flex items-center gap-2 p-3 bg-green-500/10 border border-green-500/20 rounded-xl">
+            <span class="material-symbols-outlined text-green-400 text-base">trending_up</span>
+            <p class="text-xs text-green-300 font-semibold">
+              Margen: {{ ((formRevision.precio_sugerido - formRevision.precio_base) / formRevision.precio_base * 100) | number:'1.0-0' }}%
+            </p>
+          </div>
+        }
+      </div>
+
+      <div class="flex items-center gap-3 px-6 py-4 border-t border-white/8">
+        <button (click)="rechazarProducto(productoRevisando()!); cerrarRevision()"
+                class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold bg-red-500/10 text-red-300 border border-red-500/20 hover:bg-red-500/20 transition-all">
+          <span class="material-symbols-outlined text-base">cancel</span>
+          Rechazar
+        </button>
+        <button (click)="aprobarProducto()"
+                [disabled]="guardandoRevision()"
+                class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold bg-green-500/20 text-green-300 border border-green-500/30 hover:bg-green-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+          @if (guardandoRevision()) {
+            <span class="w-4 h-4 border-2 border-green-300/30 border-t-green-300 rounded-full animate-spin"></span>
+            Aprobando…
+          } @else {
+            <span class="material-symbols-outlined text-base">check_circle</span>
+            Aprobar
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ══ MODAL: EDITAR USUARIO ══ -->
 @if (usuarioEditando()) {
   <div class="fixed inset-0 z-50 flex items-center justify-center p-4"
        (click)="cancelarEdicion()">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
     <div class="relative w-full max-w-md bg-[#18160f] border border-white/10 rounded-2xl shadow-2xl"
          (click)="$event.stopPropagation()">
-
-      <!-- Modal header -->
       <div class="flex items-center justify-between px-6 py-5 border-b border-white/8">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
@@ -354,8 +683,6 @@
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
-
-      <!-- Modal body -->
       <div class="px-6 py-5 space-y-4">
         <div>
           <label class="block text-xs font-semibold text-slate-400 mb-1.5">Nombre completo</label>
@@ -373,8 +700,6 @@
                  class="w-full bg-neutral-charcoal border border-neutral-border text-slate-100 text-sm rounded-xl px-4 py-2.5 outline-none focus:border-primary/50 transition-all placeholder:text-slate-600"/>
         </div>
       </div>
-
-      <!-- Modal footer -->
       <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-white/8">
         <button (click)="cancelarEdicion()"
                 class="px-4 py-2 rounded-xl text-sm text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all">
@@ -396,17 +721,13 @@
   </div>
 }
 
-<!-- ══════════════════════════════════
-     MODAL: CONFIRMAR ELIMINAR
-══════════════════════════════════ -->
+<!-- ══ MODAL: CONFIRMAR ELIMINAR USUARIO ══ -->
 @if (confirmandoEliminar()) {
   <div class="fixed inset-0 z-50 flex items-center justify-center p-4"
        (click)="cancelarEliminar()">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
     <div class="relative w-full max-w-sm bg-[#18160f] border border-red-500/20 rounded-2xl shadow-2xl"
          (click)="$event.stopPropagation()">
-
-      <!-- Icon -->
       <div class="px-6 pt-8 pb-4 text-center">
         <div class="w-14 h-14 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4">
           <span class="material-symbols-outlined text-red-400 text-2xl">person_remove</span>
@@ -417,8 +738,6 @@
           Esta acción no se puede deshacer.
         </p>
       </div>
-
-      <!-- Footer -->
       <div class="flex gap-3 px-6 pb-6">
         <button (click)="cancelarEliminar()"
                 class="flex-1 px-4 py-2.5 rounded-xl text-sm text-slate-400 border border-neutral-border hover:text-slate-200 hover:bg-white/5 transition-all">
@@ -434,6 +753,38 @@
             <span class="material-symbols-outlined text-base">delete</span>
             Eliminar
           }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ══ MODAL: CONFIRMAR ELIMINAR PRODUCTO ══ -->
+@if (confirmandoEliminarProducto()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4"
+       (click)="cancelarEliminarProducto()">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+    <div class="relative w-full max-w-sm bg-[#18160f] border border-red-500/20 rounded-2xl shadow-2xl"
+         (click)="$event.stopPropagation()">
+      <div class="px-6 pt-8 pb-4 text-center">
+        <div class="w-14 h-14 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4">
+          <span class="material-symbols-outlined text-red-400 text-2xl">delete_forever</span>
+        </div>
+        <h3 class="text-slate-100 font-bold text-base mb-1">Eliminar producto</h3>
+        <p class="text-slate-400 text-sm">
+          ¿Eliminar <span class="text-slate-100 font-semibold">{{ confirmandoEliminarProducto()?.nombre }}</span>?
+          Esta acción no se puede deshacer.
+        </p>
+      </div>
+      <div class="flex gap-3 px-6 pb-6">
+        <button (click)="cancelarEliminarProducto()"
+                class="flex-1 px-4 py-2.5 rounded-xl text-sm text-slate-400 border border-neutral-border hover:text-slate-200 hover:bg-white/5 transition-all">
+          Cancelar
+        </button>
+        <button (click)="eliminarProducto()"
+                class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold bg-red-500/20 text-red-300 border border-red-500/30 hover:bg-red-500/30 transition-all">
+          <span class="material-symbols-outlined text-base">delete</span>
+          Eliminar
         </button>
       </div>
     </div>

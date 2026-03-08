@@ -72,7 +72,8 @@ export const inventarioGuard: CanActivateFn = () => {
   const router = inject(Router);
   return whenReady(auth, router, () => {
     if (!auth.estaAutenticado()) return '/auth/login';
-    return auth.perfil()?.rol === 'inventario' ? true : rutaPorRol(auth);
+    const rol = auth.perfil()?.rol;
+    return (rol === 'inventario' || rol === 'admin') ? true : rutaPorRol(auth);
   });
 };
 
