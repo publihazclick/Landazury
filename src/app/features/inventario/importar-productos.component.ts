@@ -115,7 +115,7 @@ export class ImportarProductosComponent {
       precio_final:    null,
       categoria_id:    f.categoria_id ?? null,
       imagenes:        [] as string[],
-      disponible:      false,
+      disponible:      esAdmin ? f.activo : false,
       ganador:         false,
       exclusivo:       false,
       estado,
