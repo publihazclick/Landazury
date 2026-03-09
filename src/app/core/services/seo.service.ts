@@ -1,4 +1,5 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Meta, Title } from '@angular/platform-browser';
 
 const BASE_URL = 'https://landazury.vercel.app';
@@ -17,6 +18,7 @@ export interface SeoOptions {
 export class SeoService {
   private readonly meta = inject(Meta);
   private readonly titleService = inject(Title);
+  private readonly platformId = inject(PLATFORM_ID);
 
   setPage(options: SeoOptions): void {
     const fullTitle = `${options.title} | ${SITE_NAME}`;
@@ -50,6 +52,7 @@ export class SeoService {
   }
 
   private updateCanonicalLink(url: string): void {
+    if (!isPlatformBrowser(this.platformId)) return;
     const existing = document.querySelector('link[rel="canonical"]');
     if (existing) {
       existing.setAttribute('href', url);

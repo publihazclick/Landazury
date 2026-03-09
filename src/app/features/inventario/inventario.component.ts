@@ -39,7 +39,8 @@ export class InventarioComponent implements OnInit {
   readonly productoEnModal = signal<Producto | null>(null);
   readonly creativosEnModal = signal<Creativo[]>([]);
   readonly guardandoProducto = signal(false);
-  readonly subiendoCreativo = signal(false);
+  readonly subiendoImagenCreativo = signal(false);
+  readonly subiendoVideoCreativo = signal(false);
   readonly subiendoImagen = signal(false);
   readonly cargandoModal = signal(false);
   readonly confirmandoEliminar = signal<Producto | null>(null);
@@ -50,10 +51,18 @@ export class InventarioComponent implements OnInit {
 
   // Forms
   formProducto: FormProducto = this.formVacio();
-  archivoModal: File | null = null;
-  nombreArchivoModal = '';
-  descripcionArchivoModal = '';
-  publicoArchivoModal = true;
+
+  // Creativo — imágenes
+  archivoImagenModal: File | null = null;
+  nombreImagenModal = '';
+  descripcionImagenModal = '';
+  publicoImagenModal = true;
+
+  // Creativo — videos
+  archivoVideoModal: File | null = null;
+  nombreVideoModal = '';
+  descripcionVideoModal = '';
+  publicoVideoModal = true;
 
   // Stats
   readonly totalProductos = computed(() => this.productos().length);
@@ -62,11 +71,8 @@ export class InventarioComponent implements OnInit {
   readonly totalCreativos = computed(() => this.productos().reduce((acc, p) => acc + (p.creativos?.length ?? 0), 0));
 
   readonly tiposConfig: { valor: TipoCreativo; icono: string; label: string; iconColor: string; bgClass: string; chipClass: string }[] = [
-    { valor: 'imagen',    icono: 'image',          label: 'Imágenes', iconColor: 'text-sky-400',    bgClass: 'bg-sky-400/10 border border-sky-400/20',        chipClass: 'text-sky-400 bg-sky-400/10 border-sky-400/20' },
-    { valor: 'video',     icono: 'videocam',        label: 'Videos',   iconColor: 'text-purple-400', bgClass: 'bg-purple-400/10 border border-purple-400/20',  chipClass: 'text-purple-400 bg-purple-400/10 border-purple-400/20' },
-    { valor: 'pdf',       icono: 'picture_as_pdf',  label: 'PDFs',     iconColor: 'text-red-400',    bgClass: 'bg-red-400/10 border border-red-400/20',        chipClass: 'text-red-400 bg-red-400/10 border-red-400/20' },
-    { valor: 'documento', icono: 'article',          label: 'Docs',     iconColor: 'text-amber-400',  bgClass: 'bg-amber-400/10 border border-amber-400/20',    chipClass: 'text-amber-400 bg-amber-400/10 border-amber-400/20' },
-    { valor: 'otro',      icono: 'folder_zip',       label: 'Otros',    iconColor: 'text-slate-400',  bgClass: 'bg-slate-700/30 border border-slate-700/50',    chipClass: 'text-slate-400 bg-slate-700/30 border-slate-700/50' },
+    { valor: 'imagen', icono: 'image',    label: 'Imágenes', iconColor: 'text-sky-400',    bgClass: 'bg-sky-400/10 border border-sky-400/20',       chipClass: 'text-sky-400 bg-sky-400/10 border-sky-400/20' },
+    { valor: 'video',  icono: 'videocam', label: 'Videos',   iconColor: 'text-purple-400', bgClass: 'bg-purple-400/10 border border-purple-400/20', chipClass: 'text-purple-400 bg-purple-400/10 border-purple-400/20' },
   ];
 
   async ngOnInit() {
@@ -205,38 +211,81 @@ export class InventarioComponent implements OnInit {
 
   // ── Creativos en modal ──────────────────────────────
 
-  onArchivoModal(event: Event) {
+  onArchivoImagenModal(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
-    this.archivoModal = file;
-    if (!this.nombreArchivoModal) {
-      this.nombreArchivoModal = file.name.replace(/\.[^.]+$/, '');
+    this.archivoImagenModal = file;
+    if (!this.nombreImagenModal) {
+      this.nombreImagenModal = file.name.replace(/\.[^.]+$/, '');
     }
+    (event.target as HTMLInputElement).value = '';
   }
 
-  async subirCreativoModal() {
+  onArchivoVideoModal(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    this.archivoVideoModal = file;
+    if (!this.nombreVideoModal) {
+      this.nombreVideoModal = file.name.replace(/\.[^.]+$/, '');
+    }
+    (event.target as HTMLInputElement).value = '';
+  }
+
+  async subirImagenCreativoModal() {
     const producto = this.productoEnModal();
-    if (!this.archivoModal || !this.nombreArchivoModal.trim() || !producto) return;
-    this.subiendoCreativo.set(true);
+    if (!this.archivoImagenModal || !this.nombreImagenModal.trim() || !producto) return;
+    this.subiendoImagenCreativo.set(true);
     this.error.set(null);
     try {
-      const creativo = await this.creativosService.subirCreativo(this.archivoModal, {
-        nombre: this.nombreArchivoModal.trim(),
-        descripcion: this.descripcionArchivoModal || undefined,
+      const creativo = await this.creativosService.subirCreativo(this.archivoImagenModal, {
+        nombre: this.nombreImagenModal.trim(),
+        descripcion: this.descripcionImagenModal || undefined,
         productoId: producto.id,
-        publico: this.publicoArchivoModal,
+        publico: this.publicoImagenModal,
       });
       this.creativosEnModal.update(list => [creativo, ...list]);
       this.productos.update(list => list.map(p =>
         p.id === producto.id ? { ...p, creativos: [creativo, ...(p.creativos ?? [])] } : p
       ));
-      this.limpiarArchivoModal();
-      this.exito.set('Creativo subido correctamente.');
+      this.archivoImagenModal = null;
+      this.nombreImagenModal = '';
+      this.descripcionImagenModal = '';
+      this.publicoImagenModal = true;
+      this.exito.set('Imagen subida correctamente.');
       setTimeout(() => this.exito.set(null), 2000);
     } catch (e: any) {
-      this.error.set(e?.message ?? 'Error al subir el archivo.');
+      this.error.set(e?.message ?? 'Error al subir la imagen.');
     } finally {
-      this.subiendoCreativo.set(false);
+      this.subiendoImagenCreativo.set(false);
+    }
+  }
+
+  async subirVideoCreativoModal() {
+    const producto = this.productoEnModal();
+    if (!this.archivoVideoModal || !this.nombreVideoModal.trim() || !producto) return;
+    this.subiendoVideoCreativo.set(true);
+    this.error.set(null);
+    try {
+      const creativo = await this.creativosService.subirCreativo(this.archivoVideoModal, {
+        nombre: this.nombreVideoModal.trim(),
+        descripcion: this.descripcionVideoModal || undefined,
+        productoId: producto.id,
+        publico: this.publicoVideoModal,
+      });
+      this.creativosEnModal.update(list => [creativo, ...list]);
+      this.productos.update(list => list.map(p =>
+        p.id === producto.id ? { ...p, creativos: [creativo, ...(p.creativos ?? [])] } : p
+      ));
+      this.archivoVideoModal = null;
+      this.nombreVideoModal = '';
+      this.descripcionVideoModal = '';
+      this.publicoVideoModal = true;
+      this.exito.set('Video subido correctamente.');
+      setTimeout(() => this.exito.set(null), 2000);
+    } catch (e: any) {
+      this.error.set(e?.message ?? 'Error al subir el video.');
+    } finally {
+      this.subiendoVideoCreativo.set(false);
     }
   }
 
@@ -368,10 +417,14 @@ export class InventarioComponent implements OnInit {
   }
 
   limpiarArchivoModal() {
-    this.archivoModal = null;
-    this.nombreArchivoModal = '';
-    this.descripcionArchivoModal = '';
-    this.publicoArchivoModal = true;
+    this.archivoImagenModal = null;
+    this.nombreImagenModal = '';
+    this.descripcionImagenModal = '';
+    this.publicoImagenModal = true;
+    this.archivoVideoModal = null;
+    this.nombreVideoModal = '';
+    this.descripcionVideoModal = '';
+    this.publicoVideoModal = true;
   }
 
   primeraImagen(producto: Producto): string | null {

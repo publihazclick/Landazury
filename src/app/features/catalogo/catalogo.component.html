@@ -3,11 +3,66 @@
 
     <!-- Header + búsqueda -->
     <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-      <div>
-        <h1 class="text-2xl font-extrabold text-slate-100 tracking-tight">Creative Assets Hub</h1>
-        <p class="text-slate-400 text-sm mt-0.5">Descarga materiales de alta conversión para tus campañas.</p>
+
+      <!-- Selectores de bodega -->
+      <div class="flex items-center gap-3 flex-wrap">
+        <div class="mr-1">
+          <p class="text-[9px] font-black uppercase tracking-widest text-slate-600">Nuestras bodegas</p>
+          <p class="text-xs font-bold text-slate-400">Dropshipping</p>
+        </div>
+
+        <!-- Landazury Importaciones -->
+        <button (click)="seleccionarBodega('importaciones')"
+                class="relative flex items-center justify-center px-5 py-2 rounded-2xl border-2 transition-all duration-200 min-w-[140px]"
+                [class]="filtros.bodegaFiltro() === 'importaciones'
+                  ? 'border-amber-500/60 bg-amber-500/8'
+                  : 'border-white/10 bg-white/3 hover:border-amber-500/30 hover:bg-amber-500/5'">
+          <img src="/logo.png" alt="Landazury Importaciones"
+               class="h-20 w-auto object-contain transition-all duration-200"
+               [class]="filtros.bodegaFiltro() === 'importaciones' ? 'opacity-100' : 'opacity-50 group-hover:opacity-80'"/>
+          @if (filtros.bodegaFiltro() === 'importaciones') {
+            <span class="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-amber-500 flex items-center justify-center">
+              <span class="material-symbols-outlined text-[10px] text-[#0a0a08]">check</span>
+            </span>
+          }
+        </button>
+
+        <!-- Moda Landazury -->
+        <button (click)="seleccionarBodega('moda')"
+                class="relative flex items-center justify-center px-5 py-2 rounded-2xl border-2 transition-all duration-200 min-w-[140px]"
+                [class]="filtros.bodegaFiltro() === 'moda'
+                  ? 'border-rose-400/60 bg-rose-400/8'
+                  : 'border-white/10 bg-white/3 hover:border-rose-400/30 hover:bg-rose-400/5'">
+          <img src="/logo-moda.png" alt="Moda Landazury"
+               class="h-20 w-auto object-contain transition-all duration-200"
+               [class]="filtros.bodegaFiltro() === 'moda' ? 'opacity-100' : 'opacity-50'"
+               (error)="$any($event.target).style.display='none'; $any($event.target).nextElementSibling.style.display='flex'"/>
+          <!-- Fallback texto si aún no existe logo-moda.png -->
+          <span class="hidden items-center gap-1.5 transition-all"
+                [class]="filtros.bodegaFiltro() === 'moda' ? 'text-rose-300' : 'text-slate-500'">
+            <span class="material-symbols-outlined text-base">checkroom</span>
+            <span class="text-xs font-black leading-tight text-left">Moda<br><span class="text-[9px] font-bold uppercase tracking-widest">Landazury</span></span>
+          </span>
+          @if (filtros.bodegaFiltro() === 'moda') {
+            <span class="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-rose-400 flex items-center justify-center">
+              <span class="material-symbols-outlined text-[10px] text-white">check</span>
+            </span>
+          }
+        </button>
+
+        <!-- Ver todas -->
+        <button (click)="seleccionarBodega('todas')"
+                class="px-3 py-2 rounded-xl text-xs font-bold transition-all border"
+                [class]="filtros.bodegaFiltro() === 'todas'
+                  ? 'border-white/20 text-slate-200 bg-white/10'
+                  : 'border-white/8 text-slate-500 hover:text-slate-300 hover:border-white/15'">
+          Ver todas
+        </button>
+
       </div>
-      <div class="flex items-stretch rounded-xl bg-neutral-surface border border-neutral-border focus-within:border-primary transition-all w-full md:w-64">
+
+      <!-- Búsqueda -->
+      <div class="flex items-stretch rounded-xl bg-neutral-surface border border-neutral-border focus-within:border-primary transition-all w-full md:w-64 shrink-0">
         <div class="text-slate-400 flex items-center justify-center pl-4">
           <span class="material-symbols-outlined text-xl">search</span>
         </div>
@@ -133,11 +188,29 @@
                   </span>
                 }
               </div>
-              <button (click)="toggleFavorito(producto.id, $event)"
-                      class="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all bg-neutral-charcoal/70 backdrop-blur-sm hover:scale-110"
-                      [class]="esFavorito(producto.id) ? 'text-red-400' : 'text-slate-400'">
-                <span class="material-symbols-outlined text-[18px]">favorite</span>
-              </button>
+              <!-- Badge bodega + favorito -->
+              <div class="absolute top-3 right-3 flex flex-col items-end gap-1.5">
+                <!-- Logo bodega -->
+                @if (bodegaDe(producto) === 'importaciones') {
+                  <div class="bg-black/60 backdrop-blur-sm rounded-lg p-1 border border-white/10">
+                    <img src="/logo.png" alt="Landazury Importaciones" class="h-11 w-auto object-contain"/>
+                  </div>
+                } @else {
+                  <div class="bg-black/60 backdrop-blur-sm rounded-lg p-1 border border-white/10">
+                    <img src="/logo-moda.png" alt="Moda Landazury" class="h-11 w-auto object-contain"
+                         (error)="$any($event.target).style.display='none'; $any($event.target).nextElementSibling.style.display='flex'"/>
+                    <span class="hidden items-center gap-1 text-rose-300 text-[9px] font-black uppercase">
+                      <span class="material-symbols-outlined text-[10px]">checkroom</span>Moda
+                    </span>
+                  </div>
+                }
+                <!-- Favorito -->
+                <button (click)="toggleFavorito(producto.id, $event)"
+                        class="w-8 h-8 rounded-full flex items-center justify-center transition-all bg-neutral-charcoal/70 backdrop-blur-sm hover:scale-110"
+                        [class]="esFavorito(producto.id) ? 'text-red-400' : 'text-slate-400'">
+                  <span class="material-symbols-outlined text-[18px]">favorite</span>
+                </button>
+              </div>
               <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between">
                 @if (producto.precio_final) {
                   <span class="text-primary font-black text-sm">{{ producto.precio_final | currency:'COP':'symbol-narrow':'1.0-0' }}</span>

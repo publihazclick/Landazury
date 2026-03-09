@@ -1,45 +1,70 @@
-import { Component, Input, Output, EventEmitter, inject, signal } from '@angular/core';
-import { CurrencyPipe, TitleCasePipe } from '@angular/common';
+import { Component, Input, Output, EventEmitter, OnInit, inject, signal, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser, DecimalPipe } from '@angular/common';
 import { CreativosService } from '../../core/services/creativos.service';
-import type { Producto, Creativo, TipoCreativo } from '../../core/models/producto.model';
+import type { Producto, Creativo } from '../../core/models/producto.model';
 
 @Component({
   selector: 'app-producto-detalle-modal',
   standalone: true,
-  imports: [CurrencyPipe, TitleCasePipe],
+  imports: [DecimalPipe],
   templateUrl: './producto-detalle-modal.component.html',
 })
-export class ProductoDetalleModalComponent {
+export class ProductoDetalleModalComponent implements OnInit {
   @Input() producto!: Producto;
   @Output() cerrar = new EventEmitter<void>();
 
   private readonly creativosService = inject(CreativosService);
+  private readonly platformId = inject(PLATFORM_ID);
+
   readonly descargando = signal<string[]>([]);
-  readonly imagenActiva = signal(0);
+  readonly descargandoLote = signal<'imagenes' | 'videos' | null>(null);
+  readonly copiado = signal<'nombre' | 'descripcion' | null>(null);
+  // signed URLs: se cargan al vuelo cuando la URL pública falla
+  readonly urlsSigned = signal<Record<string, string>>({});
+  readonly urlsFailed = new Set<string>();
+  readonly creativoVisor = signal<Creativo | null>(null);
+
+  abrirVisor(creativo: Creativo) { this.creativoVisor.set(creativo); }
+  cerrarVisor() { this.creativoVisor.set(null); }
+
+  navegarVisor(dir: 1 | -1) {
+    const actual = this.creativoVisor();
+    if (!actual) return;
+    const lista = actual.tipo === 'imagen' ? this.imagenes : this.videos;
+    const idx = lista.findIndex(c => c.id === actual.id);
+    const siguiente = lista[(idx + dir + lista.length) % lista.length];
+    this.creativoVisor.set(siguiente);
+  }
+
+  ngOnInit() {}
+
+  displayUrl(creativo: Creativo): string {
+    return this.urlsSigned()[creativo.id] ?? creativo.archivo_url;
+  }
+
+  // Llamado desde (error) en <img> y <video> cuando la URL pública falla
+  async onMediaError(creativo: Creativo, el: HTMLImageElement | HTMLVideoElement) {
+    if (this.urlsFailed.has(creativo.id)) return; // ya intentamos, evitar bucle
+    this.urlsFailed.add(creativo.id);
+    try {
+      const url = await this.creativosService.obtenerUrlDescarga(creativo.archivo_path);
+      this.urlsSigned.update(prev => ({ ...prev, [creativo.id]: url }));
+      el.src = url;
+    } catch { /* silencioso */ }
+  }
+
+  get imagenes(): Creativo[] {
+    return (this.producto.creativos ?? []).filter(c => c.tipo === 'imagen');
+  }
+
+  get videos(): Creativo[] {
+    return (this.producto.creativos ?? []).filter(c => c.tipo === 'video');
+  }
 
   get margen(): number {
     const { precio_base, precio_final } = this.producto;
     if (!precio_final || precio_base === 0) return 0;
     return Math.round(((precio_final - precio_base) / precio_base) * 100);
-  }
-
-  iconoMaterial(tipo: TipoCreativo): string {
-    const map: Record<TipoCreativo, string> = {
-      video: 'videocam', imagen: 'image', pdf: 'picture_as_pdf',
-      documento: 'article', otro: 'folder_zip',
-    };
-    return map[tipo] ?? 'download';
-  }
-
-  chipClass(tipo: TipoCreativo): string {
-    const map: Record<TipoCreativo, string> = {
-      video:     'text-purple-400 bg-purple-400/10 border-purple-400/20',
-      imagen:    'text-sky-400    bg-sky-400/10    border-sky-400/20',
-      pdf:       'text-red-400    bg-red-400/10    border-red-400/20',
-      documento: 'text-amber-400  bg-amber-400/10  border-amber-400/20',
-      otro:      'text-slate-400  bg-slate-700/30  border-slate-700/50',
-    };
-    return map[tipo] ?? map['otro'];
   }
 
   tamano(bytes?: number): string {
@@ -52,14 +77,51 @@ export class ProductoDetalleModalComponent {
     if (this.estaDescargando(creativo.id)) return;
     this.descargando.update(ids => [...ids, creativo.id]);
     try {
-      const url = await this.creativosService.obtenerUrlDescarga(creativo.archivo_path);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = creativo.nombre;
-      a.click();
+      await this.ejecutarDescarga(creativo);
     } catch { /* silencioso */ } finally {
       this.descargando.update(ids => ids.filter(id => id !== creativo.id));
     }
+  }
+
+  async descargarTodos(tipo: 'imagenes' | 'videos') {
+    if (this.descargandoLote()) return;
+    const lista = tipo === 'imagenes' ? this.imagenes : this.videos;
+    if (lista.length === 0) return;
+    this.descargandoLote.set(tipo);
+    try {
+      for (const creativo of lista) {
+        await this.ejecutarDescarga(creativo);
+        await new Promise(r => setTimeout(r, 300));
+      }
+    } catch { /* silencioso */ } finally {
+      this.descargandoLote.set(null);
+    }
+  }
+
+  private async ejecutarDescarga(creativo: Creativo) {
+    const url = await this.creativosService.obtenerUrlDescarga(creativo.archivo_path);
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const nombreArchivo = creativo.extension
+      ? `${creativo.nombre}.${creativo.extension}`
+      : creativo.nombre;
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = nombreArchivo;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+  }
+
+  async copiar(campo: 'nombre' | 'descripcion') {
+    if (!isPlatformBrowser(this.platformId)) return;
+    const texto = campo === 'nombre' ? this.producto.nombre : (this.producto.descripcion ?? '');
+    if (!texto) return;
+    try {
+      await navigator.clipboard.writeText(texto);
+      this.copiado.set(campo);
+      setTimeout(() => this.copiado.set(null), 2000);
+    } catch { /* silencioso */ }
   }
 
   onBackdrop(event: MouseEvent) {

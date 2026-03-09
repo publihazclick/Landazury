@@ -8,6 +8,13 @@ import { CatalogoFiltrosService } from '../../core/services/catalogo-filtros.ser
 import { ProductoDetalleModalComponent } from './producto-detalle-modal.component';
 import type { Producto, Creativo, TipoCreativo } from '../../core/models/producto.model';
 
+export type BodegaId = 'importaciones' | 'moda';
+
+export function bodegaDeProducto(producto: Producto): BodegaId {
+  const slug = (producto.categoria?.slug ?? '').toLowerCase();
+  return slug === 'moda-ropa' ? 'moda' : 'importaciones';
+}
+
 @Component({
   selector: 'app-catalogo',
   standalone: true,
@@ -30,30 +37,49 @@ export class CatalogoComponent implements OnInit {
 
   abrirModal(producto: Producto) {
     this.productoModal.set(producto);
-    // Registrar vista en background (sin bloquear UI)
     this.catalogoService.registrarVista(producto.id).catch(() => {});
   }
   cerrarModal() { this.productoModal.set(null); }
 
+  // ── Qué bodegas tienen productos en el listado base ──────────────────
+  readonly bodegasConProductos = computed(() => {
+    const todos = this.productos();
+    return {
+      importaciones: todos.some(p => bodegaDeProducto(p) === 'importaciones'),
+      moda:          todos.some(p => bodegaDeProducto(p) === 'moda'),
+    };
+  });
+
+  // ── Filtrado completo ─────────────────────────────────────────────────
   readonly productosFiltrados = computed(() => {
     let result = this.productos();
-    const filtro = this.filtros.filtroAsset();
-    const cat = this.filtros.categoriaSeleccionada();
+    const filtro  = this.filtros.filtroAsset();
+    const cat     = this.filtros.categoriaSeleccionada();
+    const bodega  = this.filtros.bodegaFiltro();
 
-    if (cat) result = result.filter((p) => (p as any).categoria_id === cat || p.categoria?.id === cat);
+    if (cat)    result = result.filter(p => p.categoria_id === cat || p.categoria?.id === cat);
+    if (bodega !== 'todas') result = result.filter(p => bodegaDeProducto(p) === bodega);
 
     if (filtro === 'todos') return result;
-    return result.filter((p) => {
+    return result.filter(p => {
       if (!p.creativos || p.creativos.length === 0) return false;
-      if (filtro === 'video')   return p.creativos.some((c) => c.tipo === 'video');
-      if (filtro === 'copy')    return p.creativos.some((c) => c.tipo === 'documento' || c.tipo === 'otro');
-      if (filtro === 'imagen')  return p.creativos.some((c) => c.tipo === 'imagen');
+      if (filtro === 'video')   return p.creativos.some(c => c.tipo === 'video');
+      if (filtro === 'copy')    return p.creativos.some(c => c.tipo === 'documento' || c.tipo === 'otro');
+      if (filtro === 'imagen')  return p.creativos.some(c => c.tipo === 'imagen');
       if (filtro === 'ganador') return p.ganador || calcularMargen(p) >= 40;
       return true;
     });
   });
 
   readonly productoDestacado = computed(() => this.productosFiltrados()[0] ?? null);
+
+  // ── Helper para template ──────────────────────────────────────────────
+  bodegaDe(producto: Producto): BodegaId { return bodegaDeProducto(producto); }
+
+  seleccionarBodega(b: 'todas' | 'importaciones' | 'moda') {
+    this.filtros.bodegaFiltro.set(b);
+    // Si hay solo una bodega disponible, no tiene sentido filtrar "todas"
+  }
 
   async ngOnInit() {
     await Promise.all([this.cargarProductos(), this.cargarCategorias(), this.cargarFavoritos()]);
@@ -65,6 +91,12 @@ export class CatalogoComponent implements OnInit {
     try {
       const data = await this.catalogoService.obtenerProductos({ busqueda: this.busqueda || undefined });
       this.productos.set(data);
+      // Si solo hay una bodega, seleccionarla automáticamente
+      const imp  = data.some(p => bodegaDeProducto(p) === 'importaciones');
+      const moda = data.some(p => bodegaDeProducto(p) === 'moda');
+      if (imp && !moda) this.filtros.bodegaFiltro.set('importaciones');
+      else if (!imp && moda) this.filtros.bodegaFiltro.set('moda');
+      else this.filtros.bodegaFiltro.set('todas');
     } catch {
       this.error.set('No se pudieron cargar los productos. Intenta de nuevo.');
     } finally {
@@ -83,7 +115,7 @@ export class CatalogoComponent implements OnInit {
   async cargarFavoritos() {
     try {
       const favs = await this.catalogoService.obtenerFavoritos();
-      this.favoritos.set(new Set(favs.map((f) => f.producto_id)));
+      this.favoritos.set(new Set(favs.map(f => f.producto_id)));
     } catch { /* silencioso */ }
   }
 
@@ -92,7 +124,7 @@ export class CatalogoComponent implements OnInit {
     event.stopPropagation();
     try {
       const esFavorito = await this.catalogoService.toggleFavorito(productoId);
-      this.favoritos.update((set) => {
+      this.favoritos.update(set => {
         const nuevo = new Set(set);
         if (esFavorito) nuevo.add(productoId);
         else nuevo.delete(productoId);
@@ -108,11 +140,17 @@ export class CatalogoComponent implements OnInit {
   async descargarCreativo(creativo: Creativo) {
     try {
       const url = await this.creativosService.obtenerUrlDescarga(creativo.archivo_path);
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const nombreArchivo = creativo.extension
+        ? `${creativo.nombre}.${creativo.extension}`
+        : creativo.nombre;
       const a = document.createElement('a');
-      a.href = url;
-      a.download = creativo.nombre;
+      a.href = blobUrl;
+      a.download = nombreArchivo;
       a.click();
-      // Registrar descarga
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
       if (creativo.producto_id) {
         this.catalogoService.registrarDescarga(creativo.producto_id).catch(() => {});
       }

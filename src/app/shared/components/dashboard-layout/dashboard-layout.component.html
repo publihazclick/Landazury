@@ -12,22 +12,24 @@
          [class.translate-x-0]="menuAbierto()"
          style="background:rgba(10,10,8,0.97);border-right:1px solid rgba(224,172,41,0.1);backdrop-filter:blur(24px);">
 
-    <!-- Logo — solo para usuarios normales -->
-    <div class="flex items-center justify-between px-5 border-b border-white/5"
-         [class]="(!auth.esAdmin() && !auth.esInventario()) ? 'py-5' : 'py-3'">
-      @if (!auth.esAdmin() && !auth.esInventario()) {
-        <img src="/logo.png" class="h-24 w-auto object-contain mx-auto" alt="Landazury" loading="lazy" decoding="async"/>
-      } @else {
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
-            <span class="material-symbols-outlined text-base text-amber-400">{{ auth.esAdmin() ? 'shield_person' : 'inventory_2' }}</span>
-          </div>
-          <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">
-            {{ auth.esAdmin() ? 'Administración' : 'Operaciones' }}
+    <!-- Sidebar header -->
+    <div class="flex items-center justify-between px-5 py-3 border-b border-white/5">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-xl border flex items-center justify-center shrink-0"
+             [class]="auth.esAdmin() ? 'bg-red-500/10 border-red-500/20' : auth.esInventario() ? 'bg-amber-500/10 border-amber-500/20' : 'bg-primary/10 border-primary/20'">
+          <span class="material-symbols-outlined text-base"
+                [class]="auth.esAdmin() ? 'text-red-400' : auth.esInventario() ? 'text-amber-400' : 'text-primary'">
+            {{ auth.esAdmin() ? 'shield_person' : auth.esInventario() ? 'inventory_2' : 'storefront' }}
           </span>
         </div>
-      }
-      <button class="lg:hidden p-1 text-slate-500 hover:text-slate-300 transition-colors absolute right-3 top-3"
+        <div class="leading-tight">
+          <p class="text-[9px] font-black uppercase tracking-widest text-slate-600">Landazury</p>
+          <p class="text-xs font-bold text-slate-300">
+            {{ auth.esAdmin() ? 'Administración' : auth.esInventario() ? 'Operaciones' : 'Dropshipping' }}
+          </p>
+        </div>
+      </div>
+      <button class="lg:hidden p-1 text-slate-500 hover:text-slate-300 transition-colors"
               aria-label="Cerrar menú"
               (click)="menuAbierto.set(false)">
         <span class="material-symbols-outlined" aria-hidden="true">close</span>
@@ -191,13 +193,9 @@
         <span class="material-symbols-outlined" aria-hidden="true">menu</span>
       </button>
       <div class="flex-1 flex justify-center">
-        @if (!auth.esAdmin() && !auth.esInventario()) {
-          <img src="/logo.png" class="h-16 w-auto object-contain" alt="Landazury" loading="lazy" decoding="async"/>
-        } @else {
-          <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">
-            {{ auth.esAdmin() ? 'Administración' : 'Operaciones' }}
-          </span>
-        }
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">
+          {{ auth.esAdmin() ? 'Administración' : auth.esInventario() ? 'Operaciones' : 'Landazury' }}
+        </span>
       </div>
       <div class="w-8 h-8 rounded-full gold-gradient flex items-center justify-center text-xs font-extrabold text-[#0a0a08] shrink-0">
         {{ auth.usuario()?.email?.[0]?.toUpperCase() }}
