@@ -64,6 +64,11 @@ export class CatalogoService {
     return this.normalizar([data])[0];
   }
 
+  async insertarProductosBatch(productos: Record<string, any>[]) {
+    const { error } = await this.supabase.cliente.from('productos').insert(productos);
+    if (error) throw error;
+  }
+
   async crearProducto(producto: Omit<Producto, 'id' | 'creado_en' | 'categoria' | 'creativos'>) {
     const { data, error } = await this.supabase.cliente
       .from('productos')

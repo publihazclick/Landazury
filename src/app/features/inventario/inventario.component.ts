@@ -4,6 +4,7 @@ import { DecimalPipe } from '@angular/common';
 import { CreativosService } from '../../core/services/creativos.service';
 import { CatalogoService } from '../../core/services/catalogo.service';
 import { AuthService } from '../../core/services/auth.service';
+import { ImportarProductosComponent } from './importar-productos.component';
 import type { Creativo, Producto, TipoCreativo, Categoria, EstadoProducto } from '../../core/models/producto.model';
 
 interface FormProducto {
@@ -20,7 +21,7 @@ interface FormProducto {
 @Component({
   selector: 'app-inventario',
   standalone: true,
-  imports: [FormsModule, DecimalPipe],
+  imports: [FormsModule, DecimalPipe, ImportarProductosComponent],
   templateUrl: './inventario.component.html',
 })
 export class InventarioComponent implements OnInit {
@@ -33,6 +34,18 @@ export class InventarioComponent implements OnInit {
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
   readonly exito = signal<string | null>(null);
+
+  // Modal importar
+  readonly mostrarImportar = signal(false);
+
+  onImportarCerrar(creados: number) {
+    this.mostrarImportar.set(false);
+    if (creados > 0) {
+      this.cargarProductos();
+      this.exito.set(`${creados} producto${creados > 1 ? 's' : ''} importado${creados > 1 ? 's' : ''} correctamente.`);
+      setTimeout(() => this.exito.set(null), 4000);
+    }
+  }
 
   // Modal
   readonly mostrarModal = signal(false);
