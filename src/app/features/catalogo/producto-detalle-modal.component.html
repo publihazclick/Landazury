@@ -192,6 +192,28 @@
       }
 
 
+      <!-- Variantes -->
+      @if (producto.atributos?.length) {
+        <div class="space-y-3 border-t border-white/5 pt-4">
+          <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm">tune</span>
+            Variantes disponibles
+          </p>
+          <div class="space-y-2">
+            @for (attr of producto.atributos!; track attr.nombre) {
+              <div>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-1.5">{{ attr.nombre }}</p>
+                <div class="flex flex-wrap gap-1.5">
+                  @for (valor of attr.valores; track valor) {
+                    <span class="text-xs font-semibold px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">{{ valor }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
     </div>
 
     <!-- ══ VISOR LIGHTBOX ══ -->

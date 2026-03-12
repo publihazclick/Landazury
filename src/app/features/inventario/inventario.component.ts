@@ -5,7 +5,7 @@ import { CreativosService } from '../../core/services/creativos.service';
 import { CatalogoService } from '../../core/services/catalogo.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ImportarProductosComponent } from './importar-productos.component';
-import type { Creativo, Producto, TipoCreativo, Categoria, EstadoProducto } from '../../core/models/producto.model';
+import type { AtributoProducto, Creativo, Producto, TipoCreativo, Categoria, EstadoProducto } from '../../core/models/producto.model';
 
 interface FormProducto {
   nombre: string;
@@ -17,6 +17,7 @@ interface FormProducto {
   stock: number;
   categoria_id: string;
   disponible: boolean;
+  atributos: AtributoProducto[];
 }
 
 @Component({
@@ -63,6 +64,27 @@ export class InventarioComponent implements OnInit {
   // Imágenes del producto (edición local antes de guardar)
   imagenesEnModal: string[] = [];
   urlsAEliminar: string[] = [];
+
+  // Variantes / atributos
+  atributoNuevoValor: Record<string, string> = {};
+  atributoPersonalizadoNombre = '';
+
+  readonly mostrarSelectorAtributo = signal(false);
+
+  readonly ATRIBUTOS_CONFIG: { nombre: string; icono: string; sugeridos: string[] }[] = [
+    { nombre: 'Color',         icono: 'palette',      sugeridos: ['Negro', 'Blanco', 'Rojo', 'Azul', 'Verde', 'Amarillo', 'Rosa', 'Gris', 'Dorado', 'Plateado', 'Naranja', 'Morado'] },
+    { nombre: 'Talla',         icono: 'straighten',   sugeridos: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'Talla única'] },
+    { nombre: 'Talla Calzado', icono: 'hiking',       sugeridos: ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45'] },
+    { nombre: 'Material',      icono: 'texture',      sugeridos: ['Algodón', 'Poliéster', 'Cuero', 'Cuero sintético', 'Metal', 'Aluminio', 'Plástico', 'Silicona', 'Madera', 'Acero inoxidable', 'Tela'] },
+    { nombre: 'Capacidad',     icono: 'water_drop',   sugeridos: ['250ml', '500ml', '1L', '2L', '5L', '64GB', '128GB', '256GB', '512GB', '1TB'] },
+    { nombre: 'Pack',          icono: 'inventory_2',  sugeridos: ['1 unidad', '2 unidades', '3 unidades', '5 unidades', '10 unidades', '12 unidades', '20 unidades'] },
+    { nombre: 'Voltaje',       icono: 'bolt',         sugeridos: ['110V', '220V', '110V/220V', 'USB 5V', '12V', '24V'] },
+    { nombre: 'Aroma',         icono: 'spa',          sugeridos: ['Sin aroma', 'Lavanda', 'Rosa', 'Vainilla', 'Menta', 'Cítrico', 'Canela', 'Coco', 'Jazmín'] },
+    { nombre: 'Estilo',        icono: 'style',        sugeridos: ['Clásico', 'Moderno', 'Casual', 'Deportivo', 'Elegante', 'Minimalista', 'Vintage', 'Urbano'] },
+    { nombre: 'Género',        icono: 'wc',           sugeridos: ['Hombre', 'Mujer', 'Unisex', 'Niño', 'Niña'] },
+    { nombre: 'Conectividad',  icono: 'wifi',         sugeridos: ['Bluetooth', 'WiFi', 'USB-C', 'USB-A', 'Inalámbrico', 'Con cable', 'NFC'] },
+    { nombre: 'Modelo',        icono: 'devices',      sugeridos: [] },
+  ];
 
   // Forms
   formProducto: FormProducto = this.formVacio();
@@ -147,7 +169,10 @@ export class InventarioComponent implements OnInit {
       stock: producto.stock ?? 0,
       categoria_id: producto.categoria_id ?? '',
       disponible: producto.disponible,
+      atributos: producto.atributos ? JSON.parse(JSON.stringify(producto.atributos)) : [],
     };
+    this.atributoNuevoValor = {};
+    this.mostrarSelectorAtributo.set(false);
     this.productoEnModal.set(producto);
     this.creativosEnModal.set(producto.creativos ?? []);
     this.imagenesEnModal = [...(producto.imagenes ?? [])];
@@ -204,6 +229,7 @@ export class InventarioComponent implements OnInit {
         bodega_id: existente?.bodega_id ?? userId,
         vistas: existente?.vistas ?? 0,
         descargas: existente?.descargas ?? 0,
+        atributos: this.formProducto.atributos,
       };
 
       let mensaje: string;
@@ -441,8 +467,60 @@ export class InventarioComponent implements OnInit {
     return this.perfilesMap().get(bodegaId) ?? '—';
   }
 
+  get atributosDisponibles() {
+    return this.ATRIBUTOS_CONFIG.filter(c =>
+      !this.formProducto.atributos.some(a => a.nombre === c.nombre)
+    );
+  }
+
+  atributoConfig(nombre: string) {
+    return this.ATRIBUTOS_CONFIG.find(c => c.nombre === nombre);
+  }
+
+  atributosNoSeleccionados(atributo: AtributoProducto): string[] {
+    const config = this.ATRIBUTOS_CONFIG.find(c => c.nombre === atributo.nombre);
+    return (config?.sugeridos ?? []).filter(s => !atributo.valores.includes(s));
+  }
+
+  agregarAtributo(nombre: string) {
+    if (this.formProducto.atributos.some(a => a.nombre === nombre)) return;
+    this.formProducto.atributos = [...this.formProducto.atributos, { nombre, valores: [] }];
+    this.atributoNuevoValor[nombre] = '';
+    this.mostrarSelectorAtributo.set(false);
+  }
+
+  agregarAtributoPersonalizado() {
+    const nombre = this.atributoPersonalizadoNombre.trim();
+    if (!nombre || this.formProducto.atributos.some(a => a.nombre === nombre)) return;
+    this.agregarAtributo(nombre);
+    this.atributoPersonalizadoNombre = '';
+  }
+
+  eliminarAtributo(nombre: string) {
+    this.formProducto.atributos = this.formProducto.atributos.filter(a => a.nombre !== nombre);
+  }
+
+  agregarValor(atributoNombre: string, valor: string) {
+    const v = valor.trim();
+    if (!v) return;
+    this.formProducto.atributos = this.formProducto.atributos.map(a =>
+      a.nombre === atributoNombre && !a.valores.includes(v)
+        ? { ...a, valores: [...a.valores, v] }
+        : a
+    );
+    this.atributoNuevoValor[atributoNombre] = '';
+  }
+
+  eliminarValor(atributoNombre: string, valor: string) {
+    this.formProducto.atributos = this.formProducto.atributos.map(a =>
+      a.nombre === atributoNombre
+        ? { ...a, valores: a.valores.filter(v => v !== valor) }
+        : a
+    );
+  }
+
   formVacio(): FormProducto {
-    return { nombre: '', descripcion: '', precio_base: 0, precio_sugerido: 0, precio_final: 0, sku: '', stock: 0, categoria_id: '', disponible: false };
+    return { nombre: '', descripcion: '', precio_base: 0, precio_sugerido: 0, precio_final: 0, sku: '', stock: 0, categoria_id: '', disponible: false, atributos: [] };
   }
 
   limpiarArchivoModal() {

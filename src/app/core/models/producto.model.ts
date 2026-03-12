@@ -24,6 +24,11 @@ export interface Creativo {
 
 export type EstadoProducto = 'pendiente' | 'aprobado' | 'rechazado';
 
+export interface AtributoProducto {
+  nombre: string;
+  valores: string[];
+}
+
 export interface Producto {
   id: string;
   nombre: string;
@@ -39,6 +44,7 @@ export interface Producto {
   disponible: boolean;
   ganador: boolean;
   exclusivo: boolean;
+  atributos?: AtributoProducto[];
   estado: EstadoProducto;
   bodega_id?: string;
   vistas: number;

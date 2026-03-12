@@ -214,6 +214,18 @@
               }
             </div>
 
+            <!-- Variantes chips -->
+            @if (producto.atributos?.length) {
+              <div class="flex flex-wrap gap-1">
+                @for (attr of producto.atributos!; track attr.nombre) {
+                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-white/5 border border-white/8 text-slate-500">
+                    {{ attr.nombre }}
+                    @if (attr.valores.length) {<span class="text-slate-600"> · {{ attr.valores.slice(0,2).join(', ') }}{{ attr.valores.length > 2 ? '…' : '' }}</span>}
+                  </span>
+                }
+              </div>
+            }
+
             <!-- Creativo type chips -->
             <div class="flex flex-wrap gap-1.5 min-h-[24px]">
               @for (tipo of tiposConContenido(producto); track tipo.valor) {
@@ -375,6 +387,104 @@
             </label>
             <input [(ngModel)]="formProducto.stock" type="number" min="0" step="1" placeholder="0"
                    class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-100 placeholder:text-slate-600 px-4 py-3 outline-none transition-all text-sm"/>
+          </div>
+
+          <!-- Variantes del producto -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">tune</span>
+                Variantes del producto
+              </label>
+              <button type="button" (click)="mostrarSelectorAtributo.set(!mostrarSelectorAtributo())"
+                      class="flex items-center gap-1 text-[11px] font-bold text-primary/80 hover:text-primary transition-all">
+                <span class="material-symbols-outlined text-sm">{{ mostrarSelectorAtributo() ? 'expand_less' : 'add' }}</span>
+                Agregar variante
+              </button>
+            </div>
+
+            <!-- Selector de atributos predefinidos -->
+            @if (mostrarSelectorAtributo()) {
+              <div class="p-3 bg-[#0d0b06] border border-[#3d3524] rounded-xl space-y-3">
+                <div class="grid grid-cols-3 gap-1.5">
+                  @for (config of atributosDisponibles; track config.nombre) {
+                    <button type="button" (click)="agregarAtributo(config.nombre)"
+                            class="flex items-center gap-1 px-2 py-1.5 text-[11px] font-semibold text-slate-400 hover:text-primary bg-white/3 hover:bg-primary/10 border border-white/5 hover:border-primary/20 rounded-lg transition-all text-left">
+                      <span class="material-symbols-outlined text-[13px]">{{ config.icono }}</span>
+                      {{ config.nombre }}
+                    </button>
+                  }
+                  @if (atributosDisponibles.length === 0) {
+                    <p class="col-span-3 text-[11px] text-slate-600 italic text-center py-1">Todos los atributos predefinidos ya fueron agregados</p>
+                  }
+                </div>
+                <!-- Personalizado -->
+                <div class="flex gap-2 pt-2 border-t border-white/8">
+                  <input [(ngModel)]="atributoPersonalizadoNombre" type="text" placeholder="Nombre personalizado…"
+                         class="flex-1 bg-[#1a160f] border border-[#3d3524] rounded-lg text-slate-100 placeholder:text-slate-600 px-3 py-1.5 text-xs outline-none focus:border-primary"
+                         (keydown.enter)="agregarAtributoPersonalizado()"/>
+                  <button type="button" (click)="agregarAtributoPersonalizado()"
+                          class="px-3 py-1.5 bg-primary/10 border border-primary/20 text-primary text-xs font-bold rounded-lg hover:bg-primary/20 transition-all whitespace-nowrap">
+                    + Agregar
+                  </button>
+                </div>
+              </div>
+            }
+
+            <!-- Atributos existentes -->
+            @for (atributo of formProducto.atributos; track atributo.nombre) {
+              <div class="p-3 bg-[#0d0b06] border border-[#3d3524] rounded-xl space-y-2.5">
+                <!-- Cabecera del atributo -->
+                <div class="flex items-center justify-between">
+                  <span class="flex items-center gap-1.5 text-xs font-bold text-slate-300">
+                    <span class="material-symbols-outlined text-sm text-primary/50">{{ atributoConfig(atributo.nombre)?.icono ?? 'label' }}</span>
+                    {{ atributo.nombre }}
+                  </span>
+                  <button type="button" (click)="eliminarAtributo(atributo.nombre)"
+                          class="text-slate-600 hover:text-red-400 transition-colors">
+                    <span class="material-symbols-outlined text-sm">delete</span>
+                  </button>
+                </div>
+
+                <!-- Valores seleccionados -->
+                <div class="flex flex-wrap gap-1.5 min-h-[24px]">
+                  @for (valor of atributo.valores; track valor) {
+                    <span class="flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary">
+                      {{ valor }}
+                      <button type="button" (click)="eliminarValor(atributo.nombre, valor)"
+                              class="hover:text-red-400 transition-colors leading-none ml-0.5">×</button>
+                    </span>
+                  }
+                  @if (atributo.valores.length === 0) {
+                    <span class="text-[11px] text-slate-600 italic">Sin valores aún</span>
+                  }
+                </div>
+
+                <!-- Sugeridos clicables -->
+                @if (atributosNoSeleccionados(atributo).length > 0) {
+                  <div class="flex flex-wrap gap-1">
+                    @for (sug of atributosNoSeleccionados(atributo); track sug) {
+                      <button type="button" (click)="agregarValor(atributo.nombre, sug)"
+                              class="text-[10px] px-1.5 py-0.5 rounded border border-dashed border-slate-700 text-slate-500 hover:border-primary/40 hover:text-primary/70 transition-all">
+                        + {{ sug }}
+                      </button>
+                    }
+                  </div>
+                }
+
+                <!-- Input valor personalizado -->
+                <div class="flex gap-2">
+                  <input [(ngModel)]="atributoNuevoValor[atributo.nombre]" type="text"
+                         [placeholder]="'Agregar valor de ' + atributo.nombre + '…'"
+                         class="flex-1 bg-[#1a160f] border border-[#3d3524] rounded-lg text-slate-100 placeholder:text-slate-600 px-3 py-1.5 text-xs outline-none focus:border-primary"
+                         (keydown.enter)="agregarValor(atributo.nombre, atributoNuevoValor[atributo.nombre])"/>
+                  <button type="button" (click)="agregarValor(atributo.nombre, atributoNuevoValor[atributo.nombre])"
+                          class="w-8 h-8 flex items-center justify-center bg-white/5 border border-white/10 text-slate-400 hover:text-primary hover:border-primary/20 rounded-lg transition-all shrink-0">
+                    <span class="material-symbols-outlined text-sm">add</span>
+                  </button>
+                </div>
+              </div>
+            }
           </div>
 
           <!-- Descripción -->
