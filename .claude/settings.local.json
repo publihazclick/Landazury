@@ -15,7 +15,10 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "mcp__supabase__execute_sql",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)",
+      "mcp__supabase__deploy_edge_function"
     ]
   },
   "enabledMcpjsonServers": [

@@ -14,6 +14,15 @@ interface FormEdicion {
   telefono: string;
 }
 
+interface FormCreacion {
+  email: string;
+  password: string;
+  nombre: string;
+  rol: Rol;
+  pais: string;
+  telefono: string;
+}
+
 interface FormRevision {
   precio_base: number;
   precio_final: number;
@@ -42,9 +51,12 @@ export class AdminComponent implements OnInit {
   readonly confirmandoEliminar = signal<Perfil | null>(null);
   readonly guardandoEdicion = signal(false);
   readonly eliminando = signal(false);
+  readonly mostrarModalCrear = signal(false);
+  readonly creandoUsuario = signal(false);
 
   busqueda = '';
   formEdicion: FormEdicion = { nombre: '', pais: '', telefono: '' };
+  formCreacion: FormCreacion = { email: '', password: '', nombre: '', rol: 'usuario', pais: '', telefono: '' };
 
   readonly roles: { valor: Rol; etiqueta: string; descripcion: string; icono: string }[] = [
     { valor: 'admin',      etiqueta: 'Admin',      descripcion: 'Acceso total al sistema',            icono: 'shield_person' },
@@ -202,6 +214,42 @@ export class AdminComponent implements OnInit {
 
   confirmarEliminar(u: Perfil) { this.confirmandoEliminar.set(u); }
   cancelarEliminar() { this.confirmandoEliminar.set(null); }
+
+  abrirModalCrear() {
+    this.formCreacion = { email: '', password: '', nombre: '', rol: 'usuario', pais: '', telefono: '' };
+    this.mostrarModalCrear.set(true);
+  }
+
+  cerrarModalCrear() { this.mostrarModalCrear.set(false); }
+
+  async crearUsuario() {
+    const f = this.formCreacion;
+    if (!f.email.trim() || !f.password || !f.nombre.trim()) return;
+    this.creandoUsuario.set(true);
+    this.error.set(null);
+    try {
+      const { data, error } = await this.supabase.cliente.functions.invoke('crear-usuario', {
+        body: {
+          email: f.email.trim(),
+          password: f.password,
+          nombre: f.nombre.trim(),
+          rol: f.rol,
+          pais: f.pais.trim() || undefined,
+          telefono: f.telefono.trim() || undefined,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      await this.cargarUsuarios();
+      this.exito.set(`Usuario "${f.nombre}" creado correctamente.`);
+      setTimeout(() => this.exito.set(null), 3000);
+      this.mostrarModalCrear.set(false);
+    } catch (e: unknown) {
+      this.error.set(e instanceof Error ? e.message : 'No se pudo crear el usuario.');
+    } finally {
+      this.creandoUsuario.set(false);
+    }
+  }
 
   async eliminarUsuario() {
     const u = this.confirmandoEliminar();
