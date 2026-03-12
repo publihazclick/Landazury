@@ -208,7 +208,7 @@ export class AdminComponent implements OnInit {
 
     try {
       if (necesitaEdgeFn) {
-        const token = await this.obtenerTokenFresco();
+        const token = this.obtenerToken();
         const body: Record<string, string> = {
           userId: u.id,
           nombre: this.formEdicion.nombre.trim(),
@@ -276,7 +276,7 @@ export class AdminComponent implements OnInit {
     this.eliminando.set(true);
     this.error.set(null);
     try {
-      const token = await this.obtenerTokenFresco();
+      const token = this.obtenerToken();
       const resp = await fetch(`${environment.supabaseUrl}/functions/v1/admin-eliminar-usuario`, {
         method: 'POST',
         headers: {
@@ -345,7 +345,7 @@ export class AdminComponent implements OnInit {
     this.error.set(null);
 
     try {
-      const token = await this.obtenerTokenFresco();
+      const token = this.obtenerToken();
 
       const resp = await fetch(`${environment.supabaseUrl}/functions/v1/admin-crear-usuario`, {
         method: 'POST',
@@ -622,10 +622,10 @@ export class AdminComponent implements OnInit {
     return new Date(fecha).toLocaleDateString('es', { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
-  /** Obtiene siempre un access_token fresco (refresca si está por vencer) */
-  private async obtenerTokenFresco(): Promise<string> {
-    const { data, error } = await this.supabase.cliente.auth.getSession();
-    if (error || !data.session) throw new Error('Sesión expirada. Por favor, vuelve a iniciar sesión.');
-    return data.session.access_token;
+  /** Lee el access_token de la sesión activa */
+  private obtenerToken(): string {
+    const token = this.auth.sesion()?.access_token;
+    if (!token) throw new Error('Sesión expirada. Por favor, vuelve a iniciar sesión.');
+    return token;
   }
 }
