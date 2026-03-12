@@ -402,10 +402,8 @@ export class InventarioComponent implements OnInit {
     this.subiendoImagen.set(true);
     this.error.set(null);
     try {
-      for (const file of Array.from(files)) {
-        const url = await this.catalogoService.subirImagenProducto(file);
-        this.imagenesEnModal = [...this.imagenesEnModal, url];
-      }
+      const urls = await Promise.all(Array.from(files).map(f => this.catalogoService.subirImagenProducto(f)));
+      this.imagenesEnModal = [...this.imagenesEnModal, ...urls];
     } catch {
       this.error.set('Error al subir la imagen.');
     } finally {

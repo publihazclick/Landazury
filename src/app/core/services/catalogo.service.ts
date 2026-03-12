@@ -91,14 +91,45 @@ export class CatalogoService {
   async subirImagenProducto(file: File): Promise<string> {
     const usuario = this.auth.usuario();
     if (!usuario) throw new Error('Debes iniciar sesión');
-    const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg';
-    const path = `productos/${usuario.id}/${Date.now()}.${ext}`;
+    const compressed = file.type.startsWith('image/') ? await this.comprimirImagen(file, 1400, 0.82) : file;
+    const path = `productos/${usuario.id}/${Date.now()}.jpg`;
     const { error } = await this.supabase.cliente.storage
       .from(this.BUCKET_IMAGENES)
-      .upload(path, file, { upsert: false, contentType: file.type });
+      .upload(path, compressed, { upsert: false, contentType: 'image/jpeg' });
     if (error) throw error;
     const { data } = this.supabase.cliente.storage.from(this.BUCKET_IMAGENES).getPublicUrl(path);
     return data.publicUrl;
+  }
+
+  /** Comprime una imagen usando Canvas antes de subirla */
+  async comprimirImagen(file: File, maxPx = 1400, calidad = 0.82): Promise<File> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        let { width, height } = img;
+        if (width > maxPx || height > maxPx) {
+          if (width >= height) { height = Math.round((height * maxPx) / width); width = maxPx; }
+          else { width = Math.round((width * maxPx) / height); height = maxPx; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d')!.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) { resolve(file); return; }
+            // Solo usar comprimida si es más pequeña
+            if (blob.size >= file.size) { resolve(file); return; }
+            resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }));
+          },
+          'image/jpeg', calidad
+        );
+      };
+      img.onerror = () => { URL.revokeObjectURL(objectUrl); resolve(file); };
+      img.src = objectUrl;
+    });
   }
 
   async eliminarImagenProducto(url: string): Promise<void> {

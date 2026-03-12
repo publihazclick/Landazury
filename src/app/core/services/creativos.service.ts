@@ -39,12 +39,15 @@ export class CreativosService {
     if (!usuario) throw new Error('Debes iniciar sesión');
 
     const tipo = detectarTipo(file);
-    const ext = extension(file.name);
-    const path = `${usuario.id}/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+
+    // Comprimir imágenes antes de subir
+    const archivoFinal = tipo === 'imagen' ? await this.comprimirImagen(file, 1600, 0.85) : file;
+    const ext = extension(archivoFinal.name);
+    const path = `${usuario.id}/${Date.now()}_${archivoFinal.name.replace(/\s+/g, '_')}`;
 
     const { error: uploadError } = await this.supabase.cliente.storage
       .from(BUCKET)
-      .upload(path, file, { upsert: false });
+      .upload(path, archivoFinal, { upsert: false, contentType: archivoFinal.type });
     if (uploadError) throw uploadError;
 
     const { data: urlData } = this.supabase.cliente.storage.from(BUCKET).getPublicUrl(path);
@@ -57,7 +60,7 @@ export class CreativosService {
         tipo,
         archivo_url: urlData.publicUrl,
         archivo_path: path,
-        tamano: file.size,
+        tamano: archivoFinal.size,
         extension: ext,
         producto_id: opts.productoId ?? null,
         subido_por: usuario.id,
@@ -108,6 +111,34 @@ export class CreativosService {
 
     const { error } = await this.supabase.cliente.from('creativos').delete().eq('id', id);
     if (error) throw error;
+  }
+
+  async comprimirImagen(file: File, maxPx = 1600, calidad = 0.85): Promise<File> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        let { width, height } = img;
+        if (width > maxPx || height > maxPx) {
+          if (width >= height) { height = Math.round((height * maxPx) / width); width = maxPx; }
+          else { width = Math.round((width * maxPx) / height); height = maxPx; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d')!.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            if (!blob || blob.size >= file.size) { resolve(file); return; }
+            resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }));
+          },
+          'image/jpeg', calidad
+        );
+      };
+      img.onerror = () => { URL.revokeObjectURL(objectUrl); resolve(file); };
+      img.src = objectUrl;
+    });
   }
 
   formatearTamano(bytes?: number): string {
