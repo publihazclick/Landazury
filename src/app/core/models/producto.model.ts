@@ -34,7 +34,8 @@ export interface Producto {
   imagenes: string[];
   categoria_id?: string;
   categoria?: Categoria;
-  proveedor?: string;
+  sku?: string;
+  stock?: number;
   disponible: boolean;
   ganador: boolean;
   exclusivo: boolean;

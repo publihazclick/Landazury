@@ -109,7 +109,8 @@ export class ImportarProductosComponent {
     const payload = seleccionadas.map(f => ({
       nombre:          f.nombre,
       descripcion:     f.descripcion ?? null,
-      proveedor:       f.sku ?? null,   // SKU como referencia de proveedor
+      sku:             f.sku ?? null,
+      stock:           f.stock ?? null,
       precio_base:     f.precio_base,
       precio_sugerido: f.precio_sugerido ?? null,
       precio_final:    null,

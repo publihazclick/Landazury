@@ -326,8 +326,8 @@
                 <div class="flex items-start justify-between gap-2">
                   <div class="flex-1 min-w-0">
                     <h3 class="font-bold text-slate-100 text-sm line-clamp-1">{{ producto.nombre }}</h3>
-                    @if (producto.proveedor) {
-                      <p class="text-xs text-slate-500 mt-0.5">{{ producto.proveedor }}</p>
+                    @if (producto.sku) {
+                      <p class="text-xs text-slate-500 mt-0.5">SKU: {{ producto.sku }}</p>
                     }
                   </div>
                   <div class="flex items-center gap-2 text-[11px] text-slate-600 shrink-0">

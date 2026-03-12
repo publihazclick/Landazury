@@ -168,12 +168,22 @@
 
           <!-- Body -->
           <div class="p-4 flex flex-col gap-3 flex-1">
-            <!-- Name + provider -->
+            <!-- Name + SKU + stock + subidor -->
             <div>
               <h3 class="font-bold text-slate-100 text-sm leading-snug line-clamp-2">{{ producto.nombre }}</h3>
-              @if (producto.proveedor) {
-                <p class="text-xs text-slate-500 mt-0.5">{{ producto.proveedor }}</p>
-              }
+              <div class="flex items-center gap-2 mt-1 flex-wrap">
+                @if (producto.sku) {
+                  <span class="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-slate-500">SKU: {{ producto.sku }}</span>
+                }
+                @if (producto.stock != null && producto.stock! > 0) {
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">Stock: {{ producto.stock }}</span>
+                } @else if (producto.stock === 0) {
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-400">Sin stock</span>
+                }
+                @if (auth.esAdmin()) {
+                  <span class="text-[10px] text-slate-600">{{ nombreSubidor(producto.bodega_id) }}</span>
+                }
+              </div>
             </div>
 
             <!-- Prices -->
@@ -338,7 +348,7 @@
             </div>
           }
 
-          <!-- Categoria + Proveedor -->
+          <!-- Categoría + SKU -->
           <div class="grid grid-cols-2 gap-4">
             <div class="space-y-1.5">
               <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Categoría</label>
@@ -351,10 +361,20 @@
               </select>
             </div>
             <div class="space-y-1.5">
-              <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Proveedor</label>
-              <input [(ngModel)]="formProducto.proveedor" type="text" placeholder="Ej: TechSupply MX"
+              <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500">SKU</label>
+              <input [(ngModel)]="formProducto.sku" type="text" placeholder="Ej: TK-0042"
                      class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-100 placeholder:text-slate-600 px-4 py-3 outline-none transition-all text-sm"/>
             </div>
+          </div>
+
+          <!-- Stock -->
+          <div class="space-y-1.5">
+            <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-sm">inventory</span>
+              Stock disponible
+            </label>
+            <input [(ngModel)]="formProducto.stock" type="number" min="0" step="1" placeholder="0"
+                   class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-100 placeholder:text-slate-600 px-4 py-3 outline-none transition-all text-sm"/>
           </div>
 
           <!-- Descripción -->

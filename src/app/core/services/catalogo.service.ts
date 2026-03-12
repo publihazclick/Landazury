@@ -290,4 +290,12 @@ export class CatalogoService {
       return true;
     }
   }
+
+  async obtenerPerfilesInventario(): Promise<{ id: string; nombre: string }[]> {
+    const { data } = await this.supabase.cliente
+      .from('perfiles')
+      .select('id, nombre')
+      .in('rol', ['inventario', 'admin']);
+    return (data ?? []) as { id: string; nombre: string }[];
+  }
 }

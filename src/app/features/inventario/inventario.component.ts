@@ -13,7 +13,8 @@ interface FormProducto {
   precio_base: number;
   precio_sugerido: number;
   precio_final: number;
-  proveedor: string;
+  sku: string;
+  stock: number;
   categoria_id: string;
   disponible: boolean;
 }
@@ -57,6 +58,7 @@ export class InventarioComponent implements OnInit {
   readonly subiendoImagen = signal(false);
   readonly cargandoModal = signal(false);
   readonly confirmandoEliminar = signal<Producto | null>(null);
+  readonly perfilesMap = signal<Map<string, string>>(new Map());
 
   // Imágenes del producto (edición local antes de guardar)
   imagenesEnModal: string[] = [];
@@ -89,7 +91,9 @@ export class InventarioComponent implements OnInit {
   ];
 
   async ngOnInit() {
-    await Promise.all([this.cargarProductos(), this.cargarCategorias()]);
+    const tasks: Promise<any>[] = [this.cargarProductos(), this.cargarCategorias()];
+    if (this.auth.esAdmin()) tasks.push(this.cargarPerfiles());
+    await Promise.all(tasks);
   }
 
   async cargarProductos() {
@@ -113,6 +117,13 @@ export class InventarioComponent implements OnInit {
     } catch {}
   }
 
+  async cargarPerfiles() {
+    try {
+      const data = await this.catalogoService.obtenerPerfilesInventario();
+      this.perfilesMap.set(new Map(data.map(p => [p.id, p.nombre])));
+    } catch {}
+  }
+
   // ── Modal ───────────────────────────────────────────
 
   abrirCrear() {
@@ -132,7 +143,8 @@ export class InventarioComponent implements OnInit {
       precio_base: producto.precio_base,
       precio_sugerido: producto.precio_sugerido ?? 0,
       precio_final: producto.precio_final ?? 0,
-      proveedor: producto.proveedor ?? '',
+      sku: producto.sku ?? '',
+      stock: producto.stock ?? 0,
       categoria_id: producto.categoria_id ?? '',
       disponible: producto.disponible,
     };
@@ -181,7 +193,8 @@ export class InventarioComponent implements OnInit {
         precio_base: Number(this.formProducto.precio_base),
         precio_sugerido: Number(this.formProducto.precio_sugerido) || undefined,
         precio_final: esAdmin && Number(this.formProducto.precio_final) ? Number(this.formProducto.precio_final) : undefined,
-        proveedor: this.formProducto.proveedor || undefined,
+        sku: this.formProducto.sku || undefined,
+        stock: Number(this.formProducto.stock) || undefined,
         categoria_id: this.formProducto.categoria_id || undefined,
         disponible: esAdmin ? this.formProducto.disponible : false, // inventario no controla visibilidad
         ganador: existente?.ganador ?? false,
@@ -423,8 +436,13 @@ export class InventarioComponent implements OnInit {
 
   // ── Helpers ────────────────────────────────────────
 
+  nombreSubidor(bodegaId?: string): string {
+    if (!bodegaId) return '—';
+    return this.perfilesMap().get(bodegaId) ?? '—';
+  }
+
   formVacio(): FormProducto {
-    return { nombre: '', descripcion: '', precio_base: 0, precio_sugerido: 0, precio_final: 0, proveedor: '', categoria_id: '', disponible: false };
+    return { nombre: '', descripcion: '', precio_base: 0, precio_sugerido: 0, precio_final: 0, sku: '', stock: 0, categoria_id: '', disponible: false };
   }
 
   limpiarArchivoModal() {
