@@ -5,27 +5,29 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { CatalogoService } from '../../core/services/catalogo.service';
 import { AuthService } from '../../core/services/auth.service';
+import { environment } from '../../../environments/environment';
 import type { Perfil, Rol } from '../../core/models/usuario.model';
 import type { Producto, Categoria, EstadoProducto } from '../../core/models/producto.model';
 
 interface FormEdicion {
   nombre: string;
-  pais: string;
-  telefono: string;
-}
-
-interface FormCreacion {
   email: string;
-  password: string;
-  nombre: string;
-  rol: Rol;
   pais: string;
   telefono: string;
+  rol: Rol;
+  nuevaContrasena: string;
 }
 
 interface FormRevision {
   precio_base: number;
   precio_final: number;
+}
+
+interface CredencialesCreadas {
+  email: string;
+  contrasena: string;
+  nombre: string;
+  rol: Rol;
 }
 
 @Component({
@@ -51,12 +53,19 @@ export class AdminComponent implements OnInit {
   readonly confirmandoEliminar = signal<Perfil | null>(null);
   readonly guardandoEdicion = signal(false);
   readonly eliminando = signal(false);
-  readonly mostrarModalCrear = signal(false);
-  readonly creandoUsuario = signal(false);
+  readonly mostrarContrasenaEdicion = signal(false);
+  readonly tabEdicion = signal<'info' | 'acceso'>('info');
+  readonly guardandoContrasena = signal(false);
 
   busqueda = '';
-  formEdicion: FormEdicion = { nombre: '', pais: '', telefono: '' };
-  formCreacion: FormCreacion = { email: '', password: '', nombre: '', rol: 'usuario', pais: '', telefono: '' };
+  formEdicion: FormEdicion = { nombre: '', email: '', pais: '', telefono: '', rol: 'usuario', nuevaContrasena: '' };
+
+  // ── Crear usuario ─────────────────────────────────
+  readonly creandoUsuario = signal(false);
+  readonly cargandoCrear = signal(false);
+  readonly credencialesCreadas = signal<CredencialesCreadas | null>(null);
+  readonly mostrarContrasenaCrear = signal(false);
+  formCrear = { nombre: '', email: '', contrasena: '', rol: 'inventario' as Rol };
 
   readonly roles: { valor: Rol; etiqueta: string; descripcion: string; icono: string }[] = [
     { valor: 'admin',      etiqueta: 'Admin',      descripcion: 'Acceso total al sistema',            icono: 'shield_person' },
@@ -87,7 +96,7 @@ export class AdminComponent implements OnInit {
     const q = this.busqueda.toLowerCase().trim();
     const rol = this.filtroRol();
     return this.usuarios().filter((u) => {
-      const matchQ = !q || u.nombre.toLowerCase().includes(q);
+      const matchQ = !q || u.nombre.toLowerCase().includes(q) || (u.email ?? '').toLowerCase().includes(q);
       const matchRol = rol === 'todos' || u.rol === rol;
       return matchQ && matchRol;
     });
@@ -162,27 +171,17 @@ export class AdminComponent implements OnInit {
     }
   }
 
-  async cambiarRol(usuario: Perfil, nuevoRol: Rol) {
-    if (usuario.rol === nuevoRol) return;
-    this.error.set(null);
-    try {
-      const { error } = await this.supabase.cliente
-        .from('perfiles')
-        .update({ rol: nuevoRol })
-        .eq('id', usuario.id);
-      if (error) throw error;
-      this.usuarios.update((list) =>
-        list.map((u) => (u.id === usuario.id ? { ...u, rol: nuevoRol } : u))
-      );
-      this.exito.set(`Rol de "${usuario.nombre}" actualizado a ${nuevoRol}.`);
-      setTimeout(() => this.exito.set(null), 3000);
-    } catch {
-      this.error.set('No se pudo cambiar el rol.');
-    }
-  }
-
   editarUsuario(u: Perfil) {
-    this.formEdicion = { nombre: u.nombre, pais: u.pais ?? '', telefono: u.telefono ?? '' };
+    this.formEdicion = {
+      nombre: u.nombre,
+      email: u.email ?? '',
+      pais: u.pais ?? '',
+      telefono: u.telefono ?? '',
+      rol: u.rol,
+      nuevaContrasena: '',
+    };
+    this.mostrarContrasenaEdicion.set(false);
+    this.tabEdicion.set('info');
     this.usuarioEditando.set(u);
   }
 
@@ -191,82 +190,230 @@ export class AdminComponent implements OnInit {
   async guardarEdicion() {
     const u = this.usuarioEditando();
     if (!u) return;
+    if (!this.formEdicion.nombre.trim()) {
+      this.error.set('El nombre no puede estar vacío.');
+      return;
+    }
+    if (this.formEdicion.nuevaContrasena && this.formEdicion.nuevaContrasena.length < 6) {
+      this.error.set('La contraseña debe tener al menos 6 caracteres.');
+      return;
+    }
+
     this.guardandoEdicion.set(true);
     this.error.set(null);
+
+    const emailCambio = this.formEdicion.email.trim().toLowerCase() !== (u.email ?? '').toLowerCase();
+    const contrasenaSetted = !!this.formEdicion.nuevaContrasena;
+    const necesitaEdgeFn = emailCambio || contrasenaSetted;
+
     try {
-      const patch = {
-        nombre:   this.formEdicion.nombre.trim(),
-        pais:     this.formEdicion.pais.trim() || undefined,
+      if (necesitaEdgeFn) {
+        const session = this.auth.sesion();
+        if (!session) throw new Error('No autenticado');
+        const body: Record<string, string> = {
+          userId: u.id,
+          nombre: this.formEdicion.nombre.trim(),
+          rol: this.formEdicion.rol,
+          pais: this.formEdicion.pais.trim(),
+          telefono: this.formEdicion.telefono.trim(),
+        };
+        if (emailCambio) body['email'] = this.formEdicion.email.trim().toLowerCase();
+        if (contrasenaSetted) body['password'] = this.formEdicion.nuevaContrasena;
+
+        const resp = await fetch(`${environment.supabaseUrl}/functions/v1/admin-actualizar-usuario`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify(body),
+        });
+        const result = await resp.json();
+        if (!resp.ok) throw new Error(result.error ?? 'Error al actualizar usuario');
+      } else {
+        // Only profile fields changed — update directly
+        const patch: Record<string, string | null> = {
+          nombre: this.formEdicion.nombre.trim(),
+          rol: this.formEdicion.rol,
+          pais: this.formEdicion.pais.trim() || null,
+          telefono: this.formEdicion.telefono.trim() || null,
+        };
+        const { error } = await this.supabase.cliente.from('perfiles').update(patch).eq('id', u.id);
+        if (error) throw error;
+      }
+
+      const updated: Partial<Perfil> = {
+        nombre: this.formEdicion.nombre.trim(),
+        email: emailCambio ? this.formEdicion.email.trim().toLowerCase() : u.email,
+        rol: this.formEdicion.rol,
+        pais: this.formEdicion.pais.trim() || undefined,
         telefono: this.formEdicion.telefono.trim() || undefined,
       };
-      const { error } = await this.supabase.cliente.from('perfiles').update(patch).eq('id', u.id);
-      if (error) throw error;
-      this.usuarios.update((list) => list.map((x) => x.id === u.id ? { ...x, ...patch } : x));
-      this.exito.set(`Perfil de "${patch.nombre}" actualizado.`);
-      setTimeout(() => this.exito.set(null), 3000);
+      this.usuarios.update((list) => list.map((x) => x.id === u.id ? { ...x, ...updated } : x));
+
+      let msg = `Perfil de "${updated.nombre}" actualizado.`;
+      if (contrasenaSetted) msg += ' Contraseña cambiada.';
+      if (emailCambio) msg += ' Email actualizado.';
+      this.mostrarExito(msg);
       this.usuarioEditando.set(null);
-    } catch {
-      this.error.set('No se pudo guardar los cambios.');
+    } catch (err: any) {
+      this.error.set(err?.message || 'No se pudo guardar los cambios.');
     } finally {
       this.guardandoEdicion.set(false);
     }
   }
 
+  generarContrasenaEdicion() {
+    this.formEdicion.nuevaContrasena = this.generarContrasena();
+    this.mostrarContrasenaEdicion.set(true);
+  }
+
   confirmarEliminar(u: Perfil) { this.confirmandoEliminar.set(u); }
   cancelarEliminar() { this.confirmandoEliminar.set(null); }
-
-  abrirModalCrear() {
-    this.formCreacion = { email: '', password: '', nombre: '', rol: 'usuario', pais: '', telefono: '' };
-    this.mostrarModalCrear.set(true);
-  }
-
-  cerrarModalCrear() { this.mostrarModalCrear.set(false); }
-
-  async crearUsuario() {
-    const f = this.formCreacion;
-    if (!f.email.trim() || !f.password || !f.nombre.trim()) return;
-    this.creandoUsuario.set(true);
-    this.error.set(null);
-    try {
-      const { data, error } = await this.supabase.cliente.functions.invoke('crear-usuario', {
-        body: {
-          email: f.email.trim(),
-          password: f.password,
-          nombre: f.nombre.trim(),
-          rol: f.rol,
-          pais: f.pais.trim() || undefined,
-          telefono: f.telefono.trim() || undefined,
-        },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      await this.cargarUsuarios();
-      this.exito.set(`Usuario "${f.nombre}" creado correctamente.`);
-      setTimeout(() => this.exito.set(null), 3000);
-      this.mostrarModalCrear.set(false);
-    } catch (e: unknown) {
-      this.error.set(e instanceof Error ? e.message : 'No se pudo crear el usuario.');
-    } finally {
-      this.creandoUsuario.set(false);
-    }
-  }
 
   async eliminarUsuario() {
     const u = this.confirmandoEliminar();
     if (!u) return;
     this.eliminando.set(true);
+    this.error.set(null);
     try {
-      const { error } = await this.supabase.cliente.from('perfiles').delete().eq('id', u.id);
-      if (error) throw error;
+      const session = this.auth.sesion();
+      if (!session) throw new Error('No autenticado');
+      const resp = await fetch(`${environment.supabaseUrl}/functions/v1/admin-eliminar-usuario`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ userId: u.id }),
+      });
+      const result = await resp.json();
+      if (!resp.ok) throw new Error(result.error ?? 'Error al eliminar usuario');
       this.usuarios.update((list) => list.filter((x) => x.id !== u.id));
-      this.exito.set(`Usuario "${u.nombre}" eliminado del sistema.`);
-      setTimeout(() => this.exito.set(null), 3000);
+      this.mostrarExito(`Usuario "${u.nombre}" eliminado del sistema.`);
       this.confirmandoEliminar.set(null);
-    } catch {
-      this.error.set('No se pudo eliminar el usuario.');
+    } catch (err: any) {
+      this.error.set(err?.message || 'No se pudo eliminar el usuario.');
     } finally {
       this.eliminando.set(false);
     }
+  }
+
+  // ── Crear usuario ─────────────────────────────────
+
+  abrirCrearUsuario() {
+    this.formCrear = { nombre: '', email: '', contrasena: '', rol: 'inventario' };
+    this.mostrarContrasenaCrear.set(false);
+    this.creandoUsuario.set(true);
+  }
+
+  cancelarCrearUsuario() {
+    this.creandoUsuario.set(false);
+  }
+
+  generarContrasena(): string {
+    const mayus = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+    const minus = 'abcdefghjkmnpqrstuvwxyz';
+    const nums  = '23456789';
+    const esp   = '!@#$%';
+    const todos = mayus + minus + nums + esp;
+    // Garantizar al menos uno de cada tipo
+    const base = [
+      mayus[Math.floor(Math.random() * mayus.length)],
+      minus[Math.floor(Math.random() * minus.length)],
+      nums[Math.floor(Math.random() * nums.length)],
+      esp[Math.floor(Math.random() * esp.length)],
+    ];
+    for (let i = 0; i < 6; i++) {
+      base.push(todos[Math.floor(Math.random() * todos.length)]);
+    }
+    return base.sort(() => Math.random() - 0.5).join('');
+  }
+
+  usarContrasenaGenerada() {
+    this.formCrear.contrasena = this.generarContrasena();
+    this.mostrarContrasenaCrear.set(true);
+  }
+
+  async crearUsuario() {
+    const { nombre, email, contrasena, rol } = this.formCrear;
+    if (!nombre.trim() || !email.trim() || !contrasena) return;
+    if (contrasena.length < 6) {
+      this.error.set('La contraseña debe tener al menos 6 caracteres.');
+      return;
+    }
+
+    this.cargandoCrear.set(true);
+    this.error.set(null);
+
+    try {
+      const session = this.auth.sesion();
+      if (!session) throw new Error('No autenticado');
+
+      const resp = await fetch(`${environment.supabaseUrl}/functions/v1/admin-crear-usuario`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          password: contrasena,
+          nombre: nombre.trim(),
+          rol,
+        }),
+      });
+
+      const result = await resp.json();
+      if (!resp.ok) {
+        const msg: string = result.error ?? '';
+        if (msg.toLowerCase().includes('already registered') || msg.toLowerCase().includes('already been registered')) {
+          throw new Error('Ya existe una cuenta con ese correo electrónico.');
+        }
+        throw new Error(msg || 'No se pudo crear el usuario.');
+      }
+
+      const nuevoPerfil: Perfil = {
+        id: result.userId,
+        nombre: nombre.trim(),
+        email: email.trim().toLowerCase(),
+        rol,
+        creado_en: new Date().toISOString(),
+      };
+      this.usuarios.update(list => [nuevoPerfil, ...list]);
+
+      this.credencialesCreadas.set({
+        email: email.trim().toLowerCase(),
+        contrasena,
+        nombre: nombre.trim(),
+        rol,
+      });
+      this.creandoUsuario.set(false);
+      this.formCrear = { nombre: '', email: '', contrasena: '', rol: 'inventario' };
+      this.mostrarContrasenaCrear.set(false);
+    } catch (err: any) {
+      this.error.set(err?.message || 'No se pudo crear el usuario.');
+    } finally {
+      this.cargandoCrear.set(false);
+    }
+  }
+
+  cerrarCredenciales() { this.credencialesCreadas.set(null); }
+
+  async copiarTexto(texto: string, etiqueta: string) {
+    try {
+      await navigator.clipboard.writeText(texto);
+      this.mostrarExito(`${etiqueta} copiado al portapapeles.`);
+    } catch {
+      this.error.set('No se pudo copiar automáticamente. Cópialo manualmente.');
+    }
+  }
+
+  get linkOp(): string {
+    if (typeof window !== 'undefined') {
+      return `${window.location.origin}/op`;
+    }
+    return '/op';
   }
 
   // ── Métodos productos ─────────────────────────────────
@@ -316,8 +463,7 @@ export class AdminComponent implements OnInit {
               precio_final: Number(this.formRevision.precio_final) || p.precio_final }
           : p
       ));
-      this.exito.set(`"${producto.nombre}" aprobado y publicado.`);
-      setTimeout(() => this.exito.set(null), 3000);
+      this.mostrarExito(`"${producto.nombre}" aprobado y publicado.`);
       this.productoRevisando.set(null);
     } catch {
       this.error.set('No se pudo aprobar el producto.');
@@ -332,8 +478,7 @@ export class AdminComponent implements OnInit {
       this.productos.update(list => list.map(p =>
         p.id === producto.id ? { ...p, estado: 'rechazado' as EstadoProducto, disponible: false } : p
       ));
-      this.exito.set(`"${producto.nombre}" rechazado.`);
-      setTimeout(() => this.exito.set(null), 3000);
+      this.mostrarExito(`"${producto.nombre}" rechazado.`);
       if (this.productoRevisando()?.id === producto.id) this.productoRevisando.set(null);
     } catch {
       this.error.set('No se pudo rechazar el producto.');
@@ -357,8 +502,7 @@ export class AdminComponent implements OnInit {
       this.productos.update(list => list.map(p =>
         p.id === producto.id ? { ...p, precio_final: precio } : p
       ));
-      this.exito.set('Precio actualizado correctamente.');
-      setTimeout(() => this.exito.set(null), 2500);
+      this.mostrarExito('Precio actualizado correctamente.');
       this.editandoPreciosId.set(null);
     } catch {
       this.error.set('No se pudo guardar el precio.');
@@ -404,8 +548,7 @@ export class AdminComponent implements OnInit {
     try {
       await this.catalogoService.eliminarProducto(p.id);
       this.productos.update(list => list.filter(x => x.id !== p.id));
-      this.exito.set(`"${p.nombre}" eliminado.`);
-      setTimeout(() => this.exito.set(null), 3000);
+      this.mostrarExito(`"${p.nombre}" eliminado.`);
       this.confirmandoEliminarProducto.set(null);
     } catch {
       this.error.set('No se pudo eliminar el producto.');
@@ -415,7 +558,7 @@ export class AdminComponent implements OnInit {
   // ── Estadísticas ─────────────────────────────────────
 
   async cargarEstadisticas() {
-    if (this.topVistas().length > 0) return; // ya cargadas
+    if (this.topVistas().length > 0) return;
     this.cargandoStats.set(true);
     try {
       const [vistas, descargas, favoritos] = await Promise.all([
@@ -437,6 +580,11 @@ export class AdminComponent implements OnInit {
   }
 
   // ── Helpers ───────────────────────────────────────────
+
+  private mostrarExito(msg: string) {
+    this.exito.set(msg);
+    setTimeout(() => this.exito.set(null), 3000);
+  }
 
   badgeRol(rol: Rol): string {
     const clases: Record<Rol, string> = {

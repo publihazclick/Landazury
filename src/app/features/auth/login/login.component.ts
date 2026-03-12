@@ -84,7 +84,7 @@ export class LoginComponent {
 
   private traducirError(mensaje: string): string {
     if (mensaje.includes('Invalid login credentials') || mensaje.includes('invalid_credentials'))
-      return 'Correo o contraseña incorrectos. Verifica tus datos e intenta de nuevo.';
+      return 'El correo o la contraseña son incorrectos. Vuelve a intentarlo.';
     if (mensaje.includes('Too many requests') || mensaje.includes('rate limit') || mensaje.includes('over_email_send_rate_limit'))
       return 'Demasiados intentos. Espera unos minutos antes de volver a intentarlo.';
     if (mensaje.includes('Failed to fetch') || mensaje.includes('network') || mensaje.includes('NetworkError'))

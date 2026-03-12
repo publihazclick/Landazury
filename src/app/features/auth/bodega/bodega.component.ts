@@ -65,13 +65,17 @@ export class BodegaComponent {
 
   private traducirError(mensaje: string): string {
     if (mensaje.includes('Invalid login credentials') || mensaje.includes('invalid_credentials'))
-      return 'Credenciales incorrectas. Verifica tus datos e intenta de nuevo.';
-    if (mensaje.includes('Too many requests') || mensaje.includes('rate limit'))
-      return 'Demasiados intentos. Espera unos minutos antes de volver a intentarlo.';
+      return 'Correo o contraseña incorrectos. Verifica los datos que te compartió el administrador.';
+    if (mensaje.includes('Email not confirmed'))
+      return 'Tu cuenta aún no está activada. Pide al administrador que te cree el acceso nuevamente.';
+    if (mensaje.includes('Too many requests') || mensaje.includes('rate limit') || mensaje.includes('over_email_send_rate_limit'))
+      return 'Demasiados intentos fallidos. Espera unos minutos antes de intentarlo de nuevo.';
     if (mensaje.includes('Failed to fetch') || mensaje.includes('network') || mensaje.includes('NetworkError'))
       return 'Sin conexión a internet. Verifica tu red e intenta de nuevo.';
-    if (mensaje.includes('Email not confirmed'))
-      return 'Cuenta sin confirmar. Contacta al administrador.';
+    if (mensaje.includes('User not found'))
+      return 'No existe una cuenta con ese correo. Confirma el correo con el administrador.';
+    if (mensaje.includes('disabled') || mensaje.includes('banned'))
+      return 'Esta cuenta ha sido suspendida. Contacta al administrador.';
     return 'Ocurrió un error inesperado. Inténtalo de nuevo.';
   }
 }

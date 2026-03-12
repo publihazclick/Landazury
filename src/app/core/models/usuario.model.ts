@@ -14,6 +14,7 @@ export interface Usuario {
 export interface Perfil {
   id: string;
   nombre: string;
+  email?: string;
   rol: Rol;
   pais?: string;
   telefono?: string;

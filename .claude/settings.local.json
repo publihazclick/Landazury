@@ -16,8 +16,8 @@
       "Bash(git push:*)",
       "mcp__supabase__execute_sql",
       "Bash(curl:*)",
-      "Bash(git pull:*)",
-      "Bash(git stash:*)",
+      "Bash(npx tsc:*)",
+      "Bash(node:*)",
       "mcp__supabase__deploy_edge_function"
     ]
   },

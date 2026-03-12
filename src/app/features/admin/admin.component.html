@@ -87,7 +87,7 @@
               <div class="flex items-center pl-3 text-slate-500">
                 <span class="material-symbols-outlined text-xl">search</span>
               </div>
-              <input [(ngModel)]="busqueda" type="text" placeholder="Buscar por nombre…"
+              <input [(ngModel)]="busqueda" type="text" placeholder="Buscar por nombre o email…"
                      class="bg-transparent text-slate-100 text-sm placeholder:text-slate-600 py-2.5 px-3 outline-none w-full"/>
               @if (busqueda) {
                 <button (click)="busqueda = ''" class="pr-3 text-slate-500 hover:text-slate-300 transition-colors">
@@ -95,10 +95,10 @@
                 </button>
               }
             </div>
-            <button (click)="abrirModalCrear()"
-                    class="flex items-center gap-2 bg-primary text-[#0a0a08] px-4 py-2.5 rounded-xl text-sm font-black hover:brightness-110 transition-all shrink-0 uppercase tracking-wider">
+            <button (click)="abrirCrearUsuario()"
+                    class="flex items-center gap-2 bg-primary text-[#0a0a08] px-4 py-2.5 rounded-xl text-xs font-black hover:brightness-110 transition-all uppercase tracking-wider whitespace-nowrap shrink-0">
               <span class="material-symbols-outlined text-base">person_add</span>
-              <span class="hidden sm:inline">Crear</span>
+              Nuevo operador
             </button>
           </div>
         </div>
@@ -147,7 +147,6 @@
                   <th class="px-5 py-3 hidden lg:table-cell">Teléfono</th>
                   <th class="px-5 py-3 hidden lg:table-cell">Registrado</th>
                   <th class="px-5 py-3">Rol</th>
-                  <th class="px-5 py-3">Cambiar rol</th>
                   <th class="px-5 py-3 text-right">Acciones</th>
                 </tr>
               </thead>
@@ -159,7 +158,12 @@
                         <div class="w-9 h-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-black text-sm shrink-0">
                           {{ usuario.nombre.charAt(0).toUpperCase() }}
                         </div>
-                        <span class="font-semibold text-slate-200">{{ usuario.nombre }}</span>
+                        <div class="min-w-0">
+                          <p class="font-semibold text-slate-200 truncate">{{ usuario.nombre }}</p>
+                          @if (usuario.email) {
+                            <p class="text-xs text-slate-500 truncate">{{ usuario.email }}</p>
+                          }
+                        </div>
                       </div>
                     </td>
                     <td class="px-5 py-4 text-slate-400 hidden md:table-cell">{{ usuario.pais ?? '—' }}</td>
@@ -171,19 +175,11 @@
                       </span>
                     </td>
                     <td class="px-5 py-4">
-                      <select [value]="usuario.rol"
-                              (change)="cambiarRol(usuario, $any($event.target).value)"
-                              class="bg-neutral-charcoal border border-neutral-border text-slate-200 text-xs rounded-lg px-3 py-2 focus:outline-none focus:border-primary/50 transition-all cursor-pointer">
-                        @for (rol of roles; track rol.valor) {
-                          <option [value]="rol.valor" style="background:#171611">{{ rol.etiqueta }}</option>
-                        }
-                      </select>
-                    </td>
-                    <td class="px-5 py-4">
                       <div class="flex items-center justify-end gap-1.5">
-                        <button (click)="editarUsuario(usuario)" title="Editar perfil"
-                                class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-primary hover:bg-primary/10 border border-transparent hover:border-primary/20 transition-all">
-                          <span class="material-symbols-outlined text-base">edit</span>
+                        <button (click)="editarUsuario(usuario)" title="Editar usuario"
+                                class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-primary bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:border-primary/40 transition-all">
+                          <span class="material-symbols-outlined text-sm">edit</span>
+                          Editar
                         </button>
                         <button (click)="confirmarEliminar(usuario)" title="Eliminar usuario"
                                 class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all">
@@ -773,50 +769,197 @@
 
 <!-- ══ MODAL: EDITAR USUARIO ══ -->
 @if (usuarioEditando()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4"
+  <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
        (click)="cancelarEdicion()">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
-    <div class="relative w-full max-w-md bg-[#18160f] border border-white/10 rounded-2xl shadow-2xl"
+    <div class="relative w-full sm:max-w-lg bg-[#18160f] border border-neutral-border sm:rounded-2xl rounded-t-2xl shadow-2xl max-h-[95vh] overflow-y-auto"
          (click)="$event.stopPropagation()">
-      <div class="flex items-center justify-between px-6 py-5 border-b border-white/8">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-neutral-border sticky top-0 bg-[#18160f] z-10">
         <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-            <span class="material-symbols-outlined text-primary text-base">edit</span>
+          <div class="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-black text-sm shrink-0">
+            {{ usuarioEditando()!.nombre.charAt(0).toUpperCase() }}
           </div>
           <div>
-            <h3 class="text-slate-100 font-bold text-sm">Editar Usuario</h3>
-            <p class="text-slate-500 text-[11px]">{{ usuarioEditando()?.nombre }}</p>
+            <h3 class="text-slate-100 font-bold text-sm">Editar usuario</h3>
+            <p class="text-slate-500 text-xs truncate max-w-[200px]">{{ usuarioEditando()?.email ?? usuarioEditando()?.nombre }}</p>
           </div>
         </div>
         <button (click)="cancelarEdicion()" class="text-slate-500 hover:text-slate-300 transition-colors">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
-      <div class="px-6 py-5 space-y-4">
-        <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1.5">Nombre completo</label>
-          <input [(ngModel)]="formEdicion.nombre" type="text" placeholder="Nombre del usuario"
-                 class="w-full bg-neutral-charcoal border border-neutral-border text-slate-100 text-sm rounded-xl px-4 py-2.5 outline-none focus:border-primary/50 transition-all placeholder:text-slate-600"/>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1.5">País</label>
-          <input [(ngModel)]="formEdicion.pais" type="text" placeholder="Ej: Colombia"
-                 class="w-full bg-neutral-charcoal border border-neutral-border text-slate-100 text-sm rounded-xl px-4 py-2.5 outline-none focus:border-primary/50 transition-all placeholder:text-slate-600"/>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1.5">Teléfono</label>
-          <input [(ngModel)]="formEdicion.telefono" type="text" placeholder="Ej: +57 300 123 4567"
-                 class="w-full bg-neutral-charcoal border border-neutral-border text-slate-100 text-sm rounded-xl px-4 py-2.5 outline-none focus:border-primary/50 transition-all placeholder:text-slate-600"/>
-        </div>
+
+      <!-- Tabs -->
+      <div class="flex border-b border-neutral-border">
+        <button (click)="tabEdicion.set('info')"
+                class="flex-1 flex items-center justify-center gap-2 py-3 text-xs font-bold uppercase tracking-wider transition-all border-b-2 -mb-px"
+                [class.border-primary]="tabEdicion() === 'info'"
+                [class.text-primary]="tabEdicion() === 'info'"
+                [class.border-transparent]="tabEdicion() !== 'info'"
+                [class.text-slate-500]="tabEdicion() !== 'info'">
+          <span class="material-symbols-outlined text-sm">person</span>
+          Información
+        </button>
+        <button (click)="tabEdicion.set('acceso')"
+                class="flex-1 flex items-center justify-center gap-2 py-3 text-xs font-bold uppercase tracking-wider transition-all border-b-2 -mb-px"
+                [class.border-primary]="tabEdicion() === 'acceso'"
+                [class.text-primary]="tabEdicion() === 'acceso'"
+                [class.border-transparent]="tabEdicion() !== 'acceso'"
+                [class.text-slate-500]="tabEdicion() !== 'acceso'">
+          <span class="material-symbols-outlined text-sm">lock</span>
+          Acceso y Rol
+        </button>
       </div>
-      <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-white/8">
+
+      <!-- Error -->
+      @if (error()) {
+        <div class="mx-6 mt-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-400 flex items-center gap-2">
+          <span class="material-symbols-outlined text-sm shrink-0">error</span>
+          {{ error() }}
+          <button (click)="error.set(null)" class="ml-auto text-red-400/60 hover:text-red-400">×</button>
+        </div>
+      }
+
+      <!-- TAB: INFORMACIÓN -->
+      @if (tabEdicion() === 'info') {
+        <div class="px-6 py-5 space-y-4">
+
+          <!-- Nombre -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Nombre completo</label>
+            <input [(ngModel)]="formEdicion.nombre" type="text" placeholder="Nombre del usuario"
+                   class="w-full bg-neutral-charcoal border border-neutral-border rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
+          </div>
+
+          <!-- Email -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+              Correo electrónico
+              @if (formEdicion.email !== (usuarioEditando()?.email ?? '')) {
+                <span class="text-amber-400 text-[10px] font-normal normal-case tracking-normal">(cambio pendiente)</span>
+              }
+            </label>
+            <input [(ngModel)]="formEdicion.email" type="email" placeholder="correo@ejemplo.com"
+                   class="w-full bg-neutral-charcoal border border-neutral-border rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
+            @if (formEdicion.email !== (usuarioEditando()?.email ?? '')) {
+              <p class="text-[11px] text-amber-400/70 flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">warning</span>
+                Cambiar el correo actualizará el acceso del usuario.
+              </p>
+            }
+          </div>
+
+          <!-- País -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">País</label>
+            <input [(ngModel)]="formEdicion.pais" type="text" placeholder="Ej: Colombia"
+                   class="w-full bg-neutral-charcoal border border-neutral-border rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
+          </div>
+
+          <!-- Teléfono -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Teléfono</label>
+            <input [(ngModel)]="formEdicion.telefono" type="text" placeholder="Ej: +57 300 123 4567"
+                   class="w-full bg-neutral-charcoal border border-neutral-border rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
+          </div>
+
+        </div>
+      }
+
+      <!-- TAB: ACCESO Y ROL -->
+      @if (tabEdicion() === 'acceso') {
+        <div class="px-6 py-5 space-y-5">
+
+          <!-- Rol -->
+          <div class="space-y-2">
+            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Rol del usuario</label>
+            <div class="grid grid-cols-3 gap-2">
+              @for (rol of roles; track rol.valor) {
+                <button type="button" (click)="formEdicion.rol = rol.valor"
+                        class="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border transition-all"
+                        [class.border-primary]="formEdicion.rol === rol.valor"
+                        [class.bg-primary\/10]="formEdicion.rol === rol.valor"
+                        [class.text-primary]="formEdicion.rol === rol.valor"
+                        [class.border-neutral-border]="formEdicion.rol !== rol.valor"
+                        [class.bg-neutral-charcoal]="formEdicion.rol !== rol.valor"
+                        [class.text-slate-500]="formEdicion.rol !== rol.valor">
+                  <span class="material-symbols-outlined text-xl">{{ rol.icono }}</span>
+                  <span class="text-[10px] font-bold uppercase tracking-wider">{{ rol.etiqueta }}</span>
+                  <span class="text-[9px] text-center leading-tight" [class.text-primary\/70]="formEdicion.rol === rol.valor" [class.text-slate-600]="formEdicion.rol !== rol.valor">{{ rol.descripcion }}</span>
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Contraseña -->
+          <div class="space-y-2">
+            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm">key</span>
+              Cambiar contraseña
+            </label>
+            <p class="text-[11px] text-slate-600">Deja vacío si no quieres cambiar la contraseña.</p>
+            <div class="flex gap-2">
+              <div class="relative flex-1">
+                <input [(ngModel)]="formEdicion.nuevaContrasena"
+                       [type]="mostrarContrasenaEdicion() ? 'text' : 'password'"
+                       placeholder="Nueva contraseña (mín. 6 caracteres)"
+                       class="w-full bg-neutral-charcoal border border-neutral-border rounded-xl px-4 py-3 pr-10 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
+                <button type="button" (click)="mostrarContrasenaEdicion.update(v => !v)"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
+                  <span class="material-symbols-outlined text-base">{{ mostrarContrasenaEdicion() ? 'visibility_off' : 'visibility' }}</span>
+                </button>
+              </div>
+              <button type="button" (click)="generarContrasenaEdicion()"
+                      title="Generar contraseña segura"
+                      class="px-3 py-3 bg-neutral-charcoal border border-neutral-border rounded-xl text-slate-400 hover:text-primary hover:border-primary/40 transition-all">
+                <span class="material-symbols-outlined text-base">auto_awesome</span>
+              </button>
+            </div>
+            @if (formEdicion.nuevaContrasena) {
+              <div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 flex items-center justify-between gap-3">
+                <div>
+                  <p class="text-[10px] font-bold text-amber-600 uppercase tracking-wider mb-0.5">Nueva contraseña a guardar</p>
+                  <code class="text-amber-300 text-sm font-mono tracking-widest">{{ mostrarContrasenaEdicion() ? formEdicion.nuevaContrasena : '••••••••••' }}</code>
+                </div>
+                <button (click)="copiarTexto(formEdicion.nuevaContrasena, 'Contraseña')"
+                        class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-amber-500/10 text-slate-400 hover:text-amber-400 border border-neutral-border hover:border-amber-500/30 transition-all">
+                  <span class="material-symbols-outlined text-base">content_copy</span>
+                </button>
+              </div>
+            }
+          </div>
+
+          <!-- Link operador -->
+          @if (formEdicion.rol === 'inventario' || usuarioEditando()?.rol === 'inventario') {
+            <div class="bg-neutral-charcoal border border-neutral-border rounded-xl p-4">
+              <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">link</span>
+                Link de acceso para este operador
+              </p>
+              <div class="flex items-center justify-between gap-3">
+                <code class="text-primary text-sm font-mono break-all flex-1">{{ linkOp }}</code>
+                <button (click)="copiarTexto(linkOp, 'Link')"
+                        class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-primary/20 text-slate-400 hover:text-primary border border-neutral-border hover:border-primary/30 transition-all">
+                  <span class="material-symbols-outlined text-base">content_copy</span>
+                </button>
+              </div>
+            </div>
+          }
+
+        </div>
+      }
+
+      <!-- Footer -->
+      <div class="flex gap-3 px-6 pb-6 pt-2 sticky bottom-0 bg-[#18160f] border-t border-neutral-border">
         <button (click)="cancelarEdicion()"
-                class="px-4 py-2 rounded-xl text-sm text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all">
+                class="flex-1 px-4 py-3 rounded-xl text-sm text-slate-400 border border-neutral-border hover:text-slate-200 hover:bg-white/5 transition-all">
           Cancelar
         </button>
         <button (click)="guardarEdicion()"
                 [disabled]="guardandoEdicion() || !formEdicion.nombre.trim()"
-                class="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold bg-primary text-[#0a0a08] hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-black bg-primary text-[#0a0a08] hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all uppercase tracking-wider">
           @if (guardandoEdicion()) {
             <span class="w-4 h-4 border-2 border-[#0a0a08]/30 border-t-[#0a0a08] rounded-full animate-spin"></span>
             Guardando…
@@ -868,124 +1011,6 @@
   </div>
 }
 
-<!-- ══ MODAL: CREAR USUARIO ══ -->
-@if (mostrarModalCrear()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4"
-       (click)="cerrarModalCrear()">
-    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
-    <div class="relative w-full max-w-md bg-[#18160f] border border-white/10 rounded-2xl shadow-2xl"
-         (click)="$event.stopPropagation()">
-
-      <!-- Header -->
-      <div class="flex items-center justify-between px-6 py-5 border-b border-white/8">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-            <span class="material-symbols-outlined text-primary text-base">person_add</span>
-          </div>
-          <div>
-            <h3 class="text-slate-100 font-bold text-sm">Crear Nuevo Usuario</h3>
-            <p class="text-slate-500 text-[11px]">Se creará con acceso inmediato al sistema</p>
-          </div>
-        </div>
-        <button (click)="cerrarModalCrear()" class="text-slate-500 hover:text-slate-300 transition-colors">
-          <span class="material-symbols-outlined">close</span>
-        </button>
-      </div>
-
-      <!-- Form -->
-      <div class="px-6 py-5 space-y-4">
-
-        <!-- Nombre -->
-        <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1.5">
-            Nombre completo <span class="text-red-400">*</span>
-          </label>
-          <input [(ngModel)]="formCreacion.nombre" type="text" placeholder="Ej: María García"
-                 class="w-full bg-neutral-charcoal border border-neutral-border text-slate-100 text-sm rounded-xl px-4 py-2.5 outline-none focus:border-primary/50 transition-all placeholder:text-slate-600"/>
-        </div>
-
-        <!-- Email -->
-        <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1.5">
-            Correo electrónico <span class="text-red-400">*</span>
-          </label>
-          <input [(ngModel)]="formCreacion.email" type="email" placeholder="correo@ejemplo.com"
-                 class="w-full bg-neutral-charcoal border border-neutral-border text-slate-100 text-sm rounded-xl px-4 py-2.5 outline-none focus:border-primary/50 transition-all placeholder:text-slate-600"/>
-        </div>
-
-        <!-- Contraseña -->
-        <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1.5">
-            Contraseña <span class="text-red-400">*</span>
-          </label>
-          <input [(ngModel)]="formCreacion.password" type="password" placeholder="Mínimo 6 caracteres"
-                 class="w-full bg-neutral-charcoal border border-neutral-border text-slate-100 text-sm rounded-xl px-4 py-2.5 outline-none focus:border-primary/50 transition-all placeholder:text-slate-600"/>
-        </div>
-
-        <!-- Rol -->
-        <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1.5">Rol</label>
-          <div class="grid grid-cols-3 gap-2">
-            @for (r of roles; track r.valor) {
-              <button type="button"
-                      (click)="formCreacion.rol = r.valor"
-                      class="flex flex-col items-center gap-1.5 p-3 rounded-xl border text-xs font-semibold transition-all"
-                      [class.bg-primary]="formCreacion.rol === r.valor"
-                      [class.text-\[#0a0a08\]]="formCreacion.rol === r.valor"
-                      [class.border-primary]="formCreacion.rol === r.valor"
-                      [class.bg-neutral-charcoal]="formCreacion.rol !== r.valor"
-                      [class.text-slate-400]="formCreacion.rol !== r.valor"
-                      [class.border-neutral-border]="formCreacion.rol !== r.valor"
-                      [class.hover\:border-primary\/40]="formCreacion.rol !== r.valor">
-                <span class="material-symbols-outlined text-base">{{ r.icono }}</span>
-                {{ r.etiqueta }}
-              </button>
-            }
-          </div>
-          <p class="text-[11px] text-slate-500 mt-1.5">
-            {{ roles.find(r => r.valor === formCreacion.rol)?.descripcion }}
-          </p>
-        </div>
-
-        <!-- Opcionales -->
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1.5">País <span class="text-slate-600">(opcional)</span></label>
-            <input [(ngModel)]="formCreacion.pais" type="text" placeholder="Ej: Colombia"
-                   class="w-full bg-neutral-charcoal border border-neutral-border text-slate-100 text-sm rounded-xl px-4 py-2.5 outline-none focus:border-primary/50 transition-all placeholder:text-slate-600"/>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1.5">Teléfono <span class="text-slate-600">(opcional)</span></label>
-            <input [(ngModel)]="formCreacion.telefono" type="text" placeholder="+57 300 123 4567"
-                   class="w-full bg-neutral-charcoal border border-neutral-border text-slate-100 text-sm rounded-xl px-4 py-2.5 outline-none focus:border-primary/50 transition-all placeholder:text-slate-600"/>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Footer -->
-      <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-white/8">
-        <button (click)="cerrarModalCrear()"
-                class="px-4 py-2 rounded-xl text-sm text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all">
-          Cancelar
-        </button>
-        <button (click)="crearUsuario()"
-                [disabled]="creandoUsuario() || !formCreacion.email.trim() || !formCreacion.password || !formCreacion.nombre.trim()"
-                class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-primary text-[#0a0a08] hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-          @if (creandoUsuario()) {
-            <span class="w-4 h-4 border-2 border-[#0a0a08]/30 border-t-[#0a0a08] rounded-full animate-spin"></span>
-            Creando…
-          } @else {
-            <span class="material-symbols-outlined text-base">person_add</span>
-            Crear usuario
-          }
-        </button>
-      </div>
-
-    </div>
-  </div>
-}
-
 <!-- ══ MODAL: CONFIRMAR ELIMINAR PRODUCTO ══ -->
 @if (confirmandoEliminarProducto()) {
   <div class="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -1012,6 +1037,221 @@
                 class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold bg-red-500/20 text-red-300 border border-red-500/30 hover:bg-red-500/30 transition-all">
           <span class="material-symbols-outlined text-base">delete</span>
           Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ══ MODAL: CREAR USUARIO ══ -->
+@if (creandoUsuario()) {
+  <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+       (click)="cancelarCrearUsuario()">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+    <div class="relative w-full sm:max-w-md bg-[#18160f] border border-neutral-border sm:rounded-2xl rounded-t-2xl shadow-2xl max-h-[95vh] overflow-y-auto"
+         (click)="$event.stopPropagation()">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-neutral-border">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+            <span class="material-symbols-outlined text-amber-400 text-xl">person_add</span>
+          </div>
+          <div>
+            <h3 class="text-slate-100 font-bold text-sm">Crear nuevo operador</h3>
+            <p class="text-slate-500 text-xs">El usuario podrá acceder por <code class="text-amber-400">/op</code></p>
+          </div>
+        </div>
+        <button (click)="cancelarCrearUsuario()" class="text-slate-500 hover:text-slate-300 transition-colors">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <!-- Form -->
+      <div class="px-6 py-5 space-y-4">
+
+        <!-- Error dentro del modal -->
+        @if (error()) {
+          <div class="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-400 flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm shrink-0">error</span>
+            {{ error() }}
+            <button (click)="error.set(null)" class="ml-auto text-red-400/60 hover:text-red-400">×</button>
+          </div>
+        }
+
+        <!-- Nombre -->
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Nombre completo</label>
+          <input [(ngModel)]="formCrear.nombre" type="text" placeholder="Ej: Juan Pérez"
+                 class="w-full bg-neutral-charcoal border border-neutral-border rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
+        </div>
+
+        <!-- Email -->
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Correo electrónico</label>
+          <input [(ngModel)]="formCrear.email" type="email" placeholder="operador@correo.com"
+                 class="w-full bg-neutral-charcoal border border-neutral-border rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Contraseña</label>
+          <div class="flex gap-2">
+            <div class="relative flex-1">
+              <input [(ngModel)]="formCrear.contrasena"
+                     [type]="mostrarContrasenaCrear() ? 'text' : 'password'"
+                     placeholder="Mínimo 6 caracteres"
+                     class="w-full bg-neutral-charcoal border border-neutral-border rounded-xl px-4 py-3 pr-10 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
+              <button type="button" (click)="mostrarContrasenaCrear.update(v => !v)"
+                      class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
+                <span class="material-symbols-outlined text-base">{{ mostrarContrasenaCrear() ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+            <button type="button" (click)="usarContrasenaGenerada()"
+                    title="Generar contraseña segura"
+                    class="px-3 py-3 bg-neutral-charcoal border border-neutral-border rounded-xl text-slate-400 hover:text-primary hover:border-primary/40 transition-all">
+              <span class="material-symbols-outlined text-base">auto_awesome</span>
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-600">Haz clic en ✨ para generar una contraseña segura automáticamente.</p>
+        </div>
+
+        <!-- Rol -->
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Rol</label>
+          <div class="grid grid-cols-3 gap-2">
+            @for (rol of roles; track rol.valor) {
+              <button type="button" (click)="formCrear.rol = rol.valor"
+                      class="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border transition-all"
+                      [class.border-primary]="formCrear.rol === rol.valor"
+                      [class.bg-primary\/10]="formCrear.rol === rol.valor"
+                      [class.text-primary]="formCrear.rol === rol.valor"
+                      [class.border-neutral-border]="formCrear.rol !== rol.valor"
+                      [class.bg-neutral-charcoal]="formCrear.rol !== rol.valor"
+                      [class.text-slate-500]="formCrear.rol !== rol.valor">
+                <span class="material-symbols-outlined text-xl">{{ rol.icono }}</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider">{{ rol.etiqueta }}</span>
+              </button>
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="flex gap-3 px-6 pb-6">
+        <button (click)="cancelarCrearUsuario()"
+                class="flex-1 px-4 py-3 rounded-xl text-sm text-slate-400 border border-neutral-border hover:text-slate-200 hover:bg-white/5 transition-all">
+          Cancelar
+        </button>
+        <button (click)="crearUsuario()"
+                [disabled]="cargandoCrear() || !formCrear.nombre.trim() || !formCrear.email.trim() || !formCrear.contrasena"
+                class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-black bg-primary text-[#0a0a08] hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all uppercase tracking-wider">
+          @if (cargandoCrear()) {
+            <span class="w-4 h-4 border-2 border-[#0a0a08]/30 border-t-[#0a0a08] rounded-full animate-spin"></span>
+            Creando…
+          } @else {
+            <span class="material-symbols-outlined text-base">person_add</span>
+            Crear usuario
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ══ MODAL: CREDENCIALES CREADAS ══ -->
+@if (credencialesCreadas()) {
+  <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+       (click)="cerrarCredenciales()">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+    <div class="relative w-full sm:max-w-md bg-[#18160f] border border-green-500/20 sm:rounded-2xl rounded-t-2xl shadow-2xl"
+         (click)="$event.stopPropagation()">
+
+      <!-- Header éxito -->
+      <div class="px-6 pt-6 pb-4 text-center border-b border-neutral-border">
+        <div class="w-14 h-14 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center mx-auto mb-3">
+          <span class="material-symbols-outlined text-green-400 text-2xl">check_circle</span>
+        </div>
+        <h3 class="text-slate-100 font-bold text-base">¡Usuario creado exitosamente!</h3>
+        <p class="text-slate-400 text-sm mt-1">
+          Comparte estas credenciales con <span class="text-slate-200 font-semibold">{{ credencialesCreadas()?.nombre }}</span>
+        </p>
+      </div>
+
+      <!-- Credenciales -->
+      <div class="px-6 py-5 space-y-3">
+
+        <!-- Email -->
+        <div class="bg-neutral-charcoal border border-neutral-border rounded-xl p-4">
+          <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm text-slate-500">mail</span>
+            Correo electrónico
+          </p>
+          <div class="flex items-center justify-between gap-3">
+            <code class="text-slate-100 text-sm font-mono break-all flex-1">{{ credencialesCreadas()?.email }}</code>
+            <button (click)="copiarTexto(credencialesCreadas()!.email, 'Correo')"
+                    class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-primary/20 text-slate-400 hover:text-primary border border-neutral-border hover:border-primary/30 transition-all">
+              <span class="material-symbols-outlined text-base">content_copy</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="bg-neutral-charcoal border border-amber-500/20 rounded-xl p-4">
+          <p class="text-[10px] font-bold uppercase tracking-widest text-amber-600 mb-2 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm text-amber-600">key</span>
+            Contraseña temporal
+          </p>
+          <div class="flex items-center justify-between gap-3">
+            <code class="text-amber-300 text-sm font-mono tracking-widest flex-1">{{ credencialesCreadas()?.contrasena }}</code>
+            <button (click)="copiarTexto(credencialesCreadas()!.contrasena, 'Contraseña')"
+                    class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-amber-500/10 text-slate-400 hover:text-amber-400 border border-neutral-border hover:border-amber-500/30 transition-all">
+              <span class="material-symbols-outlined text-base">content_copy</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Link de acceso -->
+        <div class="bg-neutral-charcoal border border-neutral-border rounded-xl p-4">
+          <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm text-slate-500">link</span>
+            Link de acceso
+          </p>
+          <div class="flex items-center justify-between gap-3">
+            <code class="text-primary text-sm font-mono break-all flex-1">{{ linkOp }}</code>
+            <button (click)="copiarTexto(linkOp, 'Link')"
+                    class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-primary/20 text-slate-400 hover:text-primary border border-neutral-border hover:border-primary/30 transition-all">
+              <span class="material-symbols-outlined text-base">content_copy</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Rol badge -->
+        <div class="flex items-center gap-2 px-1">
+          <span class="material-symbols-outlined text-slate-500 text-base">badge</span>
+          <span class="text-slate-500 text-xs">Rol asignado:</span>
+          <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider" [class]="badgeRol(credencialesCreadas()!.rol)">
+            {{ credencialesCreadas()?.rol }}
+          </span>
+        </div>
+
+        <p class="text-[11px] text-slate-600 text-center pt-1">
+          Guarda estas credenciales en un lugar seguro. No las podrás ver de nuevo.
+        </p>
+      </div>
+
+      <!-- Acciones -->
+      <div class="flex gap-3 px-6 pb-6">
+        <button (click)="copiarTexto('Correo: ' + credencialesCreadas()!.email + '\nContraseña: ' + credencialesCreadas()!.contrasena + '\nLink: ' + linkOp, 'Credenciales')"
+                class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm border border-neutral-border text-slate-300 hover:bg-white/5 transition-all">
+          <span class="material-symbols-outlined text-base">copy_all</span>
+          Copiar todo
+        </button>
+        <button (click)="cerrarCredenciales()"
+                class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-black bg-primary text-[#0a0a08] hover:brightness-110 transition-all uppercase tracking-wider">
+          <span class="material-symbols-outlined text-base">check</span>
+          Listo
         </button>
       </div>
     </div>
