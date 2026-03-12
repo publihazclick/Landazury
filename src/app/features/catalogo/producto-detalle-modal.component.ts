@@ -127,4 +127,8 @@ export class ProductoDetalleModalComponent implements OnInit {
   onBackdrop(event: MouseEvent) {
     if ((event.target as HTMLElement).dataset['backdrop']) this.cerrar.emit();
   }
+
+  abrirLink(url: string) {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
 }

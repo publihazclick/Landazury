@@ -195,12 +195,12 @@
       <!-- Link de creativos externos -->
       @if (producto.link_creativos) {
         <div class="border-t border-white/5 pt-4">
-          <a [href]="producto.link_creativos" target="_blank" rel="noopener noreferrer"
+          <button type="button" (click)="abrirLink(producto.link_creativos!)"
              class="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl bg-primary/10 border border-primary/30 text-primary font-bold text-sm hover:bg-primary/20 hover:border-primary/50 transition-all group">
             <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">folder_open</span>
             Descargar creativos del producto
             <span class="material-symbols-outlined text-sm opacity-60">open_in_new</span>
-          </a>
+          </button>
         </div>
       }
 
