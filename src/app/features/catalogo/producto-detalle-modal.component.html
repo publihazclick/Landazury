@@ -57,17 +57,27 @@
       @if (producto.precio_final) {
         <div class="flex items-center gap-4 p-4 bg-white/4 border border-white/8 rounded-2xl">
           <div>
-            <p class="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-0.5">Precio de venta</p>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-0.5">Precio dropshipping</p>
             <p class="text-2xl font-black text-primary">
               ${{ producto.precio_final | number:'1.0-0' }} COP
             </p>
+            <p class="text-amber-400/80 text-sm font-semibold mt-1">
+              <span class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Precio sugerido </span>
+              ${{ producto.precio_final * 1.5 | number:'1.0-0' }} COP
+            </p>
           </div>
-          @if (margen > 0) {
-            <div class="ml-auto text-center bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-2">
-              <p class="text-[10px] font-bold uppercase tracking-widest text-green-600 mb-0.5">Tu margen</p>
-              <p class="text-xl font-black text-green-400">+{{ margen }}%</p>
+          <div class="ml-auto flex flex-col gap-2 items-end">
+            @if (margen > 0) {
+              <div class="text-center bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-2">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-green-600 mb-0.5">Tu ganancia</p>
+                <p class="text-xl font-black text-green-400">+{{ margen }}%</p>
+              </div>
+            }
+            <div class="text-center bg-white/4 border border-white/8 rounded-xl px-4 py-2">
+              <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-0.5">Stock</p>
+              <p class="text-lg font-black text-green-400">{{ stockAparente }} uds.</p>
             </div>
-          }
+          </div>
         </div>
       }
 

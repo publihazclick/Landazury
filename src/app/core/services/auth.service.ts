@@ -98,12 +98,20 @@ export class AuthService {
     if (this.cerrandoSesion()) return;
     this.cerrandoSesion.set(true);
     try {
-      await this.supabase.cliente.auth.signOut();
-    } catch { /* ignorar errores de red — igual limpiamos estado local */ } finally {
+      // Timeout de 3s por si signOut se queda colgado (red lenta / sesión expirada)
+      await Promise.race([
+        this.supabase.cliente.auth.signOut(),
+        new Promise<void>(resolve => setTimeout(resolve, 3000)),
+      ]);
+    } catch { /* ignorar errores de red */ } finally {
       this.sesion.set(null);
       this.perfil.set(null);
       this.cerrandoSesion.set(false);
-      await this.router.navigate(['/auth/login']);
+      if (isPlatformBrowser(this.platformId)) {
+        window.location.href = '/auth/login';
+      } else {
+        await this.router.navigate(['/auth/login']);
+      }
     }
   }
 

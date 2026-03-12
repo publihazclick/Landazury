@@ -102,10 +102,9 @@ export class ImportarProductosComponent {
 
     this.procesando.set(true);
     this.progreso.set(0);
-    const esAdmin = this.auth.esAdmin();
     const userId  = this.auth.usuario()?.id;
-    const estado: EstadoProducto = esAdmin ? 'aprobado' : 'pendiente';
 
+    // Todos los productos importados se auto-aprueban con margen del 30% sobre precio_base
     const payload = seleccionadas.map(f => ({
       nombre:          f.nombre,
       descripcion:     f.descripcion ?? null,
@@ -113,13 +112,13 @@ export class ImportarProductosComponent {
       stock:           f.stock ?? null,
       precio_base:     f.precio_base,
       precio_sugerido: f.precio_sugerido ?? null,
-      precio_final:    null,
+      precio_final:    Math.round(f.precio_base * 1.30),
       categoria_id:    f.categoria_id ?? null,
       imagenes:        [] as string[],
-      disponible:      esAdmin ? f.activo : false,
+      disponible:      true,
       ganador:         false,
       exclusivo:       false,
-      estado,
+      estado:          'aprobado' as EstadoProducto,
       bodega_id:       userId ?? null,
       vistas:          0,
       descargas:       0,

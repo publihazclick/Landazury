@@ -135,6 +135,17 @@ export class CatalogoComponent implements OnInit {
 
   esFavorito(id: string) { return this.favoritos().has(id); }
 
+  stockAparente(productoId: string): number {
+    const hoy = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+    const seed = productoId + hoy;
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) {
+      hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+      hash |= 0;
+    }
+    return 180 + Math.abs(hash) % 221; // rango 180–400
+  }
+
   calcularMargen(producto: Producto): number { return calcularMargen(producto); }
 
   async descargarCreativo(creativo: Creativo) {
@@ -168,6 +179,5 @@ export class CatalogoComponent implements OnInit {
 }
 
 function calcularMargen(producto: Producto): number {
-  if (!producto.precio_final || producto.precio_final === 0) return 0;
-  return Math.round(((producto.precio_final - producto.precio_base) / producto.precio_base) * 100);
+  return producto.precio_final ? 50 : 0; // Sugerido = precio_final * 1.5, margen siempre 50%
 }

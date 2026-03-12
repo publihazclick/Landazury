@@ -353,7 +353,7 @@
                       </div>
                       <!-- Input precio -->
                       <div>
-                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-1.5">Precio que verá el usuario (COP)</label>
+                        <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-1.5">Precio dropshipping (COP)</label>
                         <div class="relative">
                           <span class="absolute left-3 top-1/2 -translate-y-1/2 text-primary text-sm font-black">$</span>
                           <input [(ngModel)]="precioFinalInput" type="number" min="0" step="1000"
@@ -430,9 +430,9 @@
                           <p class="text-sm text-slate-500">$ {{ producto.precio_sugerido | number:'1.0-0' }}</p>
                         </div>
                       }
-                      <!-- Precio final usuario -->
+                      <!-- Precio dropshipping -->
                       <div class="flex items-center justify-between pt-1 border-t border-neutral-border/50">
-                        <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500">Precio usuario</p>
+                        <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500">Precio dropshipping</p>
                         @if (producto.precio_final) {
                           <p class="text-lg font-black text-primary">$ {{ producto.precio_final | number:'1.0-0' }}</p>
                         } @else {

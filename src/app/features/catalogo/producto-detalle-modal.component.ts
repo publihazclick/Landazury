@@ -62,9 +62,19 @@ export class ProductoDetalleModalComponent implements OnInit {
   }
 
   get margen(): number {
-    const { precio_base, precio_final } = this.producto;
-    if (!precio_final || precio_base === 0) return 0;
-    return Math.round(((precio_final - precio_base) / precio_base) * 100);
+    if (!this.producto.precio_final || this.producto.precio_final === 0) return 0;
+    return 50; // Sugerido = precio_final * 1.5, margen siempre 50%
+  }
+
+  get stockAparente(): number {
+    const hoy = new Date().toISOString().slice(0, 10);
+    const seed = this.producto.id + hoy;
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) {
+      hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+      hash |= 0;
+    }
+    return 180 + Math.abs(hash) % 221;
   }
 
   tamano(bytes?: number): string {

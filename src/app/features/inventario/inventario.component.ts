@@ -211,23 +211,26 @@ export class InventarioComponent implements OnInit {
       const esAdmin = this.auth.esAdmin();
       const userId = this.auth.usuario()?.id;
 
-      // Estado: admin auto-aprueba; inventario → pendiente (o vuelve a pendiente si edita)
-      const estadoNuevo: EstadoProducto = esAdmin ? 'aprobado' : 'pendiente';
+      // Todos los productos se auto-aprueban; inventario aplica margen 30% sobre precio_base
+      const precioBase = Number(this.formProducto.precio_base);
+      const precioFinal = esAdmin && Number(this.formProducto.precio_final)
+        ? Number(this.formProducto.precio_final)
+        : Math.round(precioBase * 1.30);
 
       const payload = {
         nombre: this.formProducto.nombre.trim(),
         descripcion: this.formProducto.descripcion || undefined,
-        precio_base: Number(this.formProducto.precio_base),
+        precio_base: precioBase,
         precio_sugerido: Number(this.formProducto.precio_sugerido) || undefined,
-        precio_final: esAdmin && Number(this.formProducto.precio_final) ? Number(this.formProducto.precio_final) : undefined,
+        precio_final: precioFinal,
         sku: this.formProducto.sku || undefined,
         stock: Number(this.formProducto.stock) || undefined,
         categoria_id: this.formProducto.categoria_id || undefined,
-        disponible: esAdmin ? this.formProducto.disponible : false, // inventario no controla visibilidad
+        disponible: esAdmin ? this.formProducto.disponible : true,
         ganador: existente?.ganador ?? false,
         exclusivo: existente?.exclusivo ?? false,
         imagenes: this.imagenesEnModal,
-        estado: existente ? (esAdmin ? existente.estado : 'pendiente' as EstadoProducto) : estadoNuevo,
+        estado: 'aprobado' as EstadoProducto,
         bodega_id: existente?.bodega_id ?? userId,
         vistas: existente?.vistas ?? 0,
         descargas: existente?.descargas ?? 0,
@@ -242,12 +245,12 @@ export class InventarioComponent implements OnInit {
         this.productos.update(list => list.map(p =>
           p.id === existente.id ? { ...p, ...payload, categoria: cat } : p
         ));
-        mensaje = esAdmin ? 'Producto actualizado correctamente.' : 'Producto actualizado y enviado a revisión.';
+        mensaje = 'Producto actualizado correctamente.';
       } else {
         const creado = await this.catalogoService.crearProducto(payload);
         const cat = this.categorias().find(c => c.id === payload.categoria_id);
         this.productos.update(list => [{ ...creado, categoria: cat, creativos: [] as Creativo[] }, ...list]);
-        mensaje = esAdmin ? 'Producto creado y aprobado.' : 'Producto enviado a revisión.';
+        mensaje = 'Producto creado y aprobado automáticamente.';
       }
       // Limpiar imágenes eliminadas del storage en background
       for (const url of this.urlsAEliminar) {
