@@ -18,6 +18,7 @@ interface FormProducto {
   categoria_id: string;
   disponible: boolean;
   atributos: AtributoProducto[];
+  link_creativos: string;
 }
 
 @Component({
@@ -170,6 +171,7 @@ export class InventarioComponent implements OnInit {
       categoria_id: producto.categoria_id ?? '',
       disponible: producto.disponible,
       atributos: producto.atributos ? JSON.parse(JSON.stringify(producto.atributos)) : [],
+      link_creativos: producto.link_creativos ?? '',
     };
     this.atributoNuevoValor = {};
     this.mostrarSelectorAtributo.set(false);
@@ -230,6 +232,7 @@ export class InventarioComponent implements OnInit {
         vistas: existente?.vistas ?? 0,
         descargas: existente?.descargas ?? 0,
         atributos: this.formProducto.atributos,
+        link_creativos: this.formProducto.link_creativos || undefined,
       };
 
       let mensaje: string;
@@ -520,7 +523,7 @@ export class InventarioComponent implements OnInit {
   }
 
   formVacio(): FormProducto {
-    return { nombre: '', descripcion: '', precio_base: 0, precio_sugerido: 0, precio_final: 0, sku: '', stock: 0, categoria_id: '', disponible: false, atributos: [] };
+    return { nombre: '', descripcion: '', precio_base: 0, precio_sugerido: 0, precio_final: 0, sku: '', stock: 0, categoria_id: '', disponible: false, atributos: [], link_creativos: '' };
   }
 
   limpiarArchivoModal() {

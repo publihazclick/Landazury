@@ -542,6 +542,26 @@
             </label>
           </div>
 
+          <!-- Link de creativos externos -->
+          <div class="space-y-1.5">
+            <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-sm">link</span>
+              Link de creativos (Drive, Dropbox, etc.)
+            </label>
+            <div class="relative">
+              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-600 text-base">folder_open</span>
+              <input [(ngModel)]="formProducto.link_creativos" type="url"
+                     placeholder="https://drive.google.com/..."
+                     class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-100 placeholder:text-slate-600 pl-10 pr-4 py-3 outline-none transition-all text-sm"/>
+            </div>
+            @if (formProducto.link_creativos) {
+              <p class="text-[11px] text-primary/70 flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">check_circle</span>
+                Los usuarios verán un botón para descargar desde este link
+              </p>
+            }
+          </div>
+
           <!-- Disponible toggle -->
           <label class="flex items-center gap-3.5 cursor-pointer p-3.5 rounded-xl border border-[#3d3524] hover:border-primary/20 transition-all">
             <div class="relative shrink-0">

@@ -45,6 +45,7 @@ export interface Producto {
   ganador: boolean;
   exclusivo: boolean;
   atributos?: AtributoProducto[];
+  link_creativos?: string;
   estado: EstadoProducto;
   bodega_id?: string;
   vistas: number;
