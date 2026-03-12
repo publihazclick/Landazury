@@ -18,7 +18,11 @@
       "Bash(curl:*)",
       "Bash(npx tsc:*)",
       "Bash(node:*)",
-      "mcp__supabase__deploy_edge_function"
+      "mcp__supabase__deploy_edge_function",
+      "mcp__supabase__get_logs",
+      "Bash(cd \"C:\\\\Users\\\\Victor\\\\Documents\\\\landazury\" && sed -i 's/await this\\\\.obtenerTokenFresco\\(\\)/this.obtenerToken\\(\\)/g' src/app/features/admin/admin.component.ts && grep -n \"obtenerToken\\\\b\" src/app/features/admin/admin.component.ts)",
+      "Bash(cp \"C:\\\\Users\\\\Victor\\\\Documents\\\\landazury\\\\supabase\\\\functions\\\\admin-actualizar-usuario\\\\index.ts\" /tmp/fn_actualizar.ts)",
+      "Read(//tmp/**)"
     ]
   },
   "enabledMcpjsonServers": [
