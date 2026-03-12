@@ -208,8 +208,7 @@ export class AdminComponent implements OnInit {
 
     try {
       if (necesitaEdgeFn) {
-        const session = this.auth.sesion();
-        if (!session) throw new Error('No autenticado');
+        const token = await this.obtenerTokenFresco();
         const body: Record<string, string> = {
           userId: u.id,
           nombre: this.formEdicion.nombre.trim(),
@@ -224,7 +223,7 @@ export class AdminComponent implements OnInit {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.access_token}`,
+            'Authorization': `Bearer ${token}`,
           },
           body: JSON.stringify(body),
         });
@@ -277,13 +276,12 @@ export class AdminComponent implements OnInit {
     this.eliminando.set(true);
     this.error.set(null);
     try {
-      const session = this.auth.sesion();
-      if (!session) throw new Error('No autenticado');
+      const token = await this.obtenerTokenFresco();
       const resp = await fetch(`${environment.supabaseUrl}/functions/v1/admin-eliminar-usuario`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ userId: u.id }),
       });
@@ -347,14 +345,13 @@ export class AdminComponent implements OnInit {
     this.error.set(null);
 
     try {
-      const session = this.auth.sesion();
-      if (!session) throw new Error('No autenticado');
+      const token = await this.obtenerTokenFresco();
 
       const resp = await fetch(`${environment.supabaseUrl}/functions/v1/admin-crear-usuario`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           email: email.trim().toLowerCase(),
@@ -623,5 +620,12 @@ export class AdminComponent implements OnInit {
 
   formatearFecha(fecha: string): string {
     return new Date(fecha).toLocaleDateString('es', { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  /** Obtiene siempre un access_token fresco (refresca si está por vencer) */
+  private async obtenerTokenFresco(): Promise<string> {
+    const { data, error } = await this.supabase.cliente.auth.getSession();
+    if (error || !data.session) throw new Error('Sesión expirada. Por favor, vuelve a iniciar sesión.');
+    return data.session.access_token;
   }
 }
