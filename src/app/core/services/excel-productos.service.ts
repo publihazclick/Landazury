@@ -10,6 +10,9 @@ export interface FilaImport {
   precio_sugerido?: number;  // Pricing 2 — precio sugerido de venta
   stock?: number;
   activo: boolean;
+  // Imagen y creativos
+  imagen_url?: string;       // URL imagen principal
+  link_creativos?: string;   // URL carpeta de creativos en Drive
   // Categoría
   categoria_id?: string;
   categoriaTexto: string;
@@ -34,6 +37,8 @@ const COL_PRICING1    = 'Pricing 1';   // costo proveedor
 const COL_PRICING2    = 'Pricing 2';   // precio de venta sugerido
 const COL_STOCK       = 'Stock';
 const COL_ACTIVE      = 'Active';
+const COL_IMAGEN_URL  = 'Image URL';   // URL imagen principal
+const COL_CREATIVOS   = 'Creativos Drive'; // URL carpeta Drive de creativos
 
 @Injectable({ providedIn: 'root' })
 export class ExcelProductosService {
@@ -75,10 +80,12 @@ export class ExcelProductosService {
       if (!activo && !incluirInactivos) { inactivas++; continue; }
 
       // ── Campos opcionales ────────────────────────────────────────────
-      const descripcion = this.texto(row[COL_DESCRIPTION]) || undefined;
-      const sku         = this.texto(row[COL_SKU]) || undefined;
-      const stock       = this.numero(row[COL_STOCK]) || undefined;
-      const precio2     = this.numero(row[COL_PRICING2]);
+      const descripcion    = this.texto(row[COL_DESCRIPTION]) || undefined;
+      const sku            = this.texto(row[COL_SKU]) || undefined;
+      const stock          = this.numero(row[COL_STOCK]) || undefined;
+      const precio2        = this.numero(row[COL_PRICING2]);
+      const imagen_url     = this.texto(row[COL_IMAGEN_URL]) || undefined;
+      const link_creativos = this.texto(row[COL_CREATIVOS]) || undefined;
 
       // ── Categoría ────────────────────────────────────────────────────
       const categoriaTexto = this.texto(row[COL_CATEGORY]);
@@ -92,6 +99,8 @@ export class ExcelProductosService {
         precio_sugerido: precio2 > 0 ? precio2 : undefined,
         stock,
         activo,
+        imagen_url,
+        link_creativos,
         categoria_id:    cat?.id,
         categoriaTexto,
         categoriaMatch:  !!cat,

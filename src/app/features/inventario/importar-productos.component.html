@@ -88,14 +88,16 @@
             <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Columnas que extrae el servicio</p>
             <div class="grid grid-cols-2 gap-y-2 gap-x-4">
               @for (col of [
-                {campo:'Title',       mapea:'Nombre',            req:true},
-                {campo:'Pricing 1',   mapea:'Precio proveedor',  req:true},
-                {campo:'Description', mapea:'Descripción',       req:false},
-                {campo:'Pricing 2',   mapea:'Precio sugerido',   req:false},
-                {campo:'Category',    mapea:'Categoría',         req:false},
-                {campo:'SKU',         mapea:'Referencia SKU',    req:false},
-                {campo:'Stock',       mapea:'Stock disponible',  req:false},
-                {campo:'Active',      mapea:'Activo (filtro)',   req:false}
+                {campo:'Title',            mapea:'Nombre',              req:true},
+                {campo:'Pricing 1',        mapea:'Precio proveedor',    req:true},
+                {campo:'Description',      mapea:'Descripción',         req:false},
+                {campo:'Pricing 2',        mapea:'Precio sugerido',     req:false},
+                {campo:'Category',         mapea:'Categoría',           req:false},
+                {campo:'SKU',              mapea:'Referencia SKU',      req:false},
+                {campo:'Stock',            mapea:'Stock disponible',    req:false},
+                {campo:'Active',           mapea:'Activo (filtro)',     req:false},
+                {campo:'Image URL',        mapea:'Imagen principal',    req:false},
+                {campo:'Creativos Drive',  mapea:'Link creativos Drive',req:false}
               ]; track col.campo) {
                 <div class="flex items-center gap-2">
                   <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#1a160f] border border-[#3d3524] text-slate-400 shrink-0 whitespace-nowrap">{{ col.campo }}</span>
@@ -185,6 +187,8 @@
                   <th class="px-3 py-3 text-right text-[10px] font-black uppercase tracking-widest text-slate-500">Precio prov.</th>
                   <th class="px-3 py-3 text-right text-[10px] font-black uppercase tracking-widest text-slate-500 hidden sm:table-cell">P. sugerido</th>
                   <th class="px-3 py-3 text-right text-[10px] font-black uppercase tracking-widest text-slate-500 hidden sm:table-cell">Stock</th>
+                  <th class="px-3 py-3 text-center text-[10px] font-black uppercase tracking-widest text-slate-500 hidden lg:table-cell">Imagen</th>
+                  <th class="px-3 py-3 text-center text-[10px] font-black uppercase tracking-widest text-slate-500 hidden lg:table-cell">Creativos</th>
                 </tr>
               </thead>
               <tbody>
@@ -230,6 +234,28 @@
                     <td class="px-3 py-2.5 text-right hidden sm:table-cell">
                       @if (fila.stock) {
                         <span class="text-slate-300">{{ fila.stock | number:'1.0-0' }}</span>
+                      } @else {
+                        <span class="text-slate-600">—</span>
+                      }
+                    </td>
+                    <td class="px-3 py-2.5 text-center hidden lg:table-cell">
+                      @if (fila.imagen_url) {
+                        <a [href]="fila.imagen_url" target="_blank" rel="noopener"
+                           class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors"
+                           title="{{ fila.imagen_url }}">
+                          <span class="material-symbols-outlined text-primary text-sm">image</span>
+                        </a>
+                      } @else {
+                        <span class="text-slate-600">—</span>
+                      }
+                    </td>
+                    <td class="px-3 py-2.5 text-center hidden lg:table-cell">
+                      @if (fila.link_creativos) {
+                        <a [href]="fila.link_creativos" target="_blank" rel="noopener"
+                           class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 transition-colors"
+                           title="{{ fila.link_creativos }}">
+                          <span class="material-symbols-outlined text-violet-400 text-sm">folder_open</span>
+                        </a>
                       } @else {
                         <span class="text-slate-600">—</span>
                       }
