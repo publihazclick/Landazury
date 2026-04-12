@@ -22,53 +22,49 @@
         <!-- Landazury Importaciones -->
         <button (click)="seleccionarBodega('importaciones')"
                 type="button"
-                class="group flex flex-col items-center gap-1.5 cursor-pointer">
+                class="group relative flex flex-col items-center gap-2 px-3 py-3 sm:px-5 sm:py-4 rounded-2xl border-2 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+                [class]="filtros.bodegaFiltro() === 'importaciones'
+                  ? 'border-green-500 bg-green-50 ring-2 ring-green-200'
+                  : 'border-slate-200 bg-white hover:border-green-400 hover:bg-green-50'">
+          <img src="/landazury_importaciones.jpg" alt="Landazury Importaciones"
+               class="h-16 sm:h-24 w-auto object-contain transition-all duration-200"
+               [class]="filtros.bodegaFiltro() === 'importaciones' ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'"/>
           <span class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary-dark text-[10px] sm:text-xs font-black uppercase tracking-widest group-hover:bg-primary/20 transition-all">
             <span class="material-symbols-outlined text-[13px] sm:text-sm">touch_app</span>
             Ver Bodega
           </span>
-          <div class="relative flex items-center justify-center px-3 py-2 sm:px-5 sm:py-3 rounded-2xl border-2 shadow-md group-hover:shadow-lg group-hover:-translate-y-0.5 transition-all duration-200"
-               [class]="filtros.bodegaFiltro() === 'importaciones'
-                 ? 'border-green-500 bg-green-50 ring-2 ring-green-200'
-                 : 'border-slate-200 bg-white hover:border-green-400 hover:bg-green-50'">
-            <img src="/landazury_importaciones.jpg" alt="Landazury Importaciones"
-                 class="h-16 sm:h-24 w-auto object-contain transition-all duration-200"
-                 [class]="filtros.bodegaFiltro() === 'importaciones' ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'"/>
-            @if (filtros.bodegaFiltro() === 'importaciones') {
-              <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shadow">
-                <span class="material-symbols-outlined text-sm text-white">check</span>
-              </span>
-            }
-          </div>
+          @if (filtros.bodegaFiltro() === 'importaciones') {
+            <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shadow">
+              <span class="material-symbols-outlined text-sm text-white">check</span>
+            </span>
+          }
         </button>
 
         <!-- Moda Landazury -->
         <button (click)="seleccionarBodega('moda')"
                 type="button"
-                class="group flex flex-col items-center gap-1.5 cursor-pointer">
+                class="group relative flex flex-col items-center gap-2 px-3 py-3 sm:px-5 sm:py-4 rounded-2xl border-2 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+                [class]="filtros.bodegaFiltro() === 'moda'
+                  ? 'border-green-500 bg-green-50 ring-2 ring-green-200'
+                  : 'border-slate-200 bg-white hover:border-green-400 hover:bg-green-50'">
+          <img src="/modalandazury.jpg" alt="Moda Landazury"
+               class="h-16 sm:h-24 w-auto object-contain transition-all duration-200"
+               [class]="filtros.bodegaFiltro() === 'moda' ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'"
+               (error)="$any($event.target).style.display='none'; $any($event.target).nextElementSibling.style.display='flex'"/>
+          <span class="hidden items-center gap-1.5 transition-all"
+                [class]="filtros.bodegaFiltro() === 'moda' ? 'text-green-600' : 'text-slate-500'">
+            <span class="material-symbols-outlined text-base">checkroom</span>
+            <span class="text-xs font-black leading-tight text-left">Moda<br><span class="text-[9px] font-bold uppercase tracking-widest">Landazury</span></span>
+          </span>
           <span class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary-dark text-[10px] sm:text-xs font-black uppercase tracking-widest group-hover:bg-primary/20 transition-all">
             <span class="material-symbols-outlined text-[13px] sm:text-sm">touch_app</span>
             Ver Bodega
           </span>
-          <div class="relative flex items-center justify-center px-3 py-2 sm:px-5 sm:py-3 rounded-2xl border-2 shadow-md group-hover:shadow-lg group-hover:-translate-y-0.5 transition-all duration-200"
-               [class]="filtros.bodegaFiltro() === 'moda'
-                 ? 'border-green-500 bg-green-50 ring-2 ring-green-200'
-                 : 'border-slate-200 bg-white hover:border-green-400 hover:bg-green-50'">
-            <img src="/modalandazury.jpg" alt="Moda Landazury"
-                 class="h-16 sm:h-24 w-auto object-contain transition-all duration-200"
-                 [class]="filtros.bodegaFiltro() === 'moda' ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'"
-                 (error)="$any($event.target).style.display='none'; $any($event.target).nextElementSibling.style.display='flex'"/>
-            <span class="hidden items-center gap-1.5 transition-all"
-                  [class]="filtros.bodegaFiltro() === 'moda' ? 'text-green-600' : 'text-slate-500'">
-              <span class="material-symbols-outlined text-base">checkroom</span>
-              <span class="text-xs font-black leading-tight text-left">Moda<br><span class="text-[9px] font-bold uppercase tracking-widest">Landazury</span></span>
+          @if (filtros.bodegaFiltro() === 'moda') {
+            <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shadow">
+              <span class="material-symbols-outlined text-sm text-white">check</span>
             </span>
-            @if (filtros.bodegaFiltro() === 'moda') {
-              <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shadow">
-                <span class="material-symbols-outlined text-sm text-white">check</span>
-              </span>
-            }
-          </div>
+          }
         </button>
 
         <!-- Ver todas -->
