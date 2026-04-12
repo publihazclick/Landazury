@@ -17,17 +17,17 @@
       </div>
 
       <!-- Selector de bodega -->
-      <div class="flex items-end gap-3 sm:gap-5 flex-wrap justify-center sm:justify-start">
+      <div class="flex items-end gap-2 sm:gap-5 justify-center sm:justify-start flex-nowrap overflow-x-auto no-scrollbar">
 
         <!-- Landazury Importaciones -->
         <button (click)="seleccionarBodega('importaciones')"
                 type="button"
-                class="group relative flex flex-col items-center gap-2 px-3 py-3 sm:px-5 sm:py-4 rounded-2xl border-2 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+                class="group shrink-0 relative flex flex-col items-center gap-2 px-2 py-2 sm:px-5 sm:py-4 rounded-2xl border-2 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
                 [class]="filtros.bodegaFiltro() === 'importaciones'
                   ? 'border-green-500 bg-green-50 ring-2 ring-green-200'
                   : 'border-sky-300 bg-sky-50 hover:border-sky-500 hover:bg-sky-100'">
           <img src="/landazury_importaciones.jpg" alt="Landazury Importaciones"
-               class="h-16 sm:h-24 w-auto object-contain transition-all duration-200"
+               class="h-12 sm:h-24 w-auto object-contain transition-all duration-200"
                [class]="filtros.bodegaFiltro() === 'importaciones' ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'"/>
           <span class="flex items-center gap-1 px-3 py-1 rounded-full bg-primary text-[#0f0f0f] text-[10px] sm:text-xs font-black uppercase tracking-widest shadow-md group-hover:brightness-110 group-hover:shadow-lg transition-all">
             <span class="material-symbols-outlined text-[13px] sm:text-sm">touch_app</span>
@@ -43,12 +43,12 @@
         <!-- Moda Landazury -->
         <button (click)="seleccionarBodega('moda')"
                 type="button"
-                class="group relative flex flex-col items-center gap-2 px-3 py-3 sm:px-5 sm:py-4 rounded-2xl border-2 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+                class="group shrink-0 relative flex flex-col items-center gap-2 px-2 py-2 sm:px-5 sm:py-4 rounded-2xl border-2 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
                 [class]="filtros.bodegaFiltro() === 'moda'
                   ? 'border-green-500 bg-green-50 ring-2 ring-green-200'
                   : 'border-sky-300 bg-sky-50 hover:border-sky-500 hover:bg-sky-100'">
           <img src="/modalandazury.jpg" alt="Moda Landazury"
-               class="h-16 sm:h-24 w-auto object-contain transition-all duration-200"
+               class="h-12 sm:h-24 w-auto object-contain transition-all duration-200"
                [class]="filtros.bodegaFiltro() === 'moda' ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'"
                (error)="$any($event.target).style.display='none'; $any($event.target).nextElementSibling.style.display='flex'"/>
           <span class="hidden items-center gap-1.5 transition-all"
@@ -69,11 +69,11 @@
 
         <!-- Ver todas -->
         <button (click)="seleccionarBodega('todas')"
-                class="relative self-center flex items-center gap-1.5 px-5 py-3 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-xl text-base sm:text-sm font-black uppercase tracking-wider transition-all border-2 shadow-md hover:shadow-lg hover:-translate-y-0.5"
+                class="relative self-center shrink-0 flex flex-col sm:flex-row items-center gap-1 sm:gap-1.5 px-3 py-3 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider transition-all border-2 shadow-md hover:shadow-lg hover:-translate-y-0.5"
                 [class]="filtros.bodegaFiltro() === 'todas'
                   ? 'border-green-500 bg-green-50 text-green-700 ring-2 ring-green-200'
                   : 'border-sky-300 bg-sky-50 text-sky-700 hover:border-sky-500 hover:bg-sky-100'">
-          <span class="material-symbols-outlined text-lg sm:text-base">apps</span>
+          <span class="material-symbols-outlined text-2xl sm:text-base">apps</span>
           Ver todas
           @if (filtros.bodegaFiltro() === 'todas') {
             <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shadow">
