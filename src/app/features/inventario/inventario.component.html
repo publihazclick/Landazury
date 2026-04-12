@@ -501,22 +501,37 @@
 
             <!-- Grid de imágenes actuales -->
             @if (imagenesEnModal.length > 0) {
+              @if (tieneAtributoColor) {
+                <p class="text-[10px] text-primary font-semibold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[14px]">palette</span>
+                  Asigna un color a cada foto para que los clientes puedan elegir por color
+                </p>
+              }
               <div class="grid grid-cols-3 gap-2">
                 @for (img of imagenesEnModal; track img; let i = $index) {
-                  <div class="relative group aspect-square rounded-xl overflow-hidden border border-[#3d3524]">
-                    <img [src]="img" class="w-full h-full object-cover"/>
-                    <!-- Overlay: principal badge + delete -->
-                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
+                  <div class="flex flex-col gap-1.5">
+                    <div class="relative group aspect-square rounded-xl overflow-hidden border border-[#3d3524]">
+                      <img [src]="img" class="w-full h-full object-cover"/>
+                      <!-- Overlay: principal badge + delete -->
+                      <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
+                        @if (i === 0) {
+                          <span class="absolute top-1.5 left-1.5 text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full bg-primary text-[#0a0a08]">Principal</span>
+                        }
+                        <button type="button" (click)="quitarImagen(i)"
+                                class="w-8 h-8 rounded-full bg-red-500/80 hover:bg-red-500 text-white flex items-center justify-center transition-all">
+                          <span class="material-symbols-outlined text-[16px]">delete</span>
+                        </button>
+                      </div>
                       @if (i === 0) {
-                        <span class="absolute top-1.5 left-1.5 text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full bg-primary text-[#0a0a08]">Principal</span>
+                        <span class="absolute top-1.5 left-1.5 text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full bg-primary text-[#0a0a08] group-hover:opacity-0 transition-opacity">Principal</span>
                       }
-                      <button type="button" (click)="quitarImagen(i)"
-                              class="w-8 h-8 rounded-full bg-red-500/80 hover:bg-red-500 text-white flex items-center justify-center transition-all">
-                        <span class="material-symbols-outlined text-[16px]">delete</span>
-                      </button>
                     </div>
-                    @if (i === 0) {
-                      <span class="absolute top-1.5 left-1.5 text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full bg-primary text-[#0a0a08] group-hover:opacity-0 transition-opacity">Principal</span>
+                    @if (tieneAtributoColor) {
+                      <input type="text"
+                             [value]="colorDeImagenForm(i)"
+                             (input)="setColorDeImagenForm(i, $any($event.target).value)"
+                             placeholder="Color…"
+                             class="w-full text-xs px-2 py-1.5 rounded-lg bg-[#0d0b06] border border-[#3d3524] text-slate-200 placeholder:text-slate-600 focus:border-primary focus:outline-none"/>
                     }
                   </div>
                 }

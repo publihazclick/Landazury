@@ -449,6 +449,7 @@ export class InventarioComponent implements OnInit {
     try {
       const urls = await Promise.all(Array.from(files).map(f => this.catalogoService.subirImagenProducto(f)));
       this.imagenesEnModal = [...this.imagenesEnModal, ...urls];
+      this.sincronizarColoresConImagenes();
     } catch {
       this.error.set('Error al subir la imagen.');
     } finally {
@@ -464,6 +465,14 @@ export class InventarioComponent implements OnInit {
       this.urlsAEliminar = [...this.urlsAEliminar, url];
     }
     this.imagenesEnModal = this.imagenesEnModal.filter((_, i) => i !== index);
+    const i = this.indiceAtributoColor;
+    if (i !== -1) {
+      const attr = this.formProducto.atributos[i];
+      const valores = attr.valores.filter((_, k) => k !== index);
+      this.formProducto.atributos = this.formProducto.atributos.map((a, j) =>
+        j === i ? { ...a, valores } : a
+      );
+    }
   }
 
   // ── Helpers ────────────────────────────────────────
@@ -479,6 +488,48 @@ export class InventarioComponent implements OnInit {
     );
   }
 
+  // ── Color por imagen ───────────────────────────────
+  // Cuando el producto tiene el atributo "Color", sus valores se mapean 1:1
+  // con las imágenes del producto (imagenes[i] ↔ atributo.color.valores[i]).
+
+  get indiceAtributoColor(): number {
+    return this.formProducto.atributos.findIndex(a => /colou?r/i.test(a.nombre ?? ''));
+  }
+
+  get tieneAtributoColor(): boolean {
+    return this.indiceAtributoColor !== -1;
+  }
+
+  colorDeImagenForm(idx: number): string {
+    const i = this.indiceAtributoColor;
+    if (i === -1) return '';
+    return this.formProducto.atributos[i].valores[idx] ?? '';
+  }
+
+  setColorDeImagenForm(idx: number, valor: string) {
+    const i = this.indiceAtributoColor;
+    if (i === -1) return;
+    const attr = this.formProducto.atributos[i];
+    const valores = [...attr.valores];
+    while (valores.length < this.imagenesEnModal.length) valores.push('');
+    valores[idx] = valor;
+    this.formProducto.atributos = this.formProducto.atributos.map((a, j) =>
+      j === i ? { ...a, valores } : a
+    );
+  }
+
+  private sincronizarColoresConImagenes() {
+    const i = this.indiceAtributoColor;
+    if (i === -1) return;
+    const attr = this.formProducto.atributos[i];
+    const valores = [...attr.valores];
+    while (valores.length < this.imagenesEnModal.length) valores.push('');
+    if (valores.length > this.imagenesEnModal.length) valores.length = this.imagenesEnModal.length;
+    this.formProducto.atributos = this.formProducto.atributos.map((a, j) =>
+      j === i ? { ...a, valores } : a
+    );
+  }
+
   atributoConfig(nombre: string) {
     return this.ATRIBUTOS_CONFIG.find(c => c.nombre === nombre);
   }
@@ -490,7 +541,9 @@ export class InventarioComponent implements OnInit {
 
   agregarAtributo(nombre: string) {
     if (this.formProducto.atributos.some(a => a.nombre === nombre)) return;
-    this.formProducto.atributos = [...this.formProducto.atributos, { nombre, valores: [] }];
+    const esColor = /colou?r/i.test(nombre);
+    const valoresIniciales = esColor ? Array(this.imagenesEnModal.length).fill('') : [];
+    this.formProducto.atributos = [...this.formProducto.atributos, { nombre, valores: valoresIniciales }];
     this.atributoNuevoValor[nombre] = '';
     this.mostrarSelectorAtributo.set(false);
   }
