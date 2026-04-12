@@ -29,8 +29,8 @@
           <img src="/landazury_importaciones.jpg" alt="Landazury Importaciones"
                class="h-14 sm:h-24 max-w-full object-contain transition-all duration-200"
                [class]="filtros.bodegaFiltro() === 'importaciones' ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'"/>
-          <span class="flex items-center gap-1 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-primary text-[#0f0f0f] text-[9px] sm:text-xs font-black uppercase tracking-wider sm:tracking-widest shadow-md group-hover:brightness-110 group-hover:shadow-lg transition-all whitespace-nowrap">
-            <span class="material-symbols-outlined text-[11px] sm:text-sm">touch_app</span>
+          <span class="flex items-center gap-0.5 px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-primary text-[#0f0f0f] text-[7px] sm:text-xs font-black uppercase tracking-wide sm:tracking-widest shadow-md group-hover:brightness-110 group-hover:shadow-lg transition-all whitespace-nowrap max-w-full">
+            <span class="material-symbols-outlined text-[9px] sm:text-sm">touch_app</span>
             Ver Bodega
           </span>
           @if (filtros.bodegaFiltro() === 'importaciones') {
@@ -56,8 +56,8 @@
             <span class="material-symbols-outlined text-base">checkroom</span>
             <span class="text-xs font-black leading-tight text-left">Moda<br><span class="text-[9px] font-bold uppercase tracking-widest">Landazury</span></span>
           </span>
-          <span class="flex items-center gap-1 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-primary text-[#0f0f0f] text-[9px] sm:text-xs font-black uppercase tracking-wider sm:tracking-widest shadow-md group-hover:brightness-110 group-hover:shadow-lg transition-all whitespace-nowrap">
-            <span class="material-symbols-outlined text-[11px] sm:text-sm">touch_app</span>
+          <span class="flex items-center gap-0.5 px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-primary text-[#0f0f0f] text-[7px] sm:text-xs font-black uppercase tracking-wide sm:tracking-widest shadow-md group-hover:brightness-110 group-hover:shadow-lg transition-all whitespace-nowrap max-w-full">
+            <span class="material-symbols-outlined text-[9px] sm:text-sm">touch_app</span>
             Ver Bodega
           </span>
           @if (filtros.bodegaFiltro() === 'moda') {
@@ -190,11 +190,11 @@
             @if (producto.precio_final) {
               <div class="flex items-stretch justify-between border-b border-slate-100 bg-slate-50">
                 <div class="px-2 py-2 sm:px-3 sm:py-2.5 min-w-0 flex-1">
-                  <p class="text-[9px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 leading-tight mb-1 truncate">Dropshipping</p>
+                  <p class="text-[9px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 leading-tight mb-1 truncate">Precio a Dropshippers</p>
                   <p class="text-primary-dark font-black text-base sm:text-2xl leading-none whitespace-nowrap">{{ producto.precio_final | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
                 </div>
                 <div class="px-2 py-2 sm:px-3 sm:py-2.5 min-w-0 flex-1 text-right border-l border-slate-200">
-                  <p class="text-[9px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 leading-tight mb-1 truncate">Sugerido</p>
+                  <p class="text-[9px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 leading-tight mb-1 truncate">Precio sugerido de venta</p>
                   <p class="text-slate-800 font-black text-base sm:text-2xl leading-none whitespace-nowrap">{{ precioSugerido(producto) | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
                 </div>
               </div>

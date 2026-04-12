@@ -4,6 +4,11 @@ import type { Categoria, Producto } from '../models/producto.model';
 export type FiltroAsset = 'todos' | 'video' | 'copy' | 'imagen' | 'ganador';
 export type BodegaFiltro = 'todas' | 'importaciones' | 'moda';
 
+function bodegaDeProducto(p: Producto): 'importaciones' | 'moda' {
+  const slug = (p.categoria?.slug ?? '').toLowerCase();
+  return slug === 'moda-ropa' ? 'moda' : 'importaciones';
+}
+
 @Injectable({ providedIn: 'root' })
 export class CatalogoFiltrosService {
   readonly filtroAsset = signal<FiltroAsset>('todos');
@@ -14,7 +19,12 @@ export class CatalogoFiltrosService {
   readonly productosCatalogo = signal<Producto[]>([]);
 
   readonly categoriasConProductos = computed<Categoria[]>(() => {
-    const prods = this.productosCatalogo().filter(p => p.imagenes?.some(img => !!img?.trim()));
+    const bodega = this.bodegaFiltro();
+    const prods = this.productosCatalogo().filter(p => {
+      if (!p.imagenes?.some(img => !!img?.trim())) return false;
+      if (bodega !== 'todas' && bodegaDeProducto(p) !== bodega) return false;
+      return true;
+    });
     const catMap = new Map<string, Categoria>();
     for (const p of prods) {
       const cat = p.categoria;
