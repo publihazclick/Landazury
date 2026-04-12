@@ -1,45 +1,45 @@
-<div class="min-h-screen flex items-center justify-center p-4 bg-[#0a0a08]">
+<div class="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-gradient-to-br from-slate-50 via-white to-amber-50/40">
 
-  <main class="w-full max-w-[440px]">
+  <main class="w-full max-w-[460px]">
 
     <!-- Card -->
-    <div class="glass-card rounded-2xl p-8 md:p-10">
+    <div class="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-10">
 
-      <!-- Header sin logo -->
-      <div class="flex flex-col items-center mb-8">
-        <div class="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-4">
-          <span class="material-symbols-outlined text-2xl text-primary">lock</span>
+      <!-- Header -->
+      <div class="flex flex-col items-center text-center mb-7 sm:mb-8">
+        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/30 flex items-center justify-center mb-4">
+          <span class="material-symbols-outlined text-3xl sm:text-4xl text-primary-dark">lock</span>
         </div>
-        <h1 class="text-lg font-bold text-slate-200">Iniciar sesión</h1>
-        <p class="text-slate-500 text-sm mt-1">Ingresa tus credenciales de acceso</p>
+        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Iniciar sesión</h1>
+        <p class="text-slate-500 text-sm sm:text-base mt-1.5">Ingresa tus credenciales para acceder</p>
       </div>
 
       <!-- Email sin confirmar -->
       @if (emailSinConfirmar()) {
-        <div class="mb-5 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl text-sm text-amber-300 flex gap-3">
-          <span class="material-symbols-outlined text-lg shrink-0 mt-0.5">mark_email_unread</span>
+        <div class="mb-5 p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800 flex gap-3">
+          <span class="material-symbols-outlined text-xl shrink-0 mt-0.5 text-amber-600">mark_email_unread</span>
           <div>
             <p class="font-bold mb-0.5">Correo sin confirmar</p>
-            <p class="text-amber-300/70 text-xs leading-relaxed">Revisa tu bandeja de entrada y haz clic en el enlace de confirmación para activar tu cuenta.</p>
+            <p class="text-amber-700 text-xs sm:text-sm leading-relaxed">Revisa tu bandeja de entrada y haz clic en el enlace de confirmación para activar tu cuenta.</p>
           </div>
         </div>
       }
 
       <!-- Error global -->
       @if (error()) {
-        <div class="mb-5 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400 flex items-start gap-3">
-          <span class="material-symbols-outlined text-lg shrink-0 mt-0.5">error</span>
-          <p class="flex-1 leading-relaxed">{{ error() }}</p>
-          <button type="button" (click)="cerrarError()" class="text-red-400/60 hover:text-red-400 transition-colors shrink-0">
-            <span class="material-symbols-outlined text-base">close</span>
+        <div class="mb-5 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 flex items-start gap-3">
+          <span class="material-symbols-outlined text-xl shrink-0 mt-0.5 text-red-500">error</span>
+          <p class="flex-1 leading-relaxed font-medium">{{ error() }}</p>
+          <button type="button" (click)="cerrarError()" class="text-red-400 hover:text-red-600 transition-colors shrink-0" aria-label="Cerrar error">
+            <span class="material-symbols-outlined text-lg">close</span>
           </button>
         </div>
       }
 
       <!-- Demasiados intentos -->
       @if (intentos() >= 3 && !cargando()) {
-        <div class="mb-5 p-3 bg-white/5 border border-white/10 rounded-xl text-xs text-slate-400 flex gap-2">
-          <span class="material-symbols-outlined text-base shrink-0 text-slate-500">info</span>
+        <div class="mb-5 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-600 flex gap-2">
+          <span class="material-symbols-outlined text-lg shrink-0 text-slate-400">info</span>
           <span>¿Olvidaste tu contraseña? Usa el enlace de recuperación o revisa tus credenciales de prueba.</span>
         </div>
       }
@@ -49,65 +49,66 @@
 
         <!-- Email -->
         <div class="space-y-2">
-          <label class="text-sm font-semibold text-slate-300 ml-1">Correo electrónico</label>
-          <div class="relative group input-glow rounded-xl">
-            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors text-xl">mail</span>
-            <input formControlName="email" type="email" placeholder="ejemplo@landazury.com"
-                   class="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                   [class.border-red-500/50]="form.get('email')?.invalid && form.get('email')?.touched"/>
+          <label class="text-sm font-bold text-slate-700 ml-1">Correo electrónico</label>
+          <div class="relative group">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-dark transition-colors text-xl">mail</span>
+            <input formControlName="email" type="email" placeholder="ejemplo@landazury.com" autocomplete="email"
+                   class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl py-3.5 pl-12 pr-4 text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-primary/15 focus:border-primary focus:bg-white transition-all"
+                   [class.border-red-400]="form.get('email')?.invalid && form.get('email')?.touched"/>
           </div>
           @if (form.get('email')?.invalid && form.get('email')?.touched) {
-            <p class="text-xs text-red-400 ml-1">Ingresa un correo válido.</p>
+            <p class="text-xs sm:text-sm text-red-600 ml-1 font-medium">Ingresa un correo válido.</p>
           }
         </div>
 
         <!-- Contraseña -->
         <div class="space-y-2">
           <div class="flex justify-between items-center ml-1">
-            <label class="text-sm font-semibold text-slate-300">Contraseña</label>
-            <a href="#" class="text-xs font-bold text-primary hover:text-primary/80 transition-colors uppercase tracking-wider">Olvidé mi contraseña</a>
+            <label class="text-sm font-bold text-slate-700">Contraseña</label>
+            <a href="#" class="text-xs font-bold text-primary-dark hover:text-primary transition-colors">Olvidé mi contraseña</a>
           </div>
-          <div class="relative group input-glow rounded-xl">
-            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors text-xl">lock</span>
+          <div class="relative group">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-dark transition-colors text-xl">lock</span>
             <input formControlName="contrasena" [type]="mostrarContrasena() ? 'text' : 'password'"
-                   placeholder="••••••••"
-                   class="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-12 pr-12 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                   [class.border-red-500/50]="form.get('contrasena')?.invalid && form.get('contrasena')?.touched"/>
+                   placeholder="••••••••" autocomplete="current-password"
+                   class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl py-3.5 pl-12 pr-12 text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-primary/15 focus:border-primary focus:bg-white transition-all"
+                   [class.border-red-400]="form.get('contrasena')?.invalid && form.get('contrasena')?.touched"/>
             <button type="button" (click)="mostrarContrasena.update(v => !v)"
-                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
+                    aria-label="Mostrar u ocultar contraseña"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
               <span class="material-symbols-outlined text-xl">{{ mostrarContrasena() ? 'visibility_off' : 'visibility' }}</span>
             </button>
           </div>
           @if (form.get('contrasena')?.invalid && form.get('contrasena')?.touched) {
-            <p class="text-xs text-red-400 ml-1">Mínimo 6 caracteres.</p>
+            <p class="text-xs sm:text-sm text-red-600 ml-1 font-medium">Mínimo 6 caracteres.</p>
           }
         </div>
 
         <!-- Submit -->
         <button type="submit" [disabled]="cargando()"
-                class="w-full gold-gradient hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-[#0a0a08] py-4 rounded-xl transition-all flex items-center justify-center gap-2 mt-4 uppercase tracking-widest text-xs font-extrabold">
+                class="w-full bg-gradient-to-r from-primary to-primary-dark hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed text-white py-4 rounded-xl transition-all flex items-center justify-center gap-2 mt-2 uppercase tracking-wider text-sm sm:text-base font-black shadow-lg shadow-primary/25">
           @if (cargando()) {
-            <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+            <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
             </svg>
             Ingresando...
           } @else {
-            <span>Iniciar Sesión</span>
-            <span class="material-symbols-outlined text-base">arrow_right_alt</span>
+            <span>Iniciar sesión</span>
+            <span class="material-symbols-outlined text-xl">arrow_right_alt</span>
           }
         </button>
       </form>
 
       <!-- Cuentas de prueba -->
-      <div class="mt-6">
-        <p class="text-center text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-3">Acceso rápido — Cuentas de prueba</p>
+      <div class="mt-7 pt-6 border-t border-slate-200">
+        <p class="text-center text-[11px] sm:text-xs uppercase tracking-widest text-slate-500 font-bold mb-3">Acceso rápido — Cuentas de prueba</p>
         <div class="grid grid-cols-3 gap-2">
           @for (cuenta of cuentasPrueba; track cuenta.rol) {
             <button type="button" (click)="usarCredencial(cuenta.email, cuenta.contrasena)"
-                    class="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-white/5 border border-white/[0.08] hover:border-primary/30 hover:bg-white/10 transition-all group">
-              <span class="material-symbols-outlined text-xl" [class]="cuenta.color">{{ cuenta.icono }}</span>
-              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-slate-200 transition-colors">
+                    class="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-slate-50 border-2 border-slate-200 hover:border-primary hover:bg-amber-50 transition-all group">
+              <span class="material-symbols-outlined text-2xl text-slate-600 group-hover:text-primary-dark transition-colors">{{ cuenta.icono }}</span>
+              <span class="text-[11px] sm:text-xs font-black uppercase tracking-wider text-slate-600 group-hover:text-primary-dark transition-colors">
                 {{ cuenta.rol }}
               </span>
             </button>
@@ -115,16 +116,16 @@
         </div>
       </div>
 
-      <!-- Link registro + regresar -->
-      <div class="mt-8 text-center space-y-4">
-        <a routerLink="/" class="inline-flex items-center justify-center gap-1.5 text-slate-500 hover:text-primary transition-colors text-xs font-medium">
+      <!-- Footer links -->
+      <div class="mt-7 text-center space-y-3">
+        <p class="text-slate-600 text-sm sm:text-base">
+          ¿No tienes cuenta?
+          <a routerLink="/auth/registro" class="text-primary-dark font-bold hover:underline underline-offset-4 ml-1">Regístrate</a>
+        </p>
+        <a routerLink="/" class="inline-flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-700 transition-colors text-xs sm:text-sm font-semibold">
           <span class="material-symbols-outlined text-base">arrow_back</span>
           Regresar al inicio
         </a>
-        <p class="text-slate-400 text-sm">
-          ¿No tienes cuenta?
-          <a routerLink="/auth/registro" class="text-primary font-bold hover:underline underline-offset-4 ml-1">Regístrate</a>
-        </p>
       </div>
     </div>
 
