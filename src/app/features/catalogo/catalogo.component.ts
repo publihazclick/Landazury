@@ -98,12 +98,8 @@ export class CatalogoComponent implements OnInit {
       const data = await this.catalogoService.obtenerProductos({ busqueda: this.busqueda || undefined });
       this.productos.set(data);
       this.filtros.productosCatalogo.set(data);
-      // Si solo hay una bodega, seleccionarla automáticamente
-      const imp  = data.some(p => bodegaDeProducto(p) === 'importaciones');
-      const moda = data.some(p => bodegaDeProducto(p) === 'moda');
-      if (imp && !moda) this.filtros.bodegaFiltro.set('importaciones');
-      else if (!imp && moda) this.filtros.bodegaFiltro.set('moda');
-      else this.filtros.bodegaFiltro.set('todas');
+      // Al entrar al catálogo, siempre seleccionar "Ver todas" por defecto
+      this.filtros.bodegaFiltro.set('todas');
     } catch {
       this.error.set('No se pudieron cargar los productos. Intenta de nuevo.');
     } finally {

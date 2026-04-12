@@ -29,7 +29,7 @@
           <img src="/landazury_importaciones.jpg" alt="Landazury Importaciones"
                class="h-16 sm:h-24 w-auto object-contain transition-all duration-200"
                [class]="filtros.bodegaFiltro() === 'importaciones' ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'"/>
-          <span class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary-dark text-[10px] sm:text-xs font-black uppercase tracking-widest group-hover:bg-primary/20 transition-all">
+          <span class="flex items-center gap-1 px-3 py-1 rounded-full bg-primary text-[#0f0f0f] text-[10px] sm:text-xs font-black uppercase tracking-widest shadow-md group-hover:brightness-110 group-hover:shadow-lg transition-all">
             <span class="material-symbols-outlined text-[13px] sm:text-sm">touch_app</span>
             Ver Bodega
           </span>
@@ -56,7 +56,7 @@
             <span class="material-symbols-outlined text-base">checkroom</span>
             <span class="text-xs font-black leading-tight text-left">Moda<br><span class="text-[9px] font-bold uppercase tracking-widest">Landazury</span></span>
           </span>
-          <span class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary-dark text-[10px] sm:text-xs font-black uppercase tracking-widest group-hover:bg-primary/20 transition-all">
+          <span class="flex items-center gap-1 px-3 py-1 rounded-full bg-primary text-[#0f0f0f] text-[10px] sm:text-xs font-black uppercase tracking-widest shadow-md group-hover:brightness-110 group-hover:shadow-lg transition-all">
             <span class="material-symbols-outlined text-[13px] sm:text-sm">touch_app</span>
             Ver Bodega
           </span>
@@ -69,10 +69,11 @@
 
         <!-- Ver todas -->
         <button (click)="seleccionarBodega('todas')"
-                class="self-center px-3 py-2 rounded-xl text-xs font-bold transition-all border"
+                class="self-center flex items-center gap-1.5 px-5 py-3 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-xl text-base sm:text-sm font-black uppercase tracking-wider transition-all border-2 shadow-md hover:shadow-lg hover:-translate-y-0.5"
                 [class]="filtros.bodegaFiltro() === 'todas'
-                  ? 'border-slate-400 text-slate-700 bg-slate-100'
-                  : 'border-slate-200 text-slate-400 hover:text-slate-600 hover:border-slate-300'">
+                  ? 'border-primary bg-primary text-[#0f0f0f]'
+                  : 'border-slate-300 bg-white text-slate-600 hover:border-primary hover:text-primary-dark'">
+          <span class="material-symbols-outlined text-lg sm:text-base">apps</span>
           Ver todas
         </button>
 
