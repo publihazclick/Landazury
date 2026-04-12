@@ -158,6 +158,13 @@
                       [class]="esFavorito(producto.id) ? 'text-red-400' : 'text-slate-400'">
                 <span class="material-symbols-outlined text-[16px] sm:text-[18px]">favorite</span>
               </button>
+              <!-- Badge de cantidad de fotos -->
+              @if (producto.imagenes.length > 1) {
+                <div class="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-900/70 text-white text-[10px] font-bold backdrop-blur-sm">
+                  <span class="material-symbols-outlined text-[12px]">photo_library</span>
+                  {{ producto.imagenes.length }}
+                </div>
+              }
             </div>
             <!-- Precios debajo de la imagen -->
             @if (producto.precio_final) {

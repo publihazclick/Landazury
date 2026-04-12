@@ -53,6 +53,43 @@
     <!-- Contenido scrolleable -->
     <div class="overflow-y-auto flex-1 p-5 sm:p-6 space-y-6 bg-white">
 
+      <!-- ══ GALERÍA DE FOTOS DEL PRODUCTO ══ -->
+      @if (fotosProducto.length > 0) {
+        <div class="space-y-2.5">
+          <!-- Foto principal -->
+          <button type="button" (click)="abrirLightbox(imagenPrincipalIdx())"
+                  class="relative block w-full aspect-square sm:aspect-[4/3] rounded-2xl overflow-hidden bg-slate-50 border border-slate-200 group">
+            <img [src]="fotosProducto[imagenPrincipalIdx()]" [alt]="producto.nombre"
+                 class="w-full h-full object-contain p-3 group-hover:scale-[1.02] transition-transform duration-300"/>
+            <div class="absolute bottom-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900/70 text-white text-[11px] font-bold backdrop-blur-sm">
+              <span class="material-symbols-outlined text-[14px]">zoom_in</span>
+              Ampliar
+            </div>
+            @if (fotosProducto.length > 1) {
+              <div class="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-slate-900/70 text-white text-[11px] font-bold backdrop-blur-sm">
+                {{ imagenPrincipalIdx() + 1 }} / {{ fotosProducto.length }}
+              </div>
+            }
+          </button>
+
+          <!-- Thumbnails -->
+          @if (fotosProducto.length > 1) {
+            <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+              @for (url of fotosProducto; track $index) {
+                <button type="button" (click)="seleccionarImagenPrincipal($index)"
+                        class="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all bg-white"
+                        [class]="imagenPrincipalIdx() === $index
+                          ? 'border-primary shadow-md'
+                          : 'border-slate-200 hover:border-slate-400 opacity-70 hover:opacity-100'">
+                  <img [src]="url" [alt]="'Imagen ' + ($index + 1)"
+                       class="w-full h-full object-contain p-1"/>
+                </button>
+              }
+            </div>
+          }
+        </div>
+      }
+
       <!-- Precio + margen -->
       @if (producto.precio_final) {
         <div class="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
@@ -239,6 +276,55 @@
       }
 
     </div>
+
+    <!-- ══ LIGHTBOX GALERÍA DE FOTOS DEL PRODUCTO ══ -->
+    @if (fotoLightboxIdx() !== null) {
+      <div class="absolute inset-0 z-20 bg-black/95 flex flex-col" (click)="cerrarLightbox()">
+        <div class="flex items-center justify-between px-4 py-3 shrink-0" (click)="$event.stopPropagation()">
+          <span class="text-white text-sm font-bold">
+            Foto {{ fotoLightboxIdx()! + 1 }} / {{ fotosProducto.length }}
+          </span>
+          <button (click)="cerrarLightbox()"
+                  class="w-9 h-9 flex items-center justify-center rounded-full bg-white/10 text-slate-200 hover:bg-white/20 hover:text-white transition-all">
+            <span class="material-symbols-outlined text-lg">close</span>
+          </button>
+        </div>
+
+        <div class="flex-1 flex items-center justify-center overflow-hidden px-4 relative" (click)="$event.stopPropagation()">
+          @if (fotosProducto.length > 1) {
+            <button (click)="navegarLightbox(-1)"
+                    class="absolute left-2 z-10 w-10 h-10 rounded-full bg-black/60 border border-white/10 flex items-center justify-center text-white hover:bg-black/90 transition-all">
+              <span class="material-symbols-outlined text-xl">chevron_left</span>
+            </button>
+          }
+
+          <img [src]="fotosProducto[fotoLightboxIdx()!]" [alt]="producto.nombre"
+               class="max-h-full max-w-full object-contain rounded-xl"/>
+
+          @if (fotosProducto.length > 1) {
+            <button (click)="navegarLightbox(1)"
+                    class="absolute right-2 z-10 w-10 h-10 rounded-full bg-black/60 border border-white/10 flex items-center justify-center text-white hover:bg-black/90 transition-all">
+              <span class="material-symbols-outlined text-xl">chevron_right</span>
+            </button>
+          }
+        </div>
+
+        <!-- Strip de miniaturas en el footer del lightbox -->
+        @if (fotosProducto.length > 1) {
+          <div class="px-4 py-3 shrink-0 flex gap-2 overflow-x-auto no-scrollbar" (click)="$event.stopPropagation()">
+            @for (url of fotosProducto; track $index) {
+              <button type="button" (click)="abrirLightbox($index)"
+                      class="shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all bg-white"
+                      [class]="fotoLightboxIdx() === $index
+                        ? 'border-white'
+                        : 'border-white/20 opacity-60 hover:opacity-100'">
+                <img [src]="url" class="w-full h-full object-contain p-0.5"/>
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
 
     <!-- ══ VISOR LIGHTBOX ══ -->
     @if (creativoVisor()) {

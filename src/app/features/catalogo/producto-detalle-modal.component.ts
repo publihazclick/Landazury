@@ -24,6 +24,27 @@ export class ProductoDetalleModalComponent implements OnInit {
   readonly urlsFailed = new Set<string>();
   readonly creativoVisor = signal<Creativo | null>(null);
 
+  // Galería de fotos del producto (producto.imagenes[])
+  readonly imagenPrincipalIdx = signal(0);
+  readonly fotoLightboxIdx = signal<number | null>(null);
+
+  get fotosProducto(): string[] {
+    return (this.producto.imagenes ?? []).filter(url => !!url?.trim());
+  }
+
+  abrirLightbox(idx: number) { this.fotoLightboxIdx.set(idx); }
+  cerrarLightbox() { this.fotoLightboxIdx.set(null); }
+
+  navegarLightbox(dir: 1 | -1) {
+    const actual = this.fotoLightboxIdx();
+    if (actual === null) return;
+    const n = this.fotosProducto.length;
+    if (n === 0) return;
+    this.fotoLightboxIdx.set((actual + dir + n) % n);
+  }
+
+  seleccionarImagenPrincipal(idx: number) { this.imagenPrincipalIdx.set(idx); }
+
   abrirVisor(creativo: Creativo) { this.creativoVisor.set(creativo); }
   cerrarVisor() { this.creativoVisor.set(null); }
 
