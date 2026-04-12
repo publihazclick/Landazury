@@ -32,6 +32,36 @@ export class ProductoDetalleModalComponent implements OnInit {
     return (this.producto.imagenes ?? []).filter(url => !!url?.trim());
   }
 
+  /** Atributo de colores del producto (si existe), coincidiendo por nombre. */
+  get atributoColores(): { nombre: string; valores: string[] } | null {
+    const attrs = this.producto.atributos ?? [];
+    return attrs.find(a => /colou?r/i.test(a.nombre ?? '')) ?? null;
+  }
+
+  /** Categoría elegible para mostrar colores por imagen (moda o calzado). */
+  get categoriaUsaColorPorImagen(): boolean {
+    const slug = (this.producto.categoria?.slug ?? '').toLowerCase();
+    return slug.includes('moda') || slug.includes('ropa') || slug.includes('calzado');
+  }
+
+  /** True cuando tiene sentido mapear imagen ↔ color 1 a 1. */
+  get tieneColoresPorImagen(): boolean {
+    const attr = this.atributoColores;
+    if (!attr) return false;
+    if (!this.categoriaUsaColorPorImagen) return false;
+    return attr.valores.length === this.fotosProducto.length && attr.valores.length > 0;
+  }
+
+  colorDeImagen(idx: number): string | null {
+    if (!this.tieneColoresPorImagen) return null;
+    return this.atributoColores?.valores[idx] ?? null;
+  }
+
+  seleccionarColor(idx: number) {
+    if (!this.tieneColoresPorImagen) return;
+    this.imagenPrincipalIdx.set(idx);
+  }
+
   abrirLightbox(idx: number) { this.fotoLightboxIdx.set(idx); }
   cerrarLightbox() { this.fotoLightboxIdx.set(null); }
 

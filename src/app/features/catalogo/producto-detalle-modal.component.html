@@ -61,6 +61,12 @@
                   class="relative block w-full aspect-square sm:aspect-[4/3] rounded-2xl overflow-hidden bg-slate-50 border border-slate-200 group">
             <img [src]="fotosProducto[imagenPrincipalIdx()]" [alt]="producto.nombre"
                  class="w-full h-full object-contain p-3 group-hover:scale-[1.02] transition-transform duration-300"/>
+            @if (colorDeImagen(imagenPrincipalIdx()); as color) {
+              <div class="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 border border-slate-200 text-slate-800 text-xs font-bold shadow-sm">
+                <span class="material-symbols-outlined text-[14px] text-primary">palette</span>
+                {{ color }}
+              </div>
+            }
             <div class="absolute bottom-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900/70 text-white text-[11px] font-bold backdrop-blur-sm">
               <span class="material-symbols-outlined text-[14px]">zoom_in</span>
               Ampliar
@@ -77,12 +83,17 @@
             <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
               @for (url of fotosProducto; track $index) {
                 <button type="button" (click)="seleccionarImagenPrincipal($index)"
-                        class="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all bg-white"
+                        class="shrink-0 rounded-xl overflow-hidden border-2 transition-all bg-white flex flex-col"
                         [class]="imagenPrincipalIdx() === $index
                           ? 'border-primary shadow-md'
-                          : 'border-slate-200 hover:border-slate-400 opacity-70 hover:opacity-100'">
-                  <img [src]="url" [alt]="'Imagen ' + ($index + 1)"
-                       class="w-full h-full object-contain p-1"/>
+                          : 'border-slate-200 hover:border-slate-400 opacity-80 hover:opacity-100'">
+                  <div class="w-16 h-16 sm:w-20 sm:h-20">
+                    <img [src]="url" [alt]="'Imagen ' + ($index + 1)"
+                         class="w-full h-full object-contain p-1"/>
+                  </div>
+                  @if (colorDeImagen($index); as color) {
+                    <span class="text-[9px] font-bold text-slate-700 px-1 py-0.5 truncate max-w-[80px] text-center">{{ color }}</span>
+                  }
                 </button>
               }
             </div>
@@ -260,13 +271,28 @@
             <span class="material-symbols-outlined text-base">tune</span>
             Variantes disponibles
           </p>
-          <div class="space-y-2">
+          <div class="space-y-3">
             @for (attr of producto.atributos!; track attr.nombre) {
               <div>
-                <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-1.5">{{ attr.nombre }}</p>
+                <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-1.5 flex items-center gap-1.5">
+                  {{ attr.nombre }}
+                  @if (tieneColoresPorImagen && attr === atributoColores) {
+                    <span class="normal-case tracking-normal text-slate-400 font-medium">· toca para cambiar la foto</span>
+                  }
+                </p>
                 <div class="flex flex-wrap gap-1.5">
-                  @for (valor of attr.valores; track valor) {
-                    <span class="text-sm font-semibold px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-slate-800">{{ valor }}</span>
+                  @for (valor of attr.valores; track $index) {
+                    @if (tieneColoresPorImagen && attr === atributoColores) {
+                      <button type="button" (click)="seleccionarColor($index)"
+                              class="text-sm font-semibold px-3 py-1.5 rounded-full border transition-all"
+                              [class]="imagenPrincipalIdx() === $index
+                                ? 'bg-primary/15 border-primary text-primary-dark shadow-sm'
+                                : 'bg-slate-100 border-slate-200 text-slate-800 hover:border-primary/40 hover:bg-primary/5'">
+                        {{ valor }}
+                      </button>
+                    } @else {
+                      <span class="text-sm font-semibold px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-slate-800">{{ valor }}</span>
+                    }
                   }
                 </div>
               </div>
@@ -280,12 +306,20 @@
     <!-- ══ LIGHTBOX GALERÍA DE FOTOS DEL PRODUCTO ══ -->
     @if (fotoLightboxIdx() !== null) {
       <div class="absolute inset-0 z-20 bg-black/95 flex flex-col" (click)="cerrarLightbox()">
-        <div class="flex items-center justify-between px-4 py-3 shrink-0" (click)="$event.stopPropagation()">
-          <span class="text-white text-sm font-bold">
-            Foto {{ fotoLightboxIdx()! + 1 }} / {{ fotosProducto.length }}
-          </span>
+        <div class="flex items-center justify-between px-4 py-3 shrink-0 gap-3" (click)="$event.stopPropagation()">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="text-white text-sm font-bold shrink-0">
+              Foto {{ fotoLightboxIdx()! + 1 }} / {{ fotosProducto.length }}
+            </span>
+            @if (colorDeImagen(fotoLightboxIdx()!); as color) {
+              <span class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/15 border border-white/20 text-white text-xs font-bold truncate">
+                <span class="material-symbols-outlined text-[14px] text-primary">palette</span>
+                {{ color }}
+              </span>
+            }
+          </div>
           <button (click)="cerrarLightbox()"
-                  class="w-9 h-9 flex items-center justify-center rounded-full bg-white/10 text-slate-200 hover:bg-white/20 hover:text-white transition-all">
+                  class="w-9 h-9 flex items-center justify-center rounded-full bg-white/10 text-slate-200 hover:bg-white/20 hover:text-white transition-all shrink-0">
             <span class="material-symbols-outlined text-lg">close</span>
           </button>
         </div>
