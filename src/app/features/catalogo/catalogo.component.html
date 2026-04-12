@@ -69,12 +69,17 @@
 
         <!-- Ver todas -->
         <button (click)="seleccionarBodega('todas')"
-                class="self-center flex items-center gap-1.5 px-5 py-3 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-xl text-base sm:text-sm font-black uppercase tracking-wider transition-all border-2 shadow-md hover:shadow-lg hover:-translate-y-0.5"
+                class="relative self-center flex items-center gap-1.5 px-5 py-3 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-xl text-base sm:text-sm font-black uppercase tracking-wider transition-all border-2 shadow-md hover:shadow-lg hover:-translate-y-0.5"
                 [class]="filtros.bodegaFiltro() === 'todas'
-                  ? 'border-primary bg-primary text-[#0f0f0f]'
-                  : 'border-slate-300 bg-white text-slate-600 hover:border-primary hover:text-primary-dark'">
+                  ? 'border-green-500 bg-green-50 text-green-700 ring-2 ring-green-200'
+                  : 'border-sky-300 bg-sky-50 text-sky-700 hover:border-sky-500 hover:bg-sky-100'">
           <span class="material-symbols-outlined text-lg sm:text-base">apps</span>
           Ver todas
+          @if (filtros.bodegaFiltro() === 'todas') {
+            <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shadow">
+              <span class="material-symbols-outlined text-sm text-white">check</span>
+            </span>
+          }
         </button>
 
       </div>
