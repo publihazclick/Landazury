@@ -146,10 +146,10 @@
             <div class="relative aspect-square sm:aspect-[4/5] overflow-hidden bg-white">
               @if (producto.imagenes.length) {
                 <img [src]="producto.imagenes![0]" [alt]="producto.nombre"
-                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"/>
+                     class="w-full h-full object-contain p-2 sm:p-3 bg-white group-hover:scale-105 transition-transform duration-500"/>
               } @else {
-                <div class="w-full h-full bg-neutral-border flex items-center justify-center">
-                  <span class="material-symbols-outlined text-3xl sm:text-5xl text-slate-600">inventory_2</span>
+                <div class="w-full h-full bg-slate-50 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-3xl sm:text-5xl text-slate-300">inventory_2</span>
                 </div>
               }
               <!-- Favorito -->

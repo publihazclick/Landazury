@@ -284,14 +284,14 @@
          role="list" aria-label="Productos exclusivos">
       @for (producto of exclusivosVisibles; track producto.id) {
         <div class="w-[78vw] max-w-[300px] md:min-w-[340px] md:w-auto flex-shrink-0 snap-start" role="listitem">
-          <div class="relative aspect-[4/5] rounded-2xl md:rounded-[2rem] overflow-hidden mb-4 group">
+          <div class="relative aspect-[4/5] rounded-2xl md:rounded-[2rem] overflow-hidden mb-4 group bg-white">
             @if (producto.imagenes.length) {
               <img [src]="producto.imagenes[0]" [alt]="producto.nombre"
                    loading="lazy" decoding="async"
-                   class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
+                   class="w-full h-full object-contain p-3 bg-white transition-transform duration-700 group-hover:scale-105"/>
             } @else {
-              <div class="w-full h-full bg-gradient-to-br from-[#2a2116] to-[#1a160f] flex items-center justify-center">
-                <span class="text-6xl font-black text-primary/20">{{ producto.nombre.charAt(0) }}</span>
+              <div class="w-full h-full bg-slate-50 flex items-center justify-center">
+                <span class="text-6xl font-black text-slate-300">{{ producto.nombre.charAt(0) }}</span>
               </div>
             }
             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
@@ -363,14 +363,14 @@
              [class]="i === 0 ? 'md:col-span-2 md:row-span-2' : ''">
 
           <!-- Image -->
-          <div [class]="i === 0 ? 'aspect-square md:aspect-auto md:h-full min-h-[240px]' : 'aspect-square'">
+          <div [class]="(i === 0 ? 'aspect-square md:aspect-auto md:h-full min-h-[240px]' : 'aspect-square') + ' bg-white'">
             @if (producto.imagenes.length) {
               <img [src]="producto.imagenes[0]" [alt]="producto.nombre"
                    loading="lazy" decoding="async"
-                   class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"/>
+                   class="w-full h-full object-contain p-3 bg-white transition-transform duration-700 group-hover:scale-105"/>
             } @else {
-              <div class="w-full h-full bg-gradient-to-br from-[#2a2116] to-[#111008] flex items-center justify-center">
-                <span class="text-6xl font-black text-primary/10">{{ producto.nombre.charAt(0) }}</span>
+              <div class="w-full h-full bg-slate-50 flex items-center justify-center">
+                <span class="text-6xl font-black text-slate-300">{{ producto.nombre.charAt(0) }}</span>
               </div>
             }
           </div>

@@ -119,9 +119,9 @@
           <div class="grid grid-cols-4 gap-2">
             @for (creativo of imagenes; track creativo.id) {
               <button (click)="abrirVisor(creativo)"
-                      class="relative group aspect-square rounded-xl overflow-hidden border border-slate-200 bg-slate-100 hover:border-sky-500 transition-all">
+                      class="relative group aspect-square rounded-xl overflow-hidden border border-slate-200 bg-white hover:border-sky-500 transition-all">
                 <img [src]="displayUrl(creativo)" [alt]="creativo.nombre"
-                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                     class="w-full h-full object-contain p-1.5 bg-white group-hover:scale-105 transition-transform duration-300"
                      (error)="onMediaError(creativo, $any($event.target))"/>
                 <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <span class="material-symbols-outlined text-white text-lg">zoom_in</span>
@@ -162,9 +162,9 @@
           <div class="grid grid-cols-3 gap-2">
             @for (creativo of videos; track creativo.id) {
               <button (click)="abrirVisor(creativo)"
-                      class="relative group aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-100 hover:border-purple-500 transition-all">
+                      class="relative group aspect-video rounded-xl overflow-hidden border border-slate-200 bg-white hover:border-purple-500 transition-all">
                 <video [src]="displayUrl(creativo)"
-                       class="w-full h-full object-cover"
+                       class="w-full h-full object-contain bg-white"
                        preload="metadata" muted playsinline
                        (error)="onMediaError(creativo, $any($event.target))">
                 </video>
