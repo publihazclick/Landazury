@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-neutral-charcoal text-slate-100">
+<div class="min-h-screen bg-white text-slate-900">
   <div class="max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-6">
 
     <!-- Header -->
@@ -8,7 +8,7 @@
           <span class="material-symbols-outlined text-primary text-xl">admin_panel_settings</span>
         </div>
         <div>
-          <h1 class="text-xl font-extrabold text-slate-100 tracking-tight">Panel de Administración</h1>
+          <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">Panel de Administración</h1>
           <p class="text-slate-500 text-xs">
             {{ totalUsuarios() }} usuarios ·
             @if (totalPendientes() > 0) {
@@ -37,13 +37,13 @@
     }
 
     <!-- ── TABS ── -->
-    <div class="flex flex-wrap gap-1 p-1 bg-neutral-surface border border-neutral-border rounded-xl w-fit">
+    <div class="flex flex-wrap gap-1 p-1 bg-white border border-slate-200 rounded-xl w-fit">
       <button (click)="setTab('usuarios')"
          class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all"
          [class.bg-primary]="tabActivo() === 'usuarios'"
          [class.text-\[#0a0a08\]]="tabActivo() === 'usuarios'"
          [class.text-slate-400]="tabActivo() !== 'usuarios'"
-         [class.hover\:text-slate-200]="tabActivo() !== 'usuarios'">
+         [class.hover\:text-slate-800]="tabActivo() !== 'usuarios'">
         <span class="material-symbols-outlined text-base">group</span>
         Usuarios
       </button>
@@ -52,7 +52,7 @@
          [class.bg-primary]="tabActivo() === 'productos'"
          [class.text-\[#0a0a08\]]="tabActivo() === 'productos'"
          [class.text-slate-400]="tabActivo() !== 'productos'"
-         [class.hover\:text-slate-200]="tabActivo() !== 'productos'">
+         [class.hover\:text-slate-800]="tabActivo() !== 'productos'">
         <span class="material-symbols-outlined text-base">inventory</span>
         Productos
         @if (totalPendientes() > 0) {
@@ -66,7 +66,7 @@
          [class.bg-primary]="tabActivo() === 'estadisticas'"
          [class.text-\[#0a0a08\]]="tabActivo() === 'estadisticas'"
          [class.text-slate-400]="tabActivo() !== 'estadisticas'"
-         [class.hover\:text-slate-200]="tabActivo() !== 'estadisticas'">
+         [class.hover\:text-slate-800]="tabActivo() !== 'estadisticas'">
         <span class="material-symbols-outlined text-base">bar_chart</span>
         Estadísticas
       </button>
@@ -77,20 +77,20 @@
     ══════════════════════════════════ -->
     @if (tabActivo() === 'usuarios') {
 
-      <div class="bg-neutral-surface border border-neutral-border rounded-2xl overflow-hidden">
+      <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
 
         <!-- Toolbar -->
-        <div class="p-5 border-b border-neutral-border flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-          <h2 class="text-sm font-bold text-slate-300 uppercase tracking-widest shrink-0">Usuarios del sistema</h2>
+        <div class="p-5 border-b border-slate-200 flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+          <h2 class="text-sm font-bold text-slate-700 uppercase tracking-widest shrink-0">Usuarios del sistema</h2>
           <div class="flex items-center gap-3 w-full sm:w-auto">
-            <div class="flex items-stretch rounded-lg bg-neutral-charcoal border border-neutral-border focus-within:border-primary/50 transition-all flex-1 sm:w-64">
+            <div class="flex items-stretch rounded-lg bg-white border border-slate-200 focus-within:border-primary/50 transition-all flex-1 sm:w-64">
               <div class="flex items-center pl-3 text-slate-500">
                 <span class="material-symbols-outlined text-xl">search</span>
               </div>
               <input [(ngModel)]="busqueda" type="text" placeholder="Buscar por nombre o email…"
-                     class="bg-transparent text-slate-100 text-sm placeholder:text-slate-600 py-2.5 px-3 outline-none w-full"/>
+                     class="bg-transparent text-slate-900 text-sm placeholder:text-slate-600 py-2.5 px-3 outline-none w-full"/>
               @if (busqueda) {
-                <button (click)="busqueda = ''" class="pr-3 text-slate-500 hover:text-slate-300 transition-colors">
+                <button (click)="busqueda = ''" class="pr-3 text-slate-500 hover:text-slate-700 transition-colors">
                   <span class="material-symbols-outlined text-base">close</span>
                 </button>
               }
@@ -104,16 +104,16 @@
         </div>
 
         <!-- Role filter chips -->
-        <div class="px-5 py-3 border-b border-neutral-border flex flex-wrap gap-2">
+        <div class="px-5 py-3 border-b border-slate-200 flex flex-wrap gap-2">
           @for (chip of filtroChips(); track chip.valor) {
             <button (click)="filtroRol.set(chip.valor)"
                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all"
                     [class.bg-primary]="filtroRol() === chip.valor"
                     [class.text-\[#0a0a08\]]="filtroRol() === chip.valor"
                     [class.border-primary]="filtroRol() === chip.valor"
-                    [class.bg-neutral-charcoal]="filtroRol() !== chip.valor"
+                    [class.bg-white]="filtroRol() !== chip.valor"
                     [class.text-slate-400]="filtroRol() !== chip.valor"
-                    [class.border-neutral-border]="filtroRol() !== chip.valor"
+                    [class.border-slate-200]="filtroRol() !== chip.valor"
                     [class.hover\:border-primary\/40]="filtroRol() !== chip.valor">
               <span class="material-symbols-outlined text-[14px]">{{ chip.icono }}</span>
               {{ chip.etiqueta }}
@@ -141,7 +141,7 @@
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
               <thead>
-                <tr class="border-b border-neutral-border text-left text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                <tr class="border-b border-slate-200 text-left text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                   <th class="px-5 py-3">Usuario</th>
                   <th class="px-5 py-3 hidden md:table-cell">País</th>
                   <th class="px-5 py-3 hidden lg:table-cell">Teléfono</th>
@@ -152,14 +152,14 @@
               </thead>
               <tbody>
                 @for (usuario of usuariosFiltrados; track usuario.id) {
-                  <tr class="border-b border-neutral-border/50 hover:bg-white/[0.02] transition-colors">
+                  <tr class="border-b border-slate-200/50 hover:bg-white/[0.02] transition-colors">
                     <td class="px-5 py-4">
                       <div class="flex items-center gap-3">
                         <div class="w-9 h-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-black text-sm shrink-0">
                           {{ usuario.nombre.charAt(0).toUpperCase() }}
                         </div>
                         <div class="min-w-0">
-                          <p class="font-semibold text-slate-200 truncate">{{ usuario.nombre }}</p>
+                          <p class="font-semibold text-slate-800 truncate">{{ usuario.nombre }}</p>
                           @if (usuario.email) {
                             <p class="text-xs text-slate-500 truncate">{{ usuario.email }}</p>
                           }
@@ -192,10 +192,10 @@
               </tbody>
             </table>
           </div>
-          <div class="px-5 py-3 border-t border-neutral-border">
+          <div class="px-5 py-3 border-t border-slate-200">
             <p class="text-xs text-slate-500">
-              Mostrando <span class="text-slate-300 font-semibold">{{ usuariosFiltrados.length }}</span> de
-              <span class="text-slate-300 font-semibold">{{ usuarios().length }}</span> usuarios
+              Mostrando <span class="text-slate-700 font-semibold">{{ usuariosFiltrados.length }}</span> de
+              <span class="text-slate-700 font-semibold">{{ usuarios().length }}</span> usuarios
             </p>
           </div>
         }
@@ -210,16 +210,16 @@
 
       <!-- Header productos -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div class="flex items-stretch rounded-lg bg-neutral-surface border border-neutral-border focus-within:border-primary/50 transition-all w-full sm:w-72">
+        <div class="flex items-stretch rounded-lg bg-white border border-slate-200 focus-within:border-primary/50 transition-all w-full sm:w-72">
           <div class="flex items-center pl-3 text-slate-500">
             <span class="material-symbols-outlined text-xl">search</span>
           </div>
           <input [(ngModel)]="busquedaProductos" type="text" placeholder="Buscar productos…"
-                 class="bg-transparent text-slate-100 text-sm placeholder:text-slate-600 py-2.5 px-3 outline-none w-full"/>
+                 class="bg-transparent text-slate-900 text-sm placeholder:text-slate-600 py-2.5 px-3 outline-none w-full"/>
         </div>
         <div class="flex items-center gap-2 self-start sm:self-auto">
           <button (click)="cargarProductos()"
-                  class="flex items-center gap-2 bg-neutral-surface border border-neutral-border px-4 py-2.5 rounded-xl text-sm text-slate-300 hover:border-primary/40 transition-all">
+                  class="flex items-center gap-2 bg-white border border-slate-200 px-4 py-2.5 rounded-xl text-sm text-slate-700 hover:border-primary/40 transition-all">
             <span class="material-symbols-outlined text-[18px]">refresh</span>
             Actualizar
           </button>
@@ -238,7 +238,7 @@
                   class="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold border transition-all"
                   [class]="filtroEstado() === chip.valor ? chip.colorActivo : chip.color">
             {{ chip.etiqueta }}
-            <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-white/10">{{ chip.count }}</span>
+            <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-slate-100">{{ chip.count }}</span>
           </button>
         }
       </div>
@@ -247,7 +247,7 @@
       @if (cargandoProductos()) {
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           @for (_ of [1,2,3,4,5,6]; track $index) {
-            <div class="bg-neutral-surface border border-neutral-border rounded-2xl overflow-hidden">
+            <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
               <div class="h-32 bg-neutral-border/30 animate-pulse"></div>
               <div class="p-4 space-y-2">
                 <div class="h-4 bg-neutral-border/50 rounded animate-pulse w-3/4"></div>
@@ -257,17 +257,17 @@
           }
         </div>
       } @else if (productosFiltrados().length === 0) {
-        <div class="py-16 text-center bg-neutral-surface border border-neutral-border rounded-2xl">
+        <div class="py-16 text-center bg-white border border-slate-200 rounded-2xl">
           <span class="material-symbols-outlined text-5xl text-slate-600 block mb-3">inventory_2</span>
           <p class="text-slate-400 text-sm">No hay productos con este filtro.</p>
         </div>
       } @else {
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           @for (producto of productosFiltrados(); track producto.id) {
-            <div class="bg-neutral-surface border border-neutral-border rounded-2xl overflow-hidden hover:border-primary/20 transition-all">
+            <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-primary/20 transition-all">
 
               <!-- Image -->
-              <div class="relative h-36 bg-neutral-border/20">
+              <div class="relative h-36 bg-slate-100">
                 @if (producto.imagenes.length > 0) {
                   <img [src]="producto.imagenes[0]" [alt]="producto.nombre" class="w-full h-full object-cover"/>
                 } @else if (producto.creativos && producto.creativos.length > 0) {
@@ -297,15 +297,15 @@
                           class="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider backdrop-blur-sm border transition-all"
                           [class]="producto.ganador
                             ? 'bg-primary/90 border-primary text-[#0f0f0f]'
-                            : 'bg-black/50 border-white/10 text-slate-500 hover:border-primary/30 hover:text-primary/60'">
+                            : 'bg-black/50 border-slate-200 text-slate-500 hover:border-primary/30 hover:text-primary/60'">
                     <span class="material-symbols-outlined text-[11px]">verified</span>
                     Ganador
                   </button>
                   <button (click)="toggleExclusivo(producto, $event)"
                           class="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider backdrop-blur-sm border transition-all"
                           [class]="producto.exclusivo
-                            ? 'bg-purple-500/90 border-purple-400 text-white'
-                            : 'bg-black/50 border-white/10 text-slate-500 hover:border-purple-400/30 hover:text-purple-400/60'">
+                            ? 'bg-purple-500/90 border-purple-400 text-slate-900'
+                            : 'bg-black/50 border-slate-200 text-slate-500 hover:border-purple-400/30 hover:text-purple-400/60'">
                     <span class="material-symbols-outlined text-[11px]">diamond</span>
                     Exclusivo
                   </button>
@@ -313,7 +313,7 @@
                 <!-- Creativos count -->
                 @if ((producto.creativos?.length ?? 0) > 0) {
                   <div class="absolute top-2 right-2">
-                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-black/60 text-slate-300 border border-white/10 backdrop-blur-sm">
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-black/60 text-slate-700 border border-slate-200 backdrop-blur-sm">
                       {{ producto.creativos!.length }} creativos
                     </span>
                   </div>
@@ -325,7 +325,7 @@
                 <!-- Nombre + proveedor + métricas -->
                 <div class="flex items-start justify-between gap-2">
                   <div class="flex-1 min-w-0">
-                    <h3 class="font-bold text-slate-100 text-sm line-clamp-1">{{ producto.nombre }}</h3>
+                    <h3 class="font-bold text-slate-900 text-sm line-clamp-1">{{ producto.nombre }}</h3>
                     @if (producto.sku) {
                       <p class="text-xs text-slate-500 mt-0.5">SKU: {{ producto.sku }}</p>
                     }
@@ -345,7 +345,7 @@
                       <span class="material-symbols-outlined text-primary text-base">sell</span>
                       <p class="text-xs font-black uppercase tracking-widest text-primary">Precio Final para el Usuario</p>
                     </div>
-                    <div class="p-3 space-y-3 bg-neutral-charcoal">
+                    <div class="p-3 space-y-3 bg-white">
                       <!-- Costo referencia -->
                       <div class="flex items-center justify-between text-xs">
                         <span class="text-slate-500">Costo bodega (referencia)</span>
@@ -382,7 +382,7 @@
                       <!-- Botones -->
                       <div class="flex gap-2">
                         <button (click)="cerrarEditorPrecios()"
-                                class="flex-1 py-2 rounded-xl text-xs text-slate-400 border border-neutral-border hover:bg-white/5 transition-all">
+                                class="flex-1 py-2 rounded-xl text-xs text-slate-400 border border-slate-200 hover:bg-slate-50 transition-all">
                           Cancelar
                         </button>
                         <button (click)="guardarPrecioFinal(producto)"
@@ -403,9 +403,9 @@
                 } @else {
 
                   <!-- ── Vista de precios (siempre visible) ── -->
-                  <div class="border border-neutral-border rounded-xl overflow-hidden">
+                  <div class="border border-slate-200 rounded-xl overflow-hidden">
                     <!-- Header -->
-                    <div class="bg-neutral-charcoal px-3 py-2 flex items-center justify-between">
+                    <div class="bg-white px-3 py-2 flex items-center justify-between">
                       <div class="flex items-center gap-1.5">
                         <span class="material-symbols-outlined text-slate-500 text-base">sell</span>
                         <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Precio para el Usuario</p>
@@ -417,7 +417,7 @@
                       </button>
                     </div>
                     <!-- Precios -->
-                    <div class="p-3 space-y-2 bg-neutral-surface/50">
+                    <div class="p-3 space-y-2 bg-slate-500">
                       <!-- Costo bodega -->
                       <div class="flex items-center justify-between">
                         <p class="text-[9px] font-bold uppercase tracking-widest text-slate-600">Costo bodega</p>
@@ -431,7 +431,7 @@
                         </div>
                       }
                       <!-- Precio dropshipping -->
-                      <div class="flex items-center justify-between pt-1 border-t border-neutral-border/50">
+                      <div class="flex items-center justify-between pt-1 border-t border-slate-200/50">
                         <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500">Precio dropshipping</p>
                         @if (producto.precio_final) {
                           <p class="text-lg font-black text-primary">$ {{ producto.precio_final | number:'1.0-0' }}</p>
@@ -444,7 +444,7 @@
                       </div>
 
                       @if (producto.precio_final && producto.precio_final > producto.precio_base) {
-                        <div class="flex items-center gap-2 pt-2 border-t border-neutral-border/50">
+                        <div class="flex items-center gap-2 pt-2 border-t border-slate-200/50">
                           <span class="material-symbols-outlined text-green-400 text-base">trending_up</span>
                           <span class="text-xs font-black text-green-400">+ $ {{ ganancia(producto) | number:'1.0-0' }}</span>
                           <span class="text-xs text-slate-600">ganancia</span>
@@ -453,7 +453,7 @@
                           </span>
                         </div>
                       } @else if (!producto.precio_final) {
-                        <p class="text-[11px] text-amber-500/80 flex items-center gap-1 pt-1 border-t border-neutral-border/50">
+                        <p class="text-[11px] text-amber-500/80 flex items-center gap-1 pt-1 border-t border-slate-200/50">
                           <span class="material-symbols-outlined text-sm">info</span>
                           Define el precio para mostrar la ganancia
                         </p>
@@ -464,7 +464,7 @@
                 }
 
                 <!-- Acciones de aprobación -->
-                <div class="flex items-center gap-2 pt-1 border-t border-neutral-border">
+                <div class="flex items-center gap-2 pt-1 border-t border-slate-200">
                   @if (producto.estado === 'pendiente') {
                     <button (click)="abrirRevision(producto)"
                             class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold bg-amber-500/10 border border-amber-500/20 text-amber-300 hover:bg-amber-500/20 transition-all">
@@ -504,15 +504,15 @@
 
       <!-- KPI usuarios -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5">
+        <div class="bg-white border border-slate-200 rounded-2xl p-5">
           <div class="flex items-center justify-between mb-3">
             <span class="material-symbols-outlined text-slate-500 text-2xl">group</span>
             <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Total</span>
           </div>
-          <p class="text-3xl font-black text-slate-100">{{ totalUsuarios() }}</p>
+          <p class="text-3xl font-black text-slate-900">{{ totalUsuarios() }}</p>
           <p class="text-xs text-slate-500 mt-1">Usuarios registrados</p>
         </div>
-        <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5">
+        <div class="bg-white border border-slate-200 rounded-2xl p-5">
           <div class="flex items-center justify-between mb-3">
             <span class="material-symbols-outlined text-red-400 text-2xl">shield_person</span>
             <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Admin</span>
@@ -520,7 +520,7 @@
           <p class="text-3xl font-black text-red-300">{{ contarRol('admin') }}</p>
           <p class="text-xs text-slate-500 mt-1">Administradores</p>
         </div>
-        <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5">
+        <div class="bg-white border border-slate-200 rounded-2xl p-5">
           <div class="flex items-center justify-between mb-3">
             <span class="material-symbols-outlined text-amber-400 text-2xl">inventory_2</span>
             <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Inventario</span>
@@ -528,19 +528,19 @@
           <p class="text-3xl font-black text-amber-300">{{ contarRol('inventario') }}</p>
           <p class="text-xs text-slate-500 mt-1">Bodegas activas</p>
         </div>
-        <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5">
+        <div class="bg-white border border-slate-200 rounded-2xl p-5">
           <div class="flex items-center justify-between mb-3">
             <span class="material-symbols-outlined text-slate-400 text-2xl">person</span>
             <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Usuarios</span>
           </div>
-          <p class="text-3xl font-black text-slate-200">{{ contarRol('usuario') }}</p>
+          <p class="text-3xl font-black text-slate-800">{{ contarRol('usuario') }}</p>
           <p class="text-xs text-slate-500 mt-1">Dropshippers activos</p>
         </div>
       </div>
 
       <!-- KPI productos -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5">
+        <div class="bg-white border border-slate-200 rounded-2xl p-5">
           <div class="flex items-center justify-between mb-3">
             <span class="material-symbols-outlined text-primary text-2xl">inventory</span>
             <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Productos</span>
@@ -548,7 +548,7 @@
           <p class="text-3xl font-black text-primary">{{ productos().length }}</p>
           <p class="text-xs text-slate-500 mt-1">Total en catálogo</p>
         </div>
-        <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5">
+        <div class="bg-white border border-slate-200 rounded-2xl p-5">
           <div class="flex items-center justify-between mb-3">
             <span class="material-symbols-outlined text-amber-400 text-2xl">schedule</span>
             <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Pendientes</span>
@@ -556,7 +556,7 @@
           <p class="text-3xl font-black text-amber-300">{{ contarEstado('pendiente') }}</p>
           <p class="text-xs text-slate-500 mt-1">Esperando revisión</p>
         </div>
-        <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5">
+        <div class="bg-white border border-slate-200 rounded-2xl p-5">
           <div class="flex items-center justify-between mb-3">
             <span class="material-symbols-outlined text-green-400 text-2xl">check_circle</span>
             <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Aprobados</span>
@@ -564,7 +564,7 @@
           <p class="text-3xl font-black text-green-300">{{ contarEstado('aprobado') }}</p>
           <p class="text-xs text-slate-500 mt-1">Visibles a usuarios</p>
         </div>
-        <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5">
+        <div class="bg-white border border-slate-200 rounded-2xl p-5">
           <div class="flex items-center justify-between mb-3">
             <span class="material-symbols-outlined text-red-400 text-2xl">cancel</span>
             <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Rechazados</span>
@@ -578,15 +578,15 @@
       @if (cargandoStats()) {
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
           @for (_ of [1,2,3]; track $index) {
-            <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5 h-48 animate-pulse"></div>
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 h-48 animate-pulse"></div>
           }
         </div>
       } @else {
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
           <!-- Top vistas -->
-          <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5">
-            <h3 class="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2">
+          <div class="bg-white border border-slate-200 rounded-2xl p-5">
+            <h3 class="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
               <span class="material-symbols-outlined text-base text-sky-400">visibility</span>
               Más Vistos
             </h3>
@@ -594,10 +594,10 @@
               <p class="text-slate-600 text-xs text-center py-4">Sin datos todavía</p>
             }
             @for (p of topVistas(); track p.id; let i = $index) {
-              <div class="flex items-center gap-3 py-2 border-b border-neutral-border/50 last:border-0">
+              <div class="flex items-center gap-3 py-2 border-b border-slate-200/50 last:border-0">
                 <span class="w-5 text-[11px] font-black text-slate-600">{{ i + 1 }}</span>
                 <div class="flex-1 min-w-0">
-                  <p class="text-xs font-semibold text-slate-200 truncate">{{ p.nombre }}</p>
+                  <p class="text-xs font-semibold text-slate-800 truncate">{{ p.nombre }}</p>
                 </div>
                 <span class="text-xs font-bold text-sky-400">{{ p.vistas }}</span>
               </div>
@@ -605,8 +605,8 @@
           </div>
 
           <!-- Top descargas -->
-          <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5">
-            <h3 class="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2">
+          <div class="bg-white border border-slate-200 rounded-2xl p-5">
+            <h3 class="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
               <span class="material-symbols-outlined text-base text-purple-400">download</span>
               Más Descargados
             </h3>
@@ -614,10 +614,10 @@
               <p class="text-slate-600 text-xs text-center py-4">Sin datos todavía</p>
             }
             @for (p of topDescargas(); track p.id; let i = $index) {
-              <div class="flex items-center gap-3 py-2 border-b border-neutral-border/50 last:border-0">
+              <div class="flex items-center gap-3 py-2 border-b border-slate-200/50 last:border-0">
                 <span class="w-5 text-[11px] font-black text-slate-600">{{ i + 1 }}</span>
                 <div class="flex-1 min-w-0">
-                  <p class="text-xs font-semibold text-slate-200 truncate">{{ p.nombre }}</p>
+                  <p class="text-xs font-semibold text-slate-800 truncate">{{ p.nombre }}</p>
                 </div>
                 <span class="text-xs font-bold text-purple-400">{{ p.descargas }}</span>
               </div>
@@ -625,8 +625,8 @@
           </div>
 
           <!-- Top me gusta -->
-          <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-5">
-            <h3 class="text-sm font-bold text-slate-300 mb-4 flex items-center gap-2">
+          <div class="bg-white border border-slate-200 rounded-2xl p-5">
+            <h3 class="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
               <span class="material-symbols-outlined text-base text-red-400">favorite</span>
               Más Me Gusta
             </h3>
@@ -634,7 +634,7 @@
               <p class="text-slate-600 text-xs text-center py-4">Sin datos todavía</p>
             }
             @for (f of topFavoritos(); track f.producto_id; let i = $index) {
-              <div class="flex items-center gap-3 py-2 border-b border-neutral-border/50 last:border-0">
+              <div class="flex items-center gap-3 py-2 border-b border-slate-200/50 last:border-0">
                 <span class="w-5 text-[11px] font-black text-slate-600">{{ i + 1 }}</span>
                 <div class="flex-1 min-w-0">
                   <p class="text-xs font-semibold text-slate-400 truncate font-mono">{{ f.producto_id.substring(0, 8) }}…</p>
@@ -648,7 +648,7 @@
       }
 
       <!-- Distribución por rol -->
-      <div class="bg-neutral-surface border border-neutral-border rounded-2xl p-6">
+      <div class="bg-white border border-slate-200 rounded-2xl p-6">
         <h2 class="text-sm font-bold uppercase tracking-widest text-slate-400 mb-5 flex items-center gap-2">
           <span class="material-symbols-outlined text-base text-primary">pie_chart</span>
           Distribución de roles
@@ -662,17 +662,17 @@
                         [class.text-red-400]="item.valor === 'admin'"
                         [class.text-amber-400]="item.valor === 'inventario'"
                         [class.text-slate-400]="item.valor === 'usuario'">{{ item.icono }}</span>
-                  <span class="text-sm font-semibold text-slate-200">{{ item.etiqueta }}</span>
+                  <span class="text-sm font-semibold text-slate-800">{{ item.etiqueta }}</span>
                 </div>
                 <div class="flex items-center gap-3">
                   <span class="text-xs text-slate-500">{{ item.porcentaje }}%</span>
                   <span class="text-sm font-bold"
                         [class.text-red-300]="item.valor === 'admin'"
                         [class.text-amber-300]="item.valor === 'inventario'"
-                        [class.text-slate-300]="item.valor === 'usuario'">{{ item.cantidad }}</span>
+                        [class.text-slate-700]="item.valor === 'usuario'">{{ item.cantidad }}</span>
                 </div>
               </div>
-              <div class="h-2 rounded-full bg-white/5 overflow-hidden">
+              <div class="h-2 rounded-full bg-slate-50 overflow-hidden">
                 <div class="h-full rounded-full transition-all duration-700"
                      [style.width.%]="item.porcentaje"
                      [class.bg-red-400]="item.valor === 'admin'"
@@ -695,20 +695,20 @@
   <div class="fixed inset-0 z-50 flex items-center justify-center p-4"
        (click)="cerrarRevision()">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
-    <div class="relative w-full max-w-md bg-[#18160f] border border-white/10 rounded-2xl shadow-2xl"
+    <div class="relative w-full max-w-md bg-white border border-slate-200 rounded-2xl shadow-2xl"
          (click)="$event.stopPropagation()">
 
-      <div class="flex items-center justify-between px-6 py-5 border-b border-white/8">
+      <div class="flex items-center justify-between px-6 py-5 border-b border-slate-200">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
             <span class="material-symbols-outlined text-amber-400 text-base">rate_review</span>
           </div>
           <div>
-            <h3 class="text-slate-100 font-bold text-sm">Revisar Producto</h3>
+            <h3 class="text-slate-900 font-bold text-sm">Revisar Producto</h3>
             <p class="text-slate-500 text-[11px] truncate max-w-56">{{ productoRevisando()?.nombre }}</p>
           </div>
         </div>
-        <button (click)="cerrarRevision()" class="text-slate-500 hover:text-slate-300 transition-colors">
+        <button (click)="cerrarRevision()" class="text-slate-500 hover:text-slate-700 transition-colors">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
@@ -722,7 +722,7 @@
             <div class="relative">
               <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">$</span>
               <input [(ngModel)]="formRevision.precio_base" type="number" min="0" step="100"
-                     class="w-full bg-neutral-charcoal border border-neutral-border text-slate-100 text-sm rounded-xl pl-7 pr-3 py-2.5 outline-none focus:border-primary/50 transition-all"/>
+                     class="w-full bg-white border border-slate-200 text-slate-900 text-sm rounded-xl pl-7 pr-3 py-2.5 outline-none focus:border-primary/50 transition-all"/>
             </div>
           </div>
           <div>
@@ -730,7 +730,7 @@
             <div class="relative">
               <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">$</span>
               <input [(ngModel)]="formRevision.precio_final" type="number" min="0" step="100"
-                     class="w-full bg-neutral-charcoal border border-neutral-border text-slate-100 text-sm rounded-xl pl-7 pr-3 py-2.5 outline-none focus:border-primary/50 transition-all"/>
+                     class="w-full bg-white border border-slate-200 text-slate-900 text-sm rounded-xl pl-7 pr-3 py-2.5 outline-none focus:border-primary/50 transition-all"/>
             </div>
           </div>
         </div>
@@ -745,7 +745,7 @@
         }
       </div>
 
-      <div class="flex items-center gap-3 px-6 py-4 border-t border-white/8">
+      <div class="flex items-center gap-3 px-6 py-4 border-t border-slate-200">
         <button (click)="rechazarProducto(productoRevisando()!); cerrarRevision()"
                 class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold bg-red-500/10 text-red-300 border border-red-500/20 hover:bg-red-500/20 transition-all">
           <span class="material-symbols-outlined text-base">cancel</span>
@@ -772,27 +772,27 @@
   <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
        (click)="cancelarEdicion()">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
-    <div class="relative w-full sm:max-w-lg bg-[#18160f] border border-neutral-border sm:rounded-2xl rounded-t-2xl shadow-2xl max-h-[95vh] overflow-y-auto"
+    <div class="relative w-full sm:max-w-lg bg-white border border-slate-200 sm:rounded-2xl rounded-t-2xl shadow-2xl max-h-[95vh] overflow-y-auto"
          (click)="$event.stopPropagation()">
 
       <!-- Header -->
-      <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-neutral-border sticky top-0 bg-[#18160f] z-10">
+      <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-200 sticky top-0 bg-white z-10">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-black text-sm shrink-0">
             {{ usuarioEditando()!.nombre.charAt(0).toUpperCase() }}
           </div>
           <div>
-            <h3 class="text-slate-100 font-bold text-sm">Editar usuario</h3>
+            <h3 class="text-slate-900 font-bold text-sm">Editar usuario</h3>
             <p class="text-slate-500 text-xs truncate max-w-[200px]">{{ usuarioEditando()?.email ?? usuarioEditando()?.nombre }}</p>
           </div>
         </div>
-        <button (click)="cancelarEdicion()" class="text-slate-500 hover:text-slate-300 transition-colors">
+        <button (click)="cancelarEdicion()" class="text-slate-500 hover:text-slate-700 transition-colors">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
 
       <!-- Tabs -->
-      <div class="flex border-b border-neutral-border">
+      <div class="flex border-b border-slate-200">
         <button (click)="tabEdicion.set('info')"
                 class="flex-1 flex items-center justify-center gap-2 py-3 text-xs font-bold uppercase tracking-wider transition-all border-b-2 -mb-px"
                 [class.border-primary]="tabEdicion() === 'info'"
@@ -830,7 +830,7 @@
           <div class="space-y-1.5">
             <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Nombre completo</label>
             <input [(ngModel)]="formEdicion.nombre" type="text" placeholder="Nombre del usuario"
-                   class="w-full bg-neutral-charcoal border border-neutral-border rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
+                   class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
           </div>
 
           <!-- Email -->
@@ -842,7 +842,7 @@
               }
             </label>
             <input [(ngModel)]="formEdicion.email" type="email" placeholder="correo@ejemplo.com"
-                   class="w-full bg-neutral-charcoal border border-neutral-border rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
+                   class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
             @if (formEdicion.email !== (usuarioEditando()?.email ?? '')) {
               <p class="text-[11px] text-amber-400/70 flex items-center gap-1">
                 <span class="material-symbols-outlined text-xs">warning</span>
@@ -855,14 +855,14 @@
           <div class="space-y-1.5">
             <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">País</label>
             <input [(ngModel)]="formEdicion.pais" type="text" placeholder="Ej: Colombia"
-                   class="w-full bg-neutral-charcoal border border-neutral-border rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
+                   class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
           </div>
 
           <!-- Teléfono -->
           <div class="space-y-1.5">
             <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Teléfono</label>
             <input [(ngModel)]="formEdicion.telefono" type="text" placeholder="Ej: +57 300 123 4567"
-                   class="w-full bg-neutral-charcoal border border-neutral-border rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
+                   class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
           </div>
 
         </div>
@@ -875,15 +875,15 @@
           <!-- Rol -->
           <div class="space-y-2">
             <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Rol del usuario</label>
-            <div class="grid grid-cols-3 gap-2">
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
               @for (rol of roles; track rol.valor) {
                 <button type="button" (click)="formEdicion.rol = rol.valor"
                         class="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border transition-all"
                         [class.border-primary]="formEdicion.rol === rol.valor"
                         [class.bg-primary\/10]="formEdicion.rol === rol.valor"
                         [class.text-primary]="formEdicion.rol === rol.valor"
-                        [class.border-neutral-border]="formEdicion.rol !== rol.valor"
-                        [class.bg-neutral-charcoal]="formEdicion.rol !== rol.valor"
+                        [class.border-slate-200]="formEdicion.rol !== rol.valor"
+                        [class.bg-white]="formEdicion.rol !== rol.valor"
                         [class.text-slate-500]="formEdicion.rol !== rol.valor">
                   <span class="material-symbols-outlined text-xl">{{ rol.icono }}</span>
                   <span class="text-[10px] font-bold uppercase tracking-wider">{{ rol.etiqueta }}</span>
@@ -905,15 +905,15 @@
                 <input [(ngModel)]="formEdicion.nuevaContrasena"
                        [type]="mostrarContrasenaEdicion() ? 'text' : 'password'"
                        placeholder="Nueva contraseña (mín. 6 caracteres)"
-                       class="w-full bg-neutral-charcoal border border-neutral-border rounded-xl px-4 py-3 pr-10 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
+                       class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 pr-10 text-sm text-slate-900 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
                 <button type="button" (click)="mostrarContrasenaEdicion.update(v => !v)"
-                        class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 transition-colors">
                   <span class="material-symbols-outlined text-base">{{ mostrarContrasenaEdicion() ? 'visibility_off' : 'visibility' }}</span>
                 </button>
               </div>
               <button type="button" (click)="generarContrasenaEdicion()"
                       title="Generar contraseña segura"
-                      class="px-3 py-3 bg-neutral-charcoal border border-neutral-border rounded-xl text-slate-400 hover:text-primary hover:border-primary/40 transition-all">
+                      class="px-3 py-3 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-primary hover:border-primary/40 transition-all">
                 <span class="material-symbols-outlined text-base">auto_awesome</span>
               </button>
             </div>
@@ -924,7 +924,7 @@
                   <code class="text-amber-300 text-sm font-mono tracking-widest">{{ mostrarContrasenaEdicion() ? formEdicion.nuevaContrasena : '••••••••••' }}</code>
                 </div>
                 <button (click)="copiarTexto(formEdicion.nuevaContrasena, 'Contraseña')"
-                        class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-amber-500/10 text-slate-400 hover:text-amber-400 border border-neutral-border hover:border-amber-500/30 transition-all">
+                        class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 hover:bg-amber-500/10 text-slate-400 hover:text-amber-400 border border-slate-200 hover:border-amber-500/30 transition-all">
                   <span class="material-symbols-outlined text-base">content_copy</span>
                 </button>
               </div>
@@ -933,7 +933,7 @@
 
           <!-- Link operador -->
           @if (formEdicion.rol === 'inventario' || usuarioEditando()?.rol === 'inventario') {
-            <div class="bg-neutral-charcoal border border-neutral-border rounded-xl p-4">
+            <div class="bg-white border border-slate-200 rounded-xl p-4">
               <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-sm">link</span>
                 Link de acceso para este operador
@@ -941,7 +941,7 @@
               <div class="flex items-center justify-between gap-3">
                 <code class="text-primary text-sm font-mono break-all flex-1">{{ linkOp }}</code>
                 <button (click)="copiarTexto(linkOp, 'Link')"
-                        class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-primary/20 text-slate-400 hover:text-primary border border-neutral-border hover:border-primary/30 transition-all">
+                        class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 hover:bg-primary/20 text-slate-400 hover:text-primary border border-slate-200 hover:border-primary/30 transition-all">
                   <span class="material-symbols-outlined text-base">content_copy</span>
                 </button>
               </div>
@@ -952,9 +952,9 @@
       }
 
       <!-- Footer -->
-      <div class="flex gap-3 px-6 pb-6 pt-2 sticky bottom-0 bg-[#18160f] border-t border-neutral-border">
+      <div class="flex gap-3 px-6 pb-6 pt-2 sticky bottom-0 bg-white border-t border-slate-200">
         <button (click)="cancelarEdicion()"
-                class="flex-1 px-4 py-3 rounded-xl text-sm text-slate-400 border border-neutral-border hover:text-slate-200 hover:bg-white/5 transition-all">
+                class="flex-1 px-4 py-3 rounded-xl text-sm text-slate-400 border border-slate-200 hover:text-slate-800 hover:bg-slate-50 transition-all">
           Cancelar
         </button>
         <button (click)="guardarEdicion()"
@@ -978,21 +978,21 @@
   <div class="fixed inset-0 z-50 flex items-center justify-center p-4"
        (click)="cancelarEliminar()">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
-    <div class="relative w-full max-w-sm bg-[#18160f] border border-red-500/20 rounded-2xl shadow-2xl"
+    <div class="relative w-full max-w-sm bg-white border border-red-500/20 rounded-2xl shadow-2xl"
          (click)="$event.stopPropagation()">
       <div class="px-6 pt-8 pb-4 text-center">
         <div class="w-14 h-14 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4">
           <span class="material-symbols-outlined text-red-400 text-2xl">person_remove</span>
         </div>
-        <h3 class="text-slate-100 font-bold text-base mb-1">Eliminar usuario</h3>
+        <h3 class="text-slate-900 font-bold text-base mb-1">Eliminar usuario</h3>
         <p class="text-slate-400 text-sm">
-          ¿Eliminar a <span class="text-slate-100 font-semibold">{{ confirmandoEliminar()?.nombre }}</span> del sistema?
+          ¿Eliminar a <span class="text-slate-900 font-semibold">{{ confirmandoEliminar()?.nombre }}</span> del sistema?
           Esta acción no se puede deshacer.
         </p>
       </div>
       <div class="flex gap-3 px-6 pb-6">
         <button (click)="cancelarEliminar()"
-                class="flex-1 px-4 py-2.5 rounded-xl text-sm text-slate-400 border border-neutral-border hover:text-slate-200 hover:bg-white/5 transition-all">
+                class="flex-1 px-4 py-2.5 rounded-xl text-sm text-slate-400 border border-slate-200 hover:text-slate-800 hover:bg-slate-50 transition-all">
           Cancelar
         </button>
         <button (click)="eliminarUsuario()"
@@ -1016,21 +1016,21 @@
   <div class="fixed inset-0 z-50 flex items-center justify-center p-4"
        (click)="cancelarEliminarProducto()">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
-    <div class="relative w-full max-w-sm bg-[#18160f] border border-red-500/20 rounded-2xl shadow-2xl"
+    <div class="relative w-full max-w-sm bg-white border border-red-500/20 rounded-2xl shadow-2xl"
          (click)="$event.stopPropagation()">
       <div class="px-6 pt-8 pb-4 text-center">
         <div class="w-14 h-14 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4">
           <span class="material-symbols-outlined text-red-400 text-2xl">delete_forever</span>
         </div>
-        <h3 class="text-slate-100 font-bold text-base mb-1">Eliminar producto</h3>
+        <h3 class="text-slate-900 font-bold text-base mb-1">Eliminar producto</h3>
         <p class="text-slate-400 text-sm">
-          ¿Eliminar <span class="text-slate-100 font-semibold">{{ confirmandoEliminarProducto()?.nombre }}</span>?
+          ¿Eliminar <span class="text-slate-900 font-semibold">{{ confirmandoEliminarProducto()?.nombre }}</span>?
           Esta acción no se puede deshacer.
         </p>
       </div>
       <div class="flex gap-3 px-6 pb-6">
         <button (click)="cancelarEliminarProducto()"
-                class="flex-1 px-4 py-2.5 rounded-xl text-sm text-slate-400 border border-neutral-border hover:text-slate-200 hover:bg-white/5 transition-all">
+                class="flex-1 px-4 py-2.5 rounded-xl text-sm text-slate-400 border border-slate-200 hover:text-slate-800 hover:bg-slate-50 transition-all">
           Cancelar
         </button>
         <button (click)="eliminarProducto()"
@@ -1048,21 +1048,21 @@
   <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
        (click)="cancelarCrearUsuario()">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
-    <div class="relative w-full sm:max-w-md bg-[#18160f] border border-neutral-border sm:rounded-2xl rounded-t-2xl shadow-2xl max-h-[95vh] overflow-y-auto"
+    <div class="relative w-full sm:max-w-md bg-white border border-slate-200 sm:rounded-2xl rounded-t-2xl shadow-2xl max-h-[95vh] overflow-y-auto"
          (click)="$event.stopPropagation()">
 
       <!-- Header -->
-      <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-neutral-border">
+      <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-200">
         <div class="flex items-center gap-3">
           <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
             <span class="material-symbols-outlined text-amber-400 text-xl">person_add</span>
           </div>
           <div>
-            <h3 class="text-slate-100 font-bold text-sm">Crear nuevo operador</h3>
+            <h3 class="text-slate-900 font-bold text-sm">Crear nuevo operador</h3>
             <p class="text-slate-500 text-xs">El usuario podrá acceder por <code class="text-amber-400">/op</code></p>
           </div>
         </div>
-        <button (click)="cancelarCrearUsuario()" class="text-slate-500 hover:text-slate-300 transition-colors">
+        <button (click)="cancelarCrearUsuario()" class="text-slate-500 hover:text-slate-700 transition-colors">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
@@ -1083,14 +1083,14 @@
         <div class="space-y-1.5">
           <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Nombre completo</label>
           <input [(ngModel)]="formCrear.nombre" type="text" placeholder="Ej: Juan Pérez"
-                 class="w-full bg-neutral-charcoal border border-neutral-border rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
+                 class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
         </div>
 
         <!-- Email -->
         <div class="space-y-1.5">
           <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Correo electrónico</label>
           <input [(ngModel)]="formCrear.email" type="email" placeholder="operador@correo.com"
-                 class="w-full bg-neutral-charcoal border border-neutral-border rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
+                 class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
         </div>
 
         <!-- Contraseña -->
@@ -1101,15 +1101,15 @@
               <input [(ngModel)]="formCrear.contrasena"
                      [type]="mostrarContrasenaCrear() ? 'text' : 'password'"
                      placeholder="Mínimo 6 caracteres"
-                     class="w-full bg-neutral-charcoal border border-neutral-border rounded-xl px-4 py-3 pr-10 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
+                     class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 pr-10 text-sm text-slate-900 placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"/>
               <button type="button" (click)="mostrarContrasenaCrear.update(v => !v)"
-                      class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
+                      class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 transition-colors">
                 <span class="material-symbols-outlined text-base">{{ mostrarContrasenaCrear() ? 'visibility_off' : 'visibility' }}</span>
               </button>
             </div>
             <button type="button" (click)="usarContrasenaGenerada()"
                     title="Generar contraseña segura"
-                    class="px-3 py-3 bg-neutral-charcoal border border-neutral-border rounded-xl text-slate-400 hover:text-primary hover:border-primary/40 transition-all">
+                    class="px-3 py-3 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-primary hover:border-primary/40 transition-all">
               <span class="material-symbols-outlined text-base">auto_awesome</span>
             </button>
           </div>
@@ -1119,15 +1119,15 @@
         <!-- Rol -->
         <div class="space-y-1.5">
           <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Rol</label>
-          <div class="grid grid-cols-3 gap-2">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
             @for (rol of roles; track rol.valor) {
               <button type="button" (click)="formCrear.rol = rol.valor"
                       class="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border transition-all"
                       [class.border-primary]="formCrear.rol === rol.valor"
                       [class.bg-primary\/10]="formCrear.rol === rol.valor"
                       [class.text-primary]="formCrear.rol === rol.valor"
-                      [class.border-neutral-border]="formCrear.rol !== rol.valor"
-                      [class.bg-neutral-charcoal]="formCrear.rol !== rol.valor"
+                      [class.border-slate-200]="formCrear.rol !== rol.valor"
+                      [class.bg-white]="formCrear.rol !== rol.valor"
                       [class.text-slate-500]="formCrear.rol !== rol.valor">
                 <span class="material-symbols-outlined text-xl">{{ rol.icono }}</span>
                 <span class="text-[10px] font-bold uppercase tracking-wider">{{ rol.etiqueta }}</span>
@@ -1141,7 +1141,7 @@
       <!-- Footer -->
       <div class="flex gap-3 px-6 pb-6">
         <button (click)="cancelarCrearUsuario()"
-                class="flex-1 px-4 py-3 rounded-xl text-sm text-slate-400 border border-neutral-border hover:text-slate-200 hover:bg-white/5 transition-all">
+                class="flex-1 px-4 py-3 rounded-xl text-sm text-slate-400 border border-slate-200 hover:text-slate-800 hover:bg-slate-50 transition-all">
           Cancelar
         </button>
         <button (click)="crearUsuario()"
@@ -1165,17 +1165,17 @@
   <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
        (click)="cerrarCredenciales()">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
-    <div class="relative w-full sm:max-w-md bg-[#18160f] border border-green-500/20 sm:rounded-2xl rounded-t-2xl shadow-2xl"
+    <div class="relative w-full sm:max-w-md bg-white border border-green-500/20 sm:rounded-2xl rounded-t-2xl shadow-2xl"
          (click)="$event.stopPropagation()">
 
       <!-- Header éxito -->
-      <div class="px-6 pt-6 pb-4 text-center border-b border-neutral-border">
+      <div class="px-6 pt-6 pb-4 text-center border-b border-slate-200">
         <div class="w-14 h-14 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center mx-auto mb-3">
           <span class="material-symbols-outlined text-green-400 text-2xl">check_circle</span>
         </div>
-        <h3 class="text-slate-100 font-bold text-base">¡Usuario creado exitosamente!</h3>
+        <h3 class="text-slate-900 font-bold text-base">¡Usuario creado exitosamente!</h3>
         <p class="text-slate-400 text-sm mt-1">
-          Comparte estas credenciales con <span class="text-slate-200 font-semibold">{{ credencialesCreadas()?.nombre }}</span>
+          Comparte estas credenciales con <span class="text-slate-800 font-semibold">{{ credencialesCreadas()?.nombre }}</span>
         </p>
       </div>
 
@@ -1183,22 +1183,22 @@
       <div class="px-6 py-5 space-y-3">
 
         <!-- Email -->
-        <div class="bg-neutral-charcoal border border-neutral-border rounded-xl p-4">
+        <div class="bg-white border border-slate-200 rounded-xl p-4">
           <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 flex items-center gap-1.5">
             <span class="material-symbols-outlined text-sm text-slate-500">mail</span>
             Correo electrónico
           </p>
           <div class="flex items-center justify-between gap-3">
-            <code class="text-slate-100 text-sm font-mono break-all flex-1">{{ credencialesCreadas()?.email }}</code>
+            <code class="text-slate-900 text-sm font-mono break-all flex-1">{{ credencialesCreadas()?.email }}</code>
             <button (click)="copiarTexto(credencialesCreadas()!.email, 'Correo')"
-                    class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-primary/20 text-slate-400 hover:text-primary border border-neutral-border hover:border-primary/30 transition-all">
+                    class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 hover:bg-primary/20 text-slate-400 hover:text-primary border border-slate-200 hover:border-primary/30 transition-all">
               <span class="material-symbols-outlined text-base">content_copy</span>
             </button>
           </div>
         </div>
 
         <!-- Contraseña -->
-        <div class="bg-neutral-charcoal border border-amber-500/20 rounded-xl p-4">
+        <div class="bg-white border border-amber-500/20 rounded-xl p-4">
           <p class="text-[10px] font-bold uppercase tracking-widest text-amber-600 mb-2 flex items-center gap-1.5">
             <span class="material-symbols-outlined text-sm text-amber-600">key</span>
             Contraseña temporal
@@ -1206,14 +1206,14 @@
           <div class="flex items-center justify-between gap-3">
             <code class="text-amber-300 text-sm font-mono tracking-widest flex-1">{{ credencialesCreadas()?.contrasena }}</code>
             <button (click)="copiarTexto(credencialesCreadas()!.contrasena, 'Contraseña')"
-                    class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-amber-500/10 text-slate-400 hover:text-amber-400 border border-neutral-border hover:border-amber-500/30 transition-all">
+                    class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 hover:bg-amber-500/10 text-slate-400 hover:text-amber-400 border border-slate-200 hover:border-amber-500/30 transition-all">
               <span class="material-symbols-outlined text-base">content_copy</span>
             </button>
           </div>
         </div>
 
         <!-- Link de acceso -->
-        <div class="bg-neutral-charcoal border border-neutral-border rounded-xl p-4">
+        <div class="bg-white border border-slate-200 rounded-xl p-4">
           <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 flex items-center gap-1.5">
             <span class="material-symbols-outlined text-sm text-slate-500">link</span>
             Link de acceso
@@ -1221,7 +1221,7 @@
           <div class="flex items-center justify-between gap-3">
             <code class="text-primary text-sm font-mono break-all flex-1">{{ linkOp }}</code>
             <button (click)="copiarTexto(linkOp, 'Link')"
-                    class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-primary/20 text-slate-400 hover:text-primary border border-neutral-border hover:border-primary/30 transition-all">
+                    class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 hover:bg-primary/20 text-slate-400 hover:text-primary border border-slate-200 hover:border-primary/30 transition-all">
               <span class="material-symbols-outlined text-base">content_copy</span>
             </button>
           </div>
@@ -1244,7 +1244,7 @@
       <!-- Acciones -->
       <div class="flex gap-3 px-6 pb-6">
         <button (click)="copiarTexto('Correo: ' + credencialesCreadas()!.email + '\nContraseña: ' + credencialesCreadas()!.contrasena + '\nLink: ' + linkOp, 'Credenciales')"
-                class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm border border-neutral-border text-slate-300 hover:bg-white/5 transition-all">
+                class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm border border-slate-200 text-slate-700 hover:bg-slate-50 transition-all">
           <span class="material-symbols-outlined text-base">copy_all</span>
           Copiar todo
         </button>

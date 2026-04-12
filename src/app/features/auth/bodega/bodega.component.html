@@ -8,7 +8,7 @@
         <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-4">
           <span class="material-symbols-outlined text-2xl text-amber-400">inventory_2</span>
         </div>
-        <h1 class="text-lg font-bold text-slate-200">Portal de Operaciones</h1>
+        <h1 class="text-lg font-bold text-slate-800">Portal de Operaciones</h1>
         <p class="text-slate-500 text-sm mt-1">Ingresa tus credenciales de acceso</p>
       </div>
 
@@ -36,12 +36,12 @@
 
         <!-- Email -->
         <div class="space-y-2">
-          <label for="bodega-email" class="text-sm font-semibold text-slate-300 ml-1">Correo electrónico</label>
+          <label for="bodega-email" class="text-sm font-semibold text-slate-700 ml-1">Correo electrónico</label>
           <div class="relative group input-glow rounded-xl">
             <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors text-xl" aria-hidden="true">mail</span>
             <input id="bodega-email" formControlName="email" type="email" placeholder="operador@empresa.com"
                    autocomplete="email"
-                   class="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                   class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3.5 pl-12 pr-4 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                    [class.border-red-500\/50]="form.get('email')?.invalid && form.get('email')?.touched"/>
           </div>
           @if (form.get('email')?.invalid && form.get('email')?.touched) {
@@ -51,18 +51,18 @@
 
         <!-- Contraseña -->
         <div class="space-y-2">
-          <label for="bodega-contrasena" class="text-sm font-semibold text-slate-300 ml-1">Contraseña</label>
+          <label for="bodega-contrasena" class="text-sm font-semibold text-slate-700 ml-1">Contraseña</label>
           <div class="relative group input-glow rounded-xl">
             <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors text-xl" aria-hidden="true">lock</span>
             <input id="bodega-contrasena" formControlName="contrasena"
                    [type]="mostrarContrasena() ? 'text' : 'password'"
                    placeholder="••••••••"
                    autocomplete="current-password"
-                   class="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 pl-12 pr-12 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                   class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3.5 pl-12 pr-12 text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                    [class.border-red-500\/50]="form.get('contrasena')?.invalid && form.get('contrasena')?.touched"/>
             <button type="button" (click)="mostrarContrasena.update(v => !v)"
                     [attr.aria-label]="mostrarContrasena() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
-                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
+                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 transition-colors">
               <span class="material-symbols-outlined text-xl" aria-hidden="true">{{ mostrarContrasena() ? 'visibility_off' : 'visibility' }}</span>
             </button>
           </div>

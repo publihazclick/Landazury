@@ -1,15 +1,15 @@
-<div class="min-h-screen bg-[#1a160f] text-slate-100 p-4 md:p-8">
+<div class="min-h-screen bg-slate-50 text-slate-900 p-4 md:p-8">
 
   <!-- Header -->
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
     <div>
-      <h1 class="text-2xl font-black text-slate-100 tracking-tight">Gestión de Productos</h1>
+      <h1 class="text-2xl font-black text-slate-900 tracking-tight">Gestión de Productos</h1>
       <p class="text-slate-500 text-sm mt-0.5">Crea productos y agrega sus creativos para el catálogo</p>
     </div>
     <div class="flex items-center gap-2 self-start sm:self-auto">
       @if (auth.esInventario()) {
         <button (click)="mostrarImportar.set(true)"
-                class="flex items-center gap-2 bg-white/5 border border-white/10 text-slate-300 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-white/10 hover:border-white/20 transition-all">
+                class="flex items-center gap-2 bg-slate-50 border border-slate-200 text-slate-500 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-100 hover:border-white/20 transition-all">
           <span class="material-symbols-outlined text-base">upload_file</span>
           Importar Excel
         </button>
@@ -40,7 +40,7 @@
   <!-- Stats -->
   <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-8">
     <div class="glass rounded-2xl p-3 sm:p-4 text-center">
-      <p class="text-xl sm:text-2xl font-black text-slate-100">{{ totalProductos() }}</p>
+      <p class="text-xl sm:text-2xl font-black text-slate-900">{{ totalProductos() }}</p>
       <p class="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-0.5">Total</p>
     </div>
     <div class="glass rounded-2xl p-3 sm:p-4 text-center">
@@ -73,9 +73,9 @@
     </div>
   } @else if (productos().length === 0) {
     <div class="glass rounded-2xl py-20 text-center">
-      <span class="material-symbols-outlined text-6xl text-slate-700 block mb-4">inventory_2</span>
-      <p class="text-slate-400 font-semibold mb-2">Sin productos todavía</p>
-      <p class="text-slate-600 text-sm mb-6">Crea tu primer producto y agrega sus creativos</p>
+      <span class="material-symbols-outlined text-6xl text-slate-500 block mb-4">inventory_2</span>
+      <p class="text-slate-500 font-semibold mb-2">Sin productos todavía</p>
+      <p class="text-slate-500 text-sm mb-6">Crea tu primer producto y agrega sus creativos</p>
       <button (click)="abrirCrear()"
               class="inline-flex items-center gap-2 bg-primary text-[#1a160f] px-6 py-3 rounded-xl text-sm font-black hover:brightness-110 transition-all uppercase tracking-wider">
         <span class="material-symbols-outlined text-base">add</span>
@@ -85,7 +85,7 @@
   } @else {
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
       @for (producto of productos(); track producto.id) {
-        <div class="glass rounded-2xl overflow-hidden border border-[#3d3524] group hover:border-primary/30 transition-all duration-300 flex flex-col">
+        <div class="glass rounded-2xl overflow-hidden border border-slate-200 group hover:border-primary/30 transition-all duration-300 flex flex-col">
 
           <!-- Image area -->
           <div class="aspect-[16/10] sm:h-44 sm:aspect-auto relative overflow-hidden shrink-0">
@@ -113,7 +113,7 @@
                         class="text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider backdrop-blur-sm transition-all border"
                         [class]="producto.disponible
                           ? 'bg-green-500/20 border-green-500/40 text-green-300 hover:bg-green-500/30'
-                          : 'bg-black/40 border-white/10 text-slate-400 hover:bg-black/60'">
+                          : 'bg-black/40 border-slate-200 text-slate-500 hover:bg-black/60'">
                   <span class="inline-block w-1.5 h-1.5 rounded-full mr-1 align-middle"
                         [class]="producto.disponible ? 'bg-green-400' : 'bg-slate-600'"></span>
                   {{ producto.disponible ? 'Visible' : 'Oculto' }}
@@ -128,7 +128,7 @@
                         class="flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider backdrop-blur-sm border transition-all"
                         [class]="producto.ganador
                           ? 'bg-primary/90 border-primary text-[#0f0f0f]'
-                          : 'bg-black/40 border-white/10 text-slate-500 hover:border-primary/30 hover:text-primary/60'">
+                          : 'bg-black/40 border-slate-200 text-slate-500 hover:border-primary/30 hover:text-primary/60'">
                   <span class="material-symbols-outlined text-[11px]">verified</span>
                   Ganador
                 </button>
@@ -136,7 +136,7 @@
                         class="flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider backdrop-blur-sm border transition-all"
                         [class]="producto.exclusivo
                           ? 'bg-purple-500/90 border-purple-400 text-white'
-                          : 'bg-black/40 border-white/10 text-slate-500 hover:border-purple-400/30 hover:text-purple-400/60'">
+                          : 'bg-black/40 border-slate-200 text-slate-500 hover:border-purple-400/30 hover:text-purple-400/60'">
                   <span class="material-symbols-outlined text-[11px]">diamond</span>
                   Exclusivo
                 </button>
@@ -159,7 +159,7 @@
             <!-- Category badge -->
             @if (producto.categoria) {
               <div class="absolute bottom-3 left-3">
-                <span class="text-[10px] px-2.5 py-1 rounded-full bg-black/50 border border-white/10 text-slate-300 backdrop-blur-sm font-medium">
+                <span class="text-[10px] px-2.5 py-1 rounded-full bg-black/50 border border-slate-200 text-slate-500 backdrop-blur-sm font-medium">
                   {{ producto.categoria.icono }} {{ producto.categoria.nombre }}
                 </span>
               </div>
@@ -170,10 +170,10 @@
           <div class="p-4 flex flex-col gap-3 flex-1">
             <!-- Name + SKU + stock + subidor -->
             <div>
-              <h3 class="font-bold text-slate-100 text-sm leading-snug line-clamp-2">{{ producto.nombre }}</h3>
+              <h3 class="font-bold text-slate-900 text-sm leading-snug line-clamp-2">{{ producto.nombre }}</h3>
               <div class="flex items-center gap-2 mt-1 flex-wrap">
                 @if (producto.sku) {
-                  <span class="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-slate-500">SKU: {{ producto.sku }}</span>
+                  <span class="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-50 border border-slate-200 text-slate-500">SKU: {{ producto.sku }}</span>
                 }
                 @if (producto.stock != null && producto.stock! > 0) {
                   <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">Stock: {{ producto.stock }}</span>
@@ -181,21 +181,21 @@
                   <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-400">Sin stock</span>
                 }
                 @if (auth.esAdmin()) {
-                  <span class="text-[10px] text-slate-600">{{ nombreSubidor(producto.bodega_id) }}</span>
+                  <span class="text-[10px] text-slate-500">{{ nombreSubidor(producto.bodega_id) }}</span>
                 }
               </div>
             </div>
 
             <!-- Prices -->
             <div class="grid grid-cols-3 gap-1.5">
-              <div class="bg-white/3 rounded-lg px-2 py-1.5">
-                <p class="text-[8px] font-bold uppercase tracking-widest text-slate-600 leading-none">Costo</p>
-                <p class="text-xs sm:text-sm font-bold text-slate-200 mt-0.5 truncate">$ {{ producto.precio_base | number:'1.0-0' }}</p>
+              <div class="bg-slate-50 rounded-lg px-2 py-1.5">
+                <p class="text-[8px] font-bold uppercase tracking-widest text-slate-500 leading-none">Costo</p>
+                <p class="text-xs sm:text-sm font-bold text-slate-800 mt-0.5 truncate">$ {{ producto.precio_base | number:'1.0-0' }}</p>
               </div>
               @if (producto.precio_sugerido) {
-                <div class="bg-white/3 rounded-lg px-2 py-1.5">
-                  <p class="text-[8px] font-bold uppercase tracking-widest text-slate-600 leading-none">Sugerido</p>
-                  <p class="text-xs sm:text-sm text-slate-400 mt-0.5 truncate">$ {{ producto.precio_sugerido | number:'1.0-0' }}</p>
+                <div class="bg-slate-50 rounded-lg px-2 py-1.5">
+                  <p class="text-[8px] font-bold uppercase tracking-widest text-slate-500 leading-none">Sugerido</p>
+                  <p class="text-xs sm:text-sm text-slate-500 mt-0.5 truncate">$ {{ producto.precio_sugerido | number:'1.0-0' }}</p>
                 </div>
               }
               @if (producto.precio_final) {
@@ -215,9 +215,9 @@
             @if (producto.atributos?.length) {
               <div class="flex flex-wrap gap-1">
                 @for (attr of producto.atributos!; track attr.nombre) {
-                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-white/5 border border-white/8 text-slate-500">
+                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-50 border border-slate-200 text-slate-500">
                     {{ attr.nombre }}
-                    @if (attr.valores.length) {<span class="text-slate-600"> · {{ attr.valores.slice(0,2).join(', ') }}{{ attr.valores.length > 2 ? '…' : '' }}</span>}
+                    @if (attr.valores.length) {<span class="text-slate-500"> · {{ attr.valores.slice(0,2).join(', ') }}{{ attr.valores.length > 2 ? '…' : '' }}</span>}
                   </span>
                 }
               </div>
@@ -233,19 +233,19 @@
                 </span>
               }
               @if ((producto.creativos?.length ?? 0) === 0) {
-                <span class="text-[11px] text-slate-600 italic">Sin creativos</span>
+                <span class="text-[11px] text-slate-500 italic">Sin creativos</span>
               }
             </div>
 
             <!-- Actions -->
-            <div class="flex items-center gap-2 pt-2 border-t border-[#3d3524]/50 mt-auto">
+            <div class="flex items-center gap-2 pt-2 border-t border-slate-200/50 mt-auto">
               <button (click)="abrirEditar(producto)"
                       class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-all">
                 <span class="material-symbols-outlined text-[14px]">edit</span>
                 Editar / Creativos
               </button>
               <button (click)="confirmarEliminar(producto, $event)"
-                      class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-600 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all">
+                      class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all">
                 <span class="material-symbols-outlined text-base">delete</span>
               </button>
             </div>
@@ -266,11 +266,11 @@
        (click)="cerrarModal()">
     <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
 
-    <div class="relative w-full sm:max-w-5xl h-[94dvh] sm:h-auto sm:max-h-[94dvh] bg-[#111009] border border-white/10 rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+    <div class="relative w-full sm:max-w-5xl h-[94dvh] sm:h-auto sm:max-h-[94dvh] bg-white border border-slate-200 rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden"
          (click)="$event.stopPropagation()">
 
       <!-- Modal header -->
-      <div class="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-white/8 shrink-0">
+      <div class="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-slate-200 shrink-0">
         <div class="flex items-center gap-3 min-w-0">
           <div class="w-10 h-10 sm:w-8 sm:h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
             <span class="material-symbols-outlined text-primary text-lg sm:text-base">
@@ -278,7 +278,7 @@
             </span>
           </div>
           <div class="min-w-0">
-            <h3 class="text-slate-100 font-bold text-base sm:text-sm">
+            <h3 class="text-slate-900 font-bold text-base sm:text-sm">
               {{ productoEnModal() ? 'Editar Producto' : 'Nuevo Producto' }}
             </h3>
             @if (productoEnModal()) {
@@ -287,7 +287,7 @@
           </div>
         </div>
         <button (click)="cerrarModal()" aria-label="Cerrar"
-                class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all shrink-0">
+                class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all shrink-0">
           <span class="material-symbols-outlined text-2xl sm:text-xl">close</span>
         </button>
       </div>
@@ -296,14 +296,14 @@
       <div class="flex-1 overflow-hidden flex flex-col lg:flex-row">
 
         <!-- ── LEFT: Product details ── -->
-        <div class="lg:w-3/5 overflow-y-auto p-4 sm:p-6 space-y-5 border-b lg:border-b-0 lg:border-r border-white/8">
+        <div class="lg:w-3/5 overflow-y-auto p-4 sm:p-6 space-y-5 border-b lg:border-b-0 lg:border-r border-slate-200">
 
           <!-- Nombre -->
           <div class="space-y-1.5">
             <label class="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-slate-500">Nombre del producto *</label>
             <input [(ngModel)]="formProducto.nombre" type="text"
                    placeholder="Ej: Reloj Minimalista Gold Limited"
-                   class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-100 placeholder:text-slate-600 px-4 py-3 outline-none transition-all text-base sm:text-sm"/>
+                   class="w-full bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-900 placeholder:text-slate-500 px-4 py-3 outline-none transition-all text-base sm:text-sm"/>
           </div>
 
           <!-- Precios -->
@@ -315,7 +315,7 @@
                 <div class="relative">
                   <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-semibold">$</span>
                   <input [(ngModel)]="formProducto.precio_base" type="number" min="0" step="100" placeholder="0"
-                         class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-100 placeholder:text-slate-600 pl-8 pr-4 py-3 outline-none transition-all text-sm"/>
+                         class="w-full bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-900 placeholder:text-slate-500 pl-8 pr-4 py-3 outline-none transition-all text-sm"/>
                 </div>
               </div>
               <div class="space-y-1.5">
@@ -323,7 +323,7 @@
                 <div class="relative">
                   <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-semibold">$</span>
                   <input [(ngModel)]="formProducto.precio_sugerido" type="number" min="0" step="100" placeholder="0"
-                         class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-100 placeholder:text-slate-600 pl-8 pr-4 py-3 outline-none transition-all text-sm"/>
+                         class="w-full bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-900 placeholder:text-slate-500 pl-8 pr-4 py-3 outline-none transition-all text-sm"/>
                 </div>
               </div>
             </div>
@@ -336,7 +336,7 @@
               <div class="relative">
                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-primary/60 text-sm font-semibold">$</span>
                 <input [(ngModel)]="formProducto.precio_final" type="number" min="0" step="100" placeholder="0"
-                       class="w-full bg-primary/5 border border-primary/30 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-100 placeholder:text-slate-600 pl-8 pr-4 py-3 outline-none transition-all text-sm"/>
+                       class="w-full bg-primary/5 border border-primary/30 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-900 placeholder:text-slate-500 pl-8 pr-4 py-3 outline-none transition-all text-sm"/>
               </div>
               @if (formProducto.precio_final > formProducto.precio_base && formProducto.precio_base > 0) {
                 <p class="text-[11px] text-green-400 flex items-center gap-1">
@@ -353,7 +353,7 @@
               <div class="relative">
                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-semibold">$</span>
                 <input [(ngModel)]="formProducto.precio_base" type="number" min="0" step="100" placeholder="0"
-                       class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-100 placeholder:text-slate-600 pl-8 pr-4 py-3 outline-none transition-all text-sm"/>
+                       class="w-full bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-900 placeholder:text-slate-500 pl-8 pr-4 py-3 outline-none transition-all text-sm"/>
               </div>
             </div>
           }
@@ -363,7 +363,7 @@
             <div class="space-y-1.5">
               <label class="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-slate-500">Categoría</label>
               <select [(ngModel)]="formProducto.categoria_id"
-                      class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary text-slate-100 px-4 py-3 outline-none transition-all text-base sm:text-sm appearance-none cursor-pointer">
+                      class="w-full bg-slate-50 border border-slate-200 rounded-xl focus:border-primary text-slate-900 px-4 py-3 outline-none transition-all text-base sm:text-sm appearance-none cursor-pointer">
                 <option value="" style="background:#111009">Sin categoría</option>
                 @for (cat of categorias(); track cat.id) {
                   <option [value]="cat.id" style="background:#111009">{{ cat.icono }} {{ cat.nombre }}</option>
@@ -373,7 +373,7 @@
             <div class="space-y-1.5">
               <label class="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-slate-500">SKU</label>
               <input [(ngModel)]="formProducto.sku" type="text" placeholder="Ej: TK-0042"
-                     class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-100 placeholder:text-slate-600 px-4 py-3 outline-none transition-all text-base sm:text-sm"/>
+                     class="w-full bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-900 placeholder:text-slate-500 px-4 py-3 outline-none transition-all text-base sm:text-sm"/>
             </div>
           </div>
 
@@ -384,7 +384,7 @@
               Stock disponible
             </label>
             <input [(ngModel)]="formProducto.stock" type="number" min="0" step="1" placeholder="0"
-                   class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-100 placeholder:text-slate-600 px-4 py-3 outline-none transition-all text-base sm:text-sm"/>
+                   class="w-full bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-900 placeholder:text-slate-500 px-4 py-3 outline-none transition-all text-base sm:text-sm"/>
           </div>
 
           <!-- Variantes del producto -->
@@ -403,23 +403,23 @@
 
             <!-- Selector de atributos predefinidos -->
             @if (mostrarSelectorAtributo()) {
-              <div class="p-3 bg-[#0d0b06] border border-[#3d3524] rounded-xl space-y-3">
+              <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-1.5">
                   @for (config of atributosDisponibles; track config.nombre) {
                     <button type="button" (click)="agregarAtributo(config.nombre)"
-                            class="flex items-center gap-1.5 px-3 py-2.5 sm:py-1.5 text-xs sm:text-[11px] font-semibold text-slate-400 hover:text-primary bg-white/3 hover:bg-primary/10 border border-white/5 hover:border-primary/20 rounded-lg transition-all text-left">
+                            class="flex items-center gap-1.5 px-3 py-2.5 sm:py-1.5 text-xs sm:text-[11px] font-semibold text-slate-500 hover:text-primary bg-slate-50 hover:bg-primary/10 border border-slate-200 hover:border-primary/20 rounded-lg transition-all text-left">
                       <span class="material-symbols-outlined text-base sm:text-[13px]">{{ config.icono }}</span>
                       {{ config.nombre }}
                     </button>
                   }
                   @if (atributosDisponibles.length === 0) {
-                    <p class="col-span-2 sm:col-span-3 text-xs sm:text-[11px] text-slate-600 italic text-center py-1">Todos los atributos predefinidos ya fueron agregados</p>
+                    <p class="col-span-2 sm:col-span-3 text-xs sm:text-[11px] text-slate-500 italic text-center py-1">Todos los atributos predefinidos ya fueron agregados</p>
                   }
                 </div>
                 <!-- Personalizado -->
-                <div class="flex gap-2 pt-2 border-t border-white/8">
+                <div class="flex gap-2 pt-2 border-t border-slate-200">
                   <input [(ngModel)]="atributoPersonalizadoNombre" type="text" placeholder="Nombre personalizado…"
-                         class="flex-1 bg-[#1a160f] border border-[#3d3524] rounded-lg text-slate-100 placeholder:text-slate-600 px-3 py-1.5 text-xs outline-none focus:border-primary"
+                         class="flex-1 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-500 px-3 py-1.5 text-xs outline-none focus:border-primary"
                          (keydown.enter)="agregarAtributoPersonalizado()"/>
                   <button type="button" (click)="agregarAtributoPersonalizado()"
                           class="px-3 py-1.5 bg-primary/10 border border-primary/20 text-primary text-xs font-bold rounded-lg hover:bg-primary/20 transition-all whitespace-nowrap">
@@ -431,15 +431,15 @@
 
             <!-- Atributos existentes -->
             @for (atributo of formProducto.atributos; track atributo.nombre) {
-              <div class="p-3 bg-[#0d0b06] border border-[#3d3524] rounded-xl space-y-2.5">
+              <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2.5">
                 <!-- Cabecera del atributo -->
                 <div class="flex items-center justify-between">
-                  <span class="flex items-center gap-1.5 text-xs font-bold text-slate-300">
+                  <span class="flex items-center gap-1.5 text-xs font-bold text-slate-500">
                     <span class="material-symbols-outlined text-sm text-primary/50">{{ atributoConfig(atributo.nombre)?.icono ?? 'label' }}</span>
                     {{ atributo.nombre }}
                   </span>
                   <button type="button" (click)="eliminarAtributo(atributo.nombre)"
-                          class="text-slate-600 hover:text-red-400 transition-colors">
+                          class="text-slate-500 hover:text-red-400 transition-colors">
                     <span class="material-symbols-outlined text-sm">delete</span>
                   </button>
                 </div>
@@ -454,7 +454,7 @@
                     </span>
                   }
                   @if (atributo.valores.length === 0) {
-                    <span class="text-[11px] text-slate-600 italic">Sin valores aún</span>
+                    <span class="text-[11px] text-slate-500 italic">Sin valores aún</span>
                   }
                 </div>
 
@@ -474,10 +474,10 @@
                 <div class="flex gap-2">
                   <input [(ngModel)]="atributoNuevoValor[atributo.nombre]" type="text"
                          [placeholder]="'Agregar valor de ' + atributo.nombre + '…'"
-                         class="flex-1 bg-[#1a160f] border border-[#3d3524] rounded-lg text-slate-100 placeholder:text-slate-600 px-3 py-1.5 text-xs outline-none focus:border-primary"
+                         class="flex-1 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-500 px-3 py-1.5 text-xs outline-none focus:border-primary"
                          (keydown.enter)="agregarValor(atributo.nombre, atributoNuevoValor[atributo.nombre])"/>
                   <button type="button" (click)="agregarValor(atributo.nombre, atributoNuevoValor[atributo.nombre])"
-                          class="w-8 h-8 flex items-center justify-center bg-white/5 border border-white/10 text-slate-400 hover:text-primary hover:border-primary/20 rounded-lg transition-all shrink-0">
+                          class="w-8 h-8 flex items-center justify-center bg-slate-50 border border-slate-200 text-slate-500 hover:text-primary hover:border-primary/20 rounded-lg transition-all shrink-0">
                     <span class="material-symbols-outlined text-sm">add</span>
                   </button>
                 </div>
@@ -490,7 +490,7 @@
             <label class="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-slate-500">Descripción</label>
             <textarea [(ngModel)]="formProducto.descripcion" rows="4"
                       placeholder="Describe los beneficios y características del producto..."
-                      class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-100 placeholder:text-slate-600 px-4 py-3 outline-none transition-all text-base sm:text-sm resize-none"></textarea>
+                      class="w-full bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-900 placeholder:text-slate-500 px-4 py-3 outline-none transition-all text-base sm:text-sm resize-none"></textarea>
           </div>
 
           <!-- ── Imágenes del producto ── -->
@@ -511,7 +511,7 @@
               <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-2">
                 @for (img of imagenesEnModal; track img; let i = $index) {
                   <div class="flex flex-col gap-1.5">
-                    <div class="relative aspect-square rounded-xl overflow-hidden border border-[#3d3524] bg-[#0d0b06]">
+                    <div class="relative aspect-square rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
                       <img [src]="img" class="w-full h-full object-cover"/>
                       <!-- Delete button: siempre visible para móvil (tap friendly) -->
                       <button type="button" (click)="quitarImagen(i)"
@@ -528,7 +528,7 @@
                              [value]="colorDeImagenForm(i)"
                              (input)="setColorDeImagenForm(i, $any($event.target).value)"
                              placeholder="Color…"
-                             class="w-full text-base sm:text-xs px-3 py-2.5 sm:py-1.5 rounded-lg bg-[#0d0b06] border border-[#3d3524] text-slate-200 placeholder:text-slate-600 focus:border-primary focus:outline-none"/>
+                             class="w-full text-base sm:text-xs px-3 py-2.5 sm:py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-800 placeholder:text-slate-500 focus:border-primary focus:outline-none"/>
                     }
                   </div>
                 }
@@ -537,13 +537,13 @@
 
             <!-- Zona de upload -->
             <label class="flex flex-col items-center justify-center gap-2 p-4 border-2 border-dashed rounded-xl cursor-pointer transition-all"
-                   [class]="subiendoImagen() ? 'border-primary/40 bg-primary/5' : 'border-[#3d3524] hover:border-primary/40 hover:bg-primary/5'">
+                   [class]="subiendoImagen() ? 'border-primary/40 bg-primary/5' : 'border-slate-200 hover:border-primary/40 hover:bg-primary/5'">
               @if (subiendoImagen()) {
                 <span class="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></span>
                 <span class="text-xs text-primary font-semibold">Subiendo...</span>
               } @else {
                 <span class="material-symbols-outlined text-slate-500 text-2xl">add_photo_alternate</span>
-                <span class="text-xs text-slate-500 text-center">Haz clic para subir imágenes<br/><span class="text-[10px] text-slate-600">JPG, PNG, WEBP · máx. 5 MB</span></span>
+                <span class="text-xs text-slate-500 text-center">Haz clic para subir imágenes<br/><span class="text-[10px] text-slate-500">JPG, PNG, WEBP · máx. 5 MB</span></span>
               }
               <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple
                      class="hidden" [disabled]="subiendoImagen()"
@@ -558,10 +558,10 @@
               Link de creativos (Drive, Dropbox, etc.)
             </label>
             <div class="relative">
-              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-600 text-base">folder_open</span>
+              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-500 text-base">folder_open</span>
               <input [(ngModel)]="formProducto.link_creativos" type="url"
                      placeholder="https://drive.google.com/..."
-                     class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-100 placeholder:text-slate-600 pl-10 pr-4 py-3 outline-none transition-all text-sm"/>
+                     class="w-full bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-900 placeholder:text-slate-500 pl-10 pr-4 py-3 outline-none transition-all text-sm"/>
             </div>
             @if (formProducto.link_creativos) {
               <p class="text-[11px] text-primary/70 flex items-center gap-1">
@@ -572,7 +572,7 @@
           </div>
 
           <!-- Disponible toggle -->
-          <label class="flex items-center gap-3.5 cursor-pointer p-3.5 rounded-xl border border-[#3d3524] hover:border-primary/20 transition-all">
+          <label class="flex items-center gap-3.5 cursor-pointer p-3.5 rounded-xl border border-slate-200 hover:border-primary/20 transition-all">
             <div class="relative shrink-0">
               <input type="checkbox" class="sr-only" [(ngModel)]="formProducto.disponible"/>
               <div class="w-10 h-5 rounded-full transition-all" [class]="formProducto.disponible ? 'bg-primary' : 'bg-[#3d3524]'">
@@ -581,7 +581,7 @@
               </div>
             </div>
             <div>
-              <p class="text-sm font-semibold text-slate-200">Publicado en catálogo</p>
+              <p class="text-sm font-semibold text-slate-800">Publicado en catálogo</p>
               <p class="text-xs text-slate-500 mt-0.5">Los usuarios verán este producto al ingresar</p>
             </div>
           </label>
@@ -601,11 +601,11 @@
         </div>
 
         <!-- ── RIGHT: Creativos ── -->
-        <div class="lg:w-2/5 bg-[#0d0b06] flex flex-col overflow-hidden">
+        <div class="lg:w-2/5 bg-slate-50 flex flex-col overflow-hidden">
 
           <!-- Panel header -->
-          <div class="px-5 py-4 border-b border-white/8 shrink-0 flex items-center justify-between">
-            <h4 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+          <div class="px-5 py-4 border-b border-slate-200 shrink-0 flex items-center justify-between">
+            <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2">
               <span class="material-symbols-outlined text-primary text-base">photo_library</span>
               Creativos
               @if (productoEnModal()) {
@@ -633,18 +633,18 @@
           @if (!productoEnModal()) {
             <!-- Locked: product not yet saved -->
             <div class="flex-1 flex flex-col items-center justify-center p-8 text-center">
-              <div class="w-16 h-16 rounded-2xl bg-[#1a160f] border border-[#3d3524] flex items-center justify-center mb-4">
-                <span class="material-symbols-outlined text-slate-600 text-3xl">lock</span>
+              <div class="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center mb-4">
+                <span class="material-symbols-outlined text-slate-500 text-3xl">lock</span>
               </div>
-              <p class="text-slate-400 text-sm font-semibold">Crea el producto primero</p>
-              <p class="text-slate-600 text-xs mt-2 max-w-52">Los creativos se vinculan al producto. Guarda los detalles y luego podrás subir archivos.</p>
+              <p class="text-slate-500 text-sm font-semibold">Crea el producto primero</p>
+              <p class="text-slate-500 text-xs mt-2 max-w-52">Los creativos se vinculan al producto. Guarda los detalles y luego podrás subir archivos.</p>
             </div>
           } @else {
 
             <div class="flex-1 overflow-y-auto">
 
               <!-- ── Sección Imágenes ── -->
-              <div class="p-4 border-b border-white/8 space-y-3">
+              <div class="p-4 border-b border-slate-200 space-y-3">
                 <p class="text-[10px] font-black uppercase tracking-widest text-sky-400 flex items-center gap-1.5">
                   <span class="material-symbols-outlined text-sm">image</span>
                   Imágenes
@@ -652,19 +652,19 @@
 
                 <!-- Dropzone imagen -->
                 <label class="flex items-center gap-3 px-4 py-3 border-2 border-dashed rounded-xl cursor-pointer transition-all group"
-                       [class]="archivoImagenModal ? 'border-sky-400/40 bg-sky-400/5' : 'border-[#3d3524] hover:border-sky-400/40 hover:bg-sky-400/5'">
+                       [class]="archivoImagenModal ? 'border-sky-400/40 bg-sky-400/5' : 'border-slate-200 hover:border-sky-400/40 hover:bg-sky-400/5'">
                   @if (archivoImagenModal) {
                     <span class="material-symbols-outlined text-sky-400 text-xl shrink-0">check_circle</span>
                     <div class="flex-1 min-w-0">
                       <p class="text-xs font-bold text-sky-400 truncate">{{ archivoImagenModal.name }}</p>
                       <p class="text-[10px] text-slate-500">{{ tamano(archivoImagenModal.size) }}</p>
                     </div>
-                    <span class="text-[10px] text-slate-600 underline underline-offset-2 shrink-0">Cambiar</span>
+                    <span class="text-[10px] text-slate-500 underline underline-offset-2 shrink-0">Cambiar</span>
                   } @else {
-                    <span class="material-symbols-outlined text-slate-600 group-hover:text-sky-400 transition-colors text-xl shrink-0">add_photo_alternate</span>
+                    <span class="material-symbols-outlined text-slate-500 group-hover:text-sky-400 transition-colors text-xl shrink-0">add_photo_alternate</span>
                     <div>
-                      <p class="text-xs font-semibold text-slate-500 group-hover:text-slate-300 transition-colors">Seleccionar imagen</p>
-                      <p class="text-[10px] text-slate-700">JPG · PNG · WEBP · GIF</p>
+                      <p class="text-xs font-semibold text-slate-500 group-hover:text-slate-500 transition-colors">Seleccionar imagen</p>
+                      <p class="text-[10px] text-slate-500">JPG · PNG · WEBP · GIF</p>
                     </div>
                   }
                   <input type="file" class="hidden" accept="image/*" (change)="onArchivoImagenModal($event)"/>
@@ -673,10 +673,10 @@
                 @if (archivoImagenModal) {
                   <div class="space-y-2">
                     <input [(ngModel)]="nombreImagenModal" type="text" placeholder="Nombre de la imagen *"
-                           class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-sky-400 text-slate-100 placeholder:text-slate-600 px-3 py-2 outline-none transition-all text-xs"/>
+                           class="w-full bg-slate-50 border border-slate-200 rounded-xl focus:border-sky-400 text-slate-900 placeholder:text-slate-500 px-3 py-2 outline-none transition-all text-xs"/>
                     <textarea [(ngModel)]="descripcionImagenModal" rows="2"
                               placeholder="Copy o descripción (opcional)"
-                              class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-sky-400 text-slate-100 placeholder:text-slate-600 px-3 py-2 outline-none transition-all text-xs resize-none"></textarea>
+                              class="w-full bg-slate-50 border border-slate-200 rounded-xl focus:border-sky-400 text-slate-900 placeholder:text-slate-500 px-3 py-2 outline-none transition-all text-xs resize-none"></textarea>
                     <div class="flex items-center justify-between">
                       <label class="flex items-center gap-2 cursor-pointer">
                         <div class="relative">
@@ -686,10 +686,10 @@
                                  [style.left]="publicoImagenModal ? '18px' : '2px'"></div>
                           </div>
                         </div>
-                        <span class="text-[11px] text-slate-400">Visible para usuarios</span>
+                        <span class="text-[11px] text-slate-500">Visible para usuarios</span>
                       </label>
                       <button (click)="archivoImagenModal = null; nombreImagenModal = ''"
-                              class="text-[11px] text-slate-600 hover:text-slate-400 transition-colors">Cancelar</button>
+                              class="text-[11px] text-slate-500 hover:text-slate-500 transition-colors">Cancelar</button>
                     </div>
                     <button (click)="subirImagenCreativoModal()"
                             [disabled]="subiendoImagenCreativo() || !nombreImagenModal.trim()"
@@ -707,7 +707,7 @@
               </div>
 
               <!-- ── Sección Videos ── -->
-              <div class="p-4 border-b border-white/8 space-y-3">
+              <div class="p-4 border-b border-slate-200 space-y-3">
                 <p class="text-[10px] font-black uppercase tracking-widest text-purple-400 flex items-center gap-1.5">
                   <span class="material-symbols-outlined text-sm">videocam</span>
                   Videos
@@ -715,19 +715,19 @@
 
                 <!-- Dropzone video -->
                 <label class="flex items-center gap-3 px-4 py-3 border-2 border-dashed rounded-xl cursor-pointer transition-all group"
-                       [class]="archivoVideoModal ? 'border-purple-400/40 bg-purple-400/5' : 'border-[#3d3524] hover:border-purple-400/40 hover:bg-purple-400/5'">
+                       [class]="archivoVideoModal ? 'border-purple-400/40 bg-purple-400/5' : 'border-slate-200 hover:border-purple-400/40 hover:bg-purple-400/5'">
                   @if (archivoVideoModal) {
                     <span class="material-symbols-outlined text-purple-400 text-xl shrink-0">check_circle</span>
                     <div class="flex-1 min-w-0">
                       <p class="text-xs font-bold text-purple-400 truncate">{{ archivoVideoModal.name }}</p>
                       <p class="text-[10px] text-slate-500">{{ tamano(archivoVideoModal.size) }}</p>
                     </div>
-                    <span class="text-[10px] text-slate-600 underline underline-offset-2 shrink-0">Cambiar</span>
+                    <span class="text-[10px] text-slate-500 underline underline-offset-2 shrink-0">Cambiar</span>
                   } @else {
-                    <span class="material-symbols-outlined text-slate-600 group-hover:text-purple-400 transition-colors text-xl shrink-0">video_file</span>
+                    <span class="material-symbols-outlined text-slate-500 group-hover:text-purple-400 transition-colors text-xl shrink-0">video_file</span>
                     <div>
-                      <p class="text-xs font-semibold text-slate-500 group-hover:text-slate-300 transition-colors">Seleccionar video</p>
-                      <p class="text-[10px] text-slate-700">MP4 · MOV · AVI · WEBM — máx 500MB</p>
+                      <p class="text-xs font-semibold text-slate-500 group-hover:text-slate-500 transition-colors">Seleccionar video</p>
+                      <p class="text-[10px] text-slate-500">MP4 · MOV · AVI · WEBM — máx 500MB</p>
                     </div>
                   }
                   <input type="file" class="hidden" accept="video/*" (change)="onArchivoVideoModal($event)"/>
@@ -736,10 +736,10 @@
                 @if (archivoVideoModal) {
                   <div class="space-y-2">
                     <input [(ngModel)]="nombreVideoModal" type="text" placeholder="Nombre del video *"
-                           class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-purple-400 text-slate-100 placeholder:text-slate-600 px-3 py-2 outline-none transition-all text-xs"/>
+                           class="w-full bg-slate-50 border border-slate-200 rounded-xl focus:border-purple-400 text-slate-900 placeholder:text-slate-500 px-3 py-2 outline-none transition-all text-xs"/>
                     <textarea [(ngModel)]="descripcionVideoModal" rows="2"
                               placeholder="Copy o descripción (opcional)"
-                              class="w-full bg-[#1a160f] border border-[#3d3524] rounded-xl focus:border-purple-400 text-slate-100 placeholder:text-slate-600 px-3 py-2 outline-none transition-all text-xs resize-none"></textarea>
+                              class="w-full bg-slate-50 border border-slate-200 rounded-xl focus:border-purple-400 text-slate-900 placeholder:text-slate-500 px-3 py-2 outline-none transition-all text-xs resize-none"></textarea>
                     <div class="flex items-center justify-between">
                       <label class="flex items-center gap-2 cursor-pointer">
                         <div class="relative">
@@ -749,10 +749,10 @@
                                  [style.left]="publicoVideoModal ? '18px' : '2px'"></div>
                           </div>
                         </div>
-                        <span class="text-[11px] text-slate-400">Visible para usuarios</span>
+                        <span class="text-[11px] text-slate-500">Visible para usuarios</span>
                       </label>
                       <button (click)="archivoVideoModal = null; nombreVideoModal = ''"
-                              class="text-[11px] text-slate-600 hover:text-slate-400 transition-colors">Cancelar</button>
+                              class="text-[11px] text-slate-500 hover:text-slate-500 transition-colors">Cancelar</button>
                     </div>
                     <button (click)="subirVideoCreativoModal()"
                             [disabled]="subiendoVideoCreativo() || !nombreVideoModal.trim()"
@@ -773,19 +773,19 @@
               @if (cargandoModal()) {
                 <div class="p-4 space-y-2">
                   @for (_ of [1,2,3]; track $index) {
-                    <div class="h-14 bg-[#1a160f] rounded-xl animate-pulse"></div>
+                    <div class="h-14 bg-slate-50 rounded-xl animate-pulse"></div>
                   }
                 </div>
               } @else if (creativosEnModal().length === 0) {
                 <div class="flex flex-col items-center justify-center py-10 text-center px-4">
-                  <span class="material-symbols-outlined text-4xl text-slate-700 mb-2">folder_open</span>
+                  <span class="material-symbols-outlined text-4xl text-slate-500 mb-2">folder_open</span>
                   <p class="text-slate-500 text-sm">Sin creativos todavía</p>
-                  <p class="text-slate-700 text-xs mt-1">Sube imágenes o videos arriba</p>
+                  <p class="text-slate-500 text-xs mt-1">Sube imágenes o videos arriba</p>
                 </div>
               } @else {
                 <div class="p-4 space-y-2">
                   @for (creativo of creativosEnModal(); track creativo.id) {
-                    <div class="flex items-center gap-3 p-3 rounded-xl bg-[#1a160f] border border-[#3d3524] hover:border-[#524830] transition-all group">
+                    <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200 hover:border-slate-300 transition-all group">
 
                       <!-- Type icon -->
                       <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
@@ -798,8 +798,8 @@
 
                       <!-- Info -->
                       <div class="flex-1 min-w-0">
-                        <p class="text-xs font-semibold text-slate-200 truncate">{{ creativo.nombre }}</p>
-                        <p class="text-[10px] text-slate-600 mt-0.5">
+                        <p class="text-xs font-semibold text-slate-800 truncate">{{ creativo.nombre }}</p>
+                        <p class="text-[10px] text-slate-500 mt-0.5">
                           <span class="text-slate-500 font-medium">{{ creativo.extension?.toUpperCase() }}</span>
                           @if (creativo.tamano) { · {{ tamano(creativo.tamano) }} }
                           @if (!creativo.publico) { · <span class="text-amber-500">privado</span> }
@@ -808,7 +808,7 @@
 
                       <!-- Delete -->
                       <button (click)="eliminarCreativoEnModal(creativo)"
-                              class="opacity-0 group-hover:opacity-100 w-7 h-7 flex items-center justify-center rounded-lg text-slate-600 hover:text-red-400 hover:bg-red-500/10 transition-all shrink-0">
+                              class="opacity-0 group-hover:opacity-100 w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all shrink-0">
                         <span class="material-symbols-outlined text-sm">delete</span>
                       </button>
                     </div>
@@ -832,21 +832,21 @@
   <div class="fixed inset-0 z-[60] flex items-center justify-center p-4"
        (click)="cancelarEliminar()">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
-    <div class="relative w-full max-w-sm bg-[#18160f] border border-red-500/20 rounded-2xl shadow-2xl"
+    <div class="relative w-full max-w-sm bg-white border border-red-500/20 rounded-2xl shadow-2xl"
          (click)="$event.stopPropagation()">
       <div class="px-6 pt-8 pb-4 text-center">
         <div class="w-14 h-14 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4">
           <span class="material-symbols-outlined text-red-400 text-2xl">delete_forever</span>
         </div>
-        <h3 class="text-slate-100 font-bold text-base mb-1">Eliminar producto</h3>
-        <p class="text-slate-400 text-sm">
-          ¿Eliminar <span class="text-slate-100 font-semibold">{{ confirmandoEliminar()?.nombre }}</span>?
+        <h3 class="text-slate-900 font-bold text-base mb-1">Eliminar producto</h3>
+        <p class="text-slate-500 text-sm">
+          ¿Eliminar <span class="text-slate-900 font-semibold">{{ confirmandoEliminar()?.nombre }}</span>?
           Se eliminará el producto y todos sus creativos. Esta acción no se puede deshacer.
         </p>
       </div>
       <div class="flex gap-3 px-6 pb-6">
         <button (click)="cancelarEliminar()"
-                class="flex-1 px-4 py-2.5 rounded-xl text-sm text-slate-400 border border-[#3d3524] hover:text-slate-200 hover:bg-white/5 transition-all">
+                class="flex-1 px-4 py-2.5 rounded-xl text-sm text-slate-500 border border-slate-200 hover:text-slate-800 hover:bg-slate-50 transition-all">
           Cancelar
         </button>
         <button (click)="eliminarProducto()"

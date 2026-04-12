@@ -3,8 +3,8 @@
   @if (cargando()) {
     <!-- Skeleton -->
     <div class="max-w-3xl mx-auto space-y-4 animate-pulse">
-      <div class="h-32 rounded-2xl bg-white/5"></div>
-      <div class="h-48 rounded-2xl bg-white/5"></div>
+      <div class="h-32 rounded-2xl bg-slate-50"></div>
+      <div class="h-48 rounded-2xl bg-slate-50"></div>
     </div>
   } @else {
 
@@ -20,7 +20,7 @@
             {{ auth.usuario()?.email?.[0]?.toUpperCase() }}
           </div>
           <div class="flex-1 min-w-0">
-            <h1 class="text-xl font-extrabold text-slate-100 truncate">{{ perfil()?.nombre || 'Sin nombre' }}</h1>
+            <h1 class="text-xl font-extrabold text-slate-900 truncate">{{ perfil()?.nombre || 'Sin nombre' }}</h1>
             <p class="text-sm text-slate-500 truncate">{{ auth.usuario()?.email }}</p>
             <div class="mt-2 flex items-center gap-2 flex-wrap">
               @if (perfil()?.rol === 'admin') {
@@ -32,7 +32,7 @@
                   <span class="material-symbols-outlined text-xs">inventory_2</span> Inventario
                 </span>
               } @else {
-                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-widest bg-slate-800/50 text-slate-300 border border-slate-600/30">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-widest bg-slate-800/50 text-slate-700 border border-slate-600/30">
                   <span class="material-symbols-outlined text-xs">person</span> Usuario
                 </span>
               }
@@ -49,7 +49,7 @@
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <div class="glass rounded-xl p-4 flex flex-col gap-1">
             <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Total usuarios</span>
-            <span class="text-3xl font-extrabold text-slate-100">{{ stats()!.totalUsuarios }}</span>
+            <span class="text-3xl font-extrabold text-slate-900">{{ stats()!.totalUsuarios }}</span>
           </div>
           <div class="glass rounded-xl p-4 flex flex-col gap-1">
             <span class="text-[10px] font-bold uppercase tracking-widest text-red-500/80">Admins</span>
@@ -73,7 +73,7 @@
                class="flex items-center gap-3 p-4 rounded-xl bg-white/[0.04] border border-white/[0.07] hover:border-primary/30 hover:bg-white/[0.07] transition-all group">
               <span class="material-symbols-outlined text-2xl text-red-400 group-hover:text-primary transition-colors">shield_person</span>
               <div>
-                <p class="text-sm font-semibold text-slate-200">Panel Admin</p>
+                <p class="text-sm font-semibold text-slate-800">Panel Admin</p>
                 <p class="text-xs text-slate-500">Gestión de usuarios</p>
               </div>
             </a>
@@ -81,7 +81,7 @@
                class="flex items-center gap-3 p-4 rounded-xl bg-white/[0.04] border border-white/[0.07] hover:border-primary/30 hover:bg-white/[0.07] transition-all group">
               <span class="material-symbols-outlined text-2xl text-amber-400 group-hover:text-primary transition-colors">inventory_2</span>
               <div>
-                <p class="text-sm font-semibold text-slate-200">Inventario</p>
+                <p class="text-sm font-semibold text-slate-800">Inventario</p>
                 <p class="text-xs text-slate-500">Productos y creativos</p>
               </div>
             </a>
@@ -89,14 +89,14 @@
                class="flex items-center gap-3 p-4 rounded-xl bg-white/[0.04] border border-white/[0.07] hover:border-primary/30 hover:bg-white/[0.07] transition-all group">
               <span class="material-symbols-outlined text-2xl text-slate-400 group-hover:text-primary transition-colors">shopping_bag</span>
               <div>
-                <p class="text-sm font-semibold text-slate-200">Catálogo</p>
+                <p class="text-sm font-semibold text-slate-800">Catálogo</p>
                 <p class="text-xs text-slate-500">Vista de dropshippers</p>
               </div>
             </a>
             <div class="flex items-center gap-3 p-4 rounded-xl bg-white/[0.04] border border-white/[0.07]">
               <span class="material-symbols-outlined text-2xl text-primary">workspace_premium</span>
               <div>
-                <p class="text-sm font-semibold text-slate-200">Landazury</p>
+                <p class="text-sm font-semibold text-slate-800">Landazury</p>
                 <p class="text-xs text-slate-500">Acceso total</p>
               </div>
             </div>
@@ -130,7 +130,7 @@
               <div class="relative group input-glow rounded-xl">
                 <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors text-xl">badge</span>
                 <input formControlName="nombre" type="text" placeholder="Tu nombre"
-                       class="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all text-sm"/>
+                       class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-slate-900 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all text-sm"/>
               </div>
             </div>
 
@@ -150,7 +150,7 @@
               <div class="relative group input-glow rounded-xl">
                 <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors text-xl">public</span>
                 <select formControlName="pais"
-                        class="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all text-sm appearance-none">
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all text-sm appearance-none">
                   <option value="" class="bg-[#1a1a0f]">Sin especificar</option>
                   @for (pais of paises; track pais) {
                     <option [value]="pais" class="bg-[#1a1a0f]">{{ pais }}</option>
@@ -165,7 +165,7 @@
               <div class="relative group input-glow rounded-xl">
                 <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors text-xl">phone</span>
                 <input formControlName="telefono" type="tel" placeholder="+52 55 0000 0000"
-                       class="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all text-sm"/>
+                       class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-slate-900 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all text-sm"/>
               </div>
             </div>
           </div>
