@@ -16,6 +16,8 @@ DROP POLICY IF EXISTS "productos_inventario_insertar"    ON productos;
 DROP POLICY IF EXISTS "productos_inventario_actualizar"  ON productos;
 DROP POLICY IF EXISTS "productos_inventario_eliminar"    ON productos;
 DROP POLICY IF EXISTS "productos_inventario_lectura"     ON productos;
+DROP POLICY IF EXISTS "categorias_inventario_insertar"   ON categorias;
+DROP POLICY IF EXISTS "categorias_inventario_actualizar" ON categorias;
 DROP POLICY IF EXISTS "admin_lectura_perfiles"           ON perfiles;
 DROP POLICY IF EXISTS "admin_actualizacion_perfiles"     ON perfiles;
 DROP POLICY IF EXISTS "perfil_propio_lectura"            ON perfiles;
@@ -54,6 +56,17 @@ CREATE POLICY "productos_inventario_actualizar" ON productos
 
 CREATE POLICY "productos_inventario_eliminar" ON productos
   FOR DELETE USING (
+    (SELECT rol FROM perfiles WHERE id = auth.uid()) IN ('inventario', 'admin')
+  );
+
+-- Categorías: inventario y admin pueden crear/actualizar (para auto-creación desde Excel)
+CREATE POLICY "categorias_inventario_insertar" ON categorias
+  FOR INSERT WITH CHECK (
+    (SELECT rol FROM perfiles WHERE id = auth.uid()) IN ('inventario', 'admin')
+  );
+
+CREATE POLICY "categorias_inventario_actualizar" ON categorias
+  FOR UPDATE USING (
     (SELECT rol FROM perfiles WHERE id = auth.uid()) IN ('inventario', 'admin')
   );
 

@@ -104,8 +104,37 @@ export class ImportarProductosComponent {
     this.progreso.set(0);
     const userId  = this.auth.usuario()?.id;
 
+    // Auto-crear categorías que el Excel mencionó pero no existen aún
+    const textosSinMatch = Array.from(new Set(
+      seleccionadas
+        .filter(f => !f.categoriaMatch && f.categoriaTexto)
+        .map(f => f.categoriaTexto.trim()),
+    ));
+    if (textosSinMatch.length > 0) {
+      const nuevas: Record<string, string> = {};
+      for (const texto of textosSinMatch) {
+        try {
+          const cat = await this.catalogoService.crearCategoria(texto);
+          nuevas[texto.toLowerCase()] = cat.id;
+        } catch { /* ignorar fallos de creación */ }
+      }
+      // Refrescar lista global y asignar IDs a las filas
+      if (Object.keys(nuevas).length > 0) {
+        try {
+          const data = await this.catalogoService.obtenerCategorias();
+          this.filtros.categorias.set(data);
+        } catch { /* silencioso */ }
+        this.filas.update(fs => fs.map(f => {
+          const id = nuevas[f.categoriaTexto.trim().toLowerCase()];
+          return id ? { ...f, categoria_id: id, categoriaMatch: true } : f;
+        }));
+      }
+    }
+
+    const filasFinales = this.filasSeleccionadas;
+
     // Todos los productos importados se auto-aprueban con margen del 30% sobre precio_base
-    const payload = seleccionadas.map(f => ({
+    const payload = filasFinales.map(f => ({
       nombre:          f.nombre,
       descripcion:     f.descripcion ?? null,
       sku:             f.sku ?? null,

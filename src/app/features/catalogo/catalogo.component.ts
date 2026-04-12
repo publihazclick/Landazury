@@ -41,17 +41,7 @@ export class CatalogoComponent implements OnInit {
   }
   cerrarModal() { this.productoModal.set(null); }
 
-  // ── Categorías que tienen al menos un producto con imagen ────────────
-  readonly categoriasConProductos = computed(() => {
-    const prods = this.productos().filter(p => p.imagenes?.some(img => !!img?.trim()));
-    // Extraer categorías directamente de los productos (más fiable)
-    const catMap = new Map<string, { id: string; nombre: string; icono?: string }>();
-    for (const p of prods) {
-      const cat = p.categoria;
-      if (cat?.id && cat.nombre) catMap.set(cat.id, cat);
-    }
-    return Array.from(catMap.values()).sort((a, b) => a.nombre.localeCompare(b.nombre));
-  });
+  readonly categoriasConProductos = this.filtros.categoriasConProductos;
 
   seleccionarCategoria(id: string) {
     this.filtros.categoriaSeleccionada.set(this.filtros.categoriaSeleccionada() === id ? '' : id);
@@ -107,6 +97,7 @@ export class CatalogoComponent implements OnInit {
     try {
       const data = await this.catalogoService.obtenerProductos({ busqueda: this.busqueda || undefined });
       this.productos.set(data);
+      this.filtros.productosCatalogo.set(data);
       // Si solo hay una bodega, seleccionarla automáticamente
       const imp  = data.some(p => bodegaDeProducto(p) === 'importaciones');
       const moda = data.some(p => bodegaDeProducto(p) === 'moda');

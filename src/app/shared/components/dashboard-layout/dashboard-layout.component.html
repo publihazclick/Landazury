@@ -126,8 +126,8 @@
             }
           </div>
 
-          <!-- Categorías -->
-          @if (filtros.categorias().length > 0) {
+          <!-- Categorías (solo las que tienen productos) -->
+          @if (filtros.categoriasConProductos().length > 0) {
             <div class="mt-4">
               <p class="text-sm font-bold uppercase tracking-widest text-slate-400 px-4 pb-2">Categorías</p>
               <button (click)="filtros.categoriaSeleccionada.set('')"
@@ -138,7 +138,7 @@
                       [class.hover\:text-slate-700]="filtros.categoriaSeleccionada() !== ''">
                 Todas
               </button>
-              @for (cat of filtros.categorias(); track cat.id) {
+              @for (cat of filtros.categoriasConProductos(); track cat.id) {
                 <button (click)="filtros.categoriaSeleccionada.set(cat.id)"
                         class="w-full text-left pl-14 pr-4 py-3 rounded-xl text-xl font-semibold transition-colors"
                         [class.text-amber-800]="filtros.categoriaSeleccionada() === cat.id"

@@ -65,6 +65,17 @@ ALTER TABLE favoritos ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "categorias_lectura_publica" ON categorias
   FOR SELECT USING (true);
 
+-- Categorías: inventario/admin puede crear y actualizar
+CREATE POLICY "categorias_inventario_insertar" ON categorias
+  FOR INSERT WITH CHECK (
+    EXISTS (SELECT 1 FROM perfiles WHERE id = auth.uid() AND rol IN ('inventario', 'admin'))
+  );
+
+CREATE POLICY "categorias_inventario_actualizar" ON categorias
+  FOR UPDATE USING (
+    EXISTS (SELECT 1 FROM perfiles WHERE id = auth.uid() AND rol IN ('inventario', 'admin'))
+  );
+
 -- Productos: lectura pública de productos disponibles
 CREATE POLICY "productos_lectura_publica" ON productos
   FOR SELECT USING (disponible = true);

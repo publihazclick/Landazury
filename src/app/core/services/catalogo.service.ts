@@ -214,6 +214,22 @@ export class CatalogoService {
     return data as Categoria[];
   }
 
+  async crearCategoria(nombre: string): Promise<Categoria> {
+    const slug = nombre
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    const { data, error } = await this.supabase.cliente
+      .from('categorias')
+      .insert({ nombre, slug })
+      .select()
+      .single();
+    if (error) throw error;
+    return data as Categoria;
+  }
+
   async obtenerGanadores() {
     const { data, error } = await this.supabase.cliente
       .from('productos')

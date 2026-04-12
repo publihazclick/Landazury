@@ -129,10 +129,19 @@ export class ExcelProductosService {
 
   private buscarCategoria(texto: string, categorias: Categoria[]): Categoria | undefined {
     if (!texto) return undefined;
-    const lower = texto.toLowerCase();
+    const normalizado = this.normalizar(texto);
     return categorias.find(c =>
-      c.nombre.toLowerCase() === lower ||
-      c.slug.toLowerCase()   === lower,
+      this.normalizar(c.nombre) === normalizado ||
+      this.normalizar(c.slug)   === normalizado,
     );
+  }
+
+  private normalizar(texto: string): string {
+    return texto
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[\s\-_]+/g, '')
+      .trim();
   }
 }
