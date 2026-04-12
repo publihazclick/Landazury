@@ -21,6 +21,13 @@ body {
   color: #1a1a1a;
 }
 
+/* Evitar el auto-zoom de iOS Safari al enfocar inputs en móvil */
+@media (max-width: 640px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
 .ultra-glass {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(20px) saturate(180%);
