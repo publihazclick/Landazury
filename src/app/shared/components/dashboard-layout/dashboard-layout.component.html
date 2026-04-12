@@ -6,8 +6,17 @@
          (click)="menuAbierto.set(false)"></div>
   }
 
+  <!-- Desktop hamburger (visible solo cuando el menú está cerrado en lg+) -->
+  @if (!menuAbierto()) {
+    <button (click)="menuAbierto.set(true)"
+            aria-label="Abrir menú"
+            class="hidden lg:flex fixed top-4 left-4 z-30 w-12 h-12 items-center justify-center rounded-xl border-2 border-slate-300 bg-white text-slate-800 hover:bg-slate-50 transition-all shadow-md">
+      <span class="material-symbols-outlined text-[28px]" aria-hidden="true">menu</span>
+    </button>
+  }
+
   <!-- ───── SIDEBAR ───── -->
-  <aside class="fixed top-0 left-0 h-full w-80 lg:w-72 flex flex-col z-40 transition-transform duration-300 lg:translate-x-0 bg-white border-r border-slate-200 shadow-xl lg:shadow-none"
+  <aside class="fixed top-0 left-0 h-full w-80 lg:w-72 flex flex-col z-40 transition-transform duration-300 bg-white border-r border-slate-200 shadow-xl"
          [class.-translate-x-full]="!menuAbierto()"
          [class.translate-x-0]="menuAbierto()">
 
@@ -28,7 +37,7 @@
           </p>
         </div>
       </div>
-      <button class="lg:hidden p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-all"
+      <button class="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-all"
               aria-label="Cerrar menú"
               (click)="menuAbierto.set(false)">
         <span class="material-symbols-outlined text-3xl" aria-hidden="true">close</span>
@@ -184,7 +193,8 @@
   </aside>
 
   <!-- ───── MAIN AREA ───── -->
-  <div class="flex-1 lg:ml-72 flex flex-col min-h-screen">
+  <div class="flex-1 flex flex-col min-h-screen transition-[margin] duration-300"
+       [class.lg:ml-72]="menuAbierto()">
 
     <!-- Mobile topbar -->
     <header class="lg:hidden sticky top-0 z-20 flex items-center px-4 py-3 border-b border-slate-200 bg-white/90 backdrop-blur-xl shadow-sm">

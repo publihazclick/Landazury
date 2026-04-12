@@ -13,14 +13,19 @@ export class DashboardLayoutComponent {
   readonly auth = inject(AuthService);
   readonly filtros = inject(CatalogoFiltrosService);
   private readonly router = inject(Router);
-  readonly menuAbierto = signal(false);
+  readonly menuAbierto = signal(true);
   readonly urlActual = signal(this.router.url);
 
   constructor() {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      this.menuAbierto.set(false);
+    }
     this.router.events.subscribe((e) => {
       if (e instanceof NavigationEnd) {
         this.urlActual.set(e.urlAfterRedirects);
-        this.menuAbierto.set(false);
+        if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+          this.menuAbierto.set(false);
+        }
       }
     });
   }
