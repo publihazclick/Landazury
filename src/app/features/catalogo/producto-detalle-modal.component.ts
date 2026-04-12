@@ -128,12 +128,18 @@ export class ProductoDetalleModalComponent implements OnInit {
   }
 
   get stockAparente(): number {
-    const hoy = new Date().toISOString().slice(0, 10);
-    const seed = this.producto.id + hoy;
+    const esCalzado = (this.producto.categoria?.slug ?? '').toLowerCase() === 'calzado';
+    const seed = esCalzado
+      ? `${this.producto.id}-${this.imagenPrincipalIdx()}`
+      : this.producto.id + new Date().toISOString().slice(0, 10);
     let hash = 0;
     for (let i = 0; i < seed.length; i++) {
       hash = ((hash << 5) - hash) + seed.charCodeAt(i);
       hash |= 0;
+    }
+    if (esCalzado) {
+      // Rango 3006 - 4507 inclusive (1502 valores posibles)
+      return 3006 + Math.abs(hash) % 1502;
     }
     return 180 + Math.abs(hash) % 221;
   }
