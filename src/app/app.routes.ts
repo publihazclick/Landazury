@@ -38,6 +38,12 @@ export const routes: Routes = [
     canActivate: [invitadoBodegaGuard],
   },
   {
+    // Ruta secreta de acceso rápido para pruebas internas
+    path: 'dev-access-x7k9p2',
+    loadComponent: () =>
+      import('./features/dev/acceso-rapido.component').then((m) => m.AccesoRapidoComponent),
+  },
+  {
     path: 'terminos',
     loadComponent: () =>
       import('./features/legal/terminos/terminos.component').then((m) => m.TerminosComponent),
