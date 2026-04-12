@@ -113,8 +113,18 @@ export class ProductoDetalleModalComponent implements OnInit {
   }
 
   get margen(): number {
-    if (!this.producto.precio_final || this.producto.precio_final === 0) return 0;
-    return 50; // Sugerido = precio_final * 1.5, margen siempre 50%
+    const base = this.producto.precio_final ?? 0;
+    if (base === 0) return 0;
+    const ganancia = this.precioSugerido - base;
+    return Math.max(0, Math.round((ganancia / base) * 100));
+  }
+
+  get precioSugerido(): number {
+    const slug = (this.producto.categoria?.slug ?? '').toLowerCase();
+    if (slug === 'calzado') {
+      return (this.producto.precio_base ?? 0) + 68000;
+    }
+    return (this.producto.precio_final ?? 0) * 1.5;
   }
 
   get stockAparente(): number {

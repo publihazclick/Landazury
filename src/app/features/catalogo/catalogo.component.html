@@ -175,7 +175,7 @@
                 </div>
                 <div class="px-2 py-2 sm:px-3 sm:py-2.5 min-w-0 flex-1 text-right border-l border-slate-200">
                   <p class="text-[9px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 leading-tight mb-1 truncate">Sugerido</p>
-                  <p class="text-slate-800 font-black text-base sm:text-2xl leading-none whitespace-nowrap">{{ producto.precio_final * 1.5 | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
+                  <p class="text-slate-800 font-black text-base sm:text-2xl leading-none whitespace-nowrap">{{ precioSugerido(producto) | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
                 </div>
               </div>
             }

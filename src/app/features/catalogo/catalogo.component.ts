@@ -155,6 +155,14 @@ export class CatalogoComponent implements OnInit {
 
   calcularMargen(producto: Producto): number { return calcularMargen(producto); }
 
+  precioSugerido(producto: Producto): number {
+    const slug = (producto.categoria?.slug ?? '').toLowerCase();
+    if (slug === 'calzado') {
+      return (producto.precio_base ?? 0) + 68000;
+    }
+    return (producto.precio_final ?? 0) * 1.5;
+  }
+
   async descargarCreativo(creativo: Creativo) {
     try {
       const url = await this.creativosService.obtenerUrlDescarga(creativo.archivo_path);
