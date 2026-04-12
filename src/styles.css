@@ -28,6 +28,11 @@ body {
   }
 }
 
+/* Bloquea double-tap y gesture zoom sobre elementos interactivos */
+input, select, textarea, button, a {
+  touch-action: manipulation;
+}
+
 .ultra-glass {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(20px) saturate(180%);
