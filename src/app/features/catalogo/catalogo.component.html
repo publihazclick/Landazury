@@ -17,38 +17,46 @@
       </div>
 
       <!-- Selector de bodega -->
-      <div class="flex flex-col items-center sm:items-start gap-2">
-        <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-base text-primary">touch_app</span>
-          Ver Bodega
-        </p>
-        <div class="flex items-center gap-3 flex-wrap justify-center sm:justify-start">
+      <div class="flex items-end gap-3 sm:gap-5 flex-wrap justify-center sm:justify-start">
 
-          <!-- Landazury Importaciones -->
-          <button (click)="seleccionarBodega('importaciones')"
-                  class="relative flex items-center justify-center px-3 py-2 sm:px-5 sm:py-3 rounded-xl border-2 transition-all duration-200"
-                  [class]="filtros.bodegaFiltro() === 'importaciones'
-                    ? 'border-green-500 bg-green-50'
-                    : 'border-slate-200 bg-white hover:border-green-400 hover:bg-green-50'">
+        <!-- Landazury Importaciones -->
+        <button (click)="seleccionarBodega('importaciones')"
+                type="button"
+                class="group flex flex-col items-center gap-1.5 cursor-pointer">
+          <span class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary-dark text-[10px] sm:text-xs font-black uppercase tracking-widest group-hover:bg-primary/20 transition-all">
+            <span class="material-symbols-outlined text-[13px] sm:text-sm">touch_app</span>
+            Ver Bodega
+          </span>
+          <div class="relative flex items-center justify-center px-3 py-2 sm:px-5 sm:py-3 rounded-2xl border-2 shadow-md group-hover:shadow-lg group-hover:-translate-y-0.5 transition-all duration-200"
+               [class]="filtros.bodegaFiltro() === 'importaciones'
+                 ? 'border-green-500 bg-green-50 ring-2 ring-green-200'
+                 : 'border-slate-200 bg-white hover:border-green-400 hover:bg-green-50'">
             <img src="/landazury_importaciones.jpg" alt="Landazury Importaciones"
                  class="h-16 sm:h-24 w-auto object-contain transition-all duration-200"
-                 [class]="filtros.bodegaFiltro() === 'importaciones' ? 'opacity-100' : 'opacity-50'"/>
+                 [class]="filtros.bodegaFiltro() === 'importaciones' ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'"/>
             @if (filtros.bodegaFiltro() === 'importaciones') {
               <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shadow">
                 <span class="material-symbols-outlined text-sm text-white">check</span>
               </span>
             }
-          </button>
+          </div>
+        </button>
 
-          <!-- Moda Landazury -->
-          <button (click)="seleccionarBodega('moda')"
-                  class="relative flex items-center justify-center px-3 py-2 sm:px-5 sm:py-3 rounded-xl border-2 transition-all duration-200"
-                  [class]="filtros.bodegaFiltro() === 'moda'
-                    ? 'border-green-500 bg-green-50'
-                    : 'border-slate-200 bg-white hover:border-green-400 hover:bg-green-50'">
+        <!-- Moda Landazury -->
+        <button (click)="seleccionarBodega('moda')"
+                type="button"
+                class="group flex flex-col items-center gap-1.5 cursor-pointer">
+          <span class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary-dark text-[10px] sm:text-xs font-black uppercase tracking-widest group-hover:bg-primary/20 transition-all">
+            <span class="material-symbols-outlined text-[13px] sm:text-sm">touch_app</span>
+            Ver Bodega
+          </span>
+          <div class="relative flex items-center justify-center px-3 py-2 sm:px-5 sm:py-3 rounded-2xl border-2 shadow-md group-hover:shadow-lg group-hover:-translate-y-0.5 transition-all duration-200"
+               [class]="filtros.bodegaFiltro() === 'moda'
+                 ? 'border-green-500 bg-green-50 ring-2 ring-green-200'
+                 : 'border-slate-200 bg-white hover:border-green-400 hover:bg-green-50'">
             <img src="/modalandazury.jpg" alt="Moda Landazury"
                  class="h-16 sm:h-24 w-auto object-contain transition-all duration-200"
-                 [class]="filtros.bodegaFiltro() === 'moda' ? 'opacity-100' : 'opacity-50'"
+                 [class]="filtros.bodegaFiltro() === 'moda' ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'"
                  (error)="$any($event.target).style.display='none'; $any($event.target).nextElementSibling.style.display='flex'"/>
             <span class="hidden items-center gap-1.5 transition-all"
                   [class]="filtros.bodegaFiltro() === 'moda' ? 'text-green-600' : 'text-slate-500'">
@@ -60,18 +68,17 @@
                 <span class="material-symbols-outlined text-sm text-white">check</span>
               </span>
             }
-          </button>
+          </div>
+        </button>
 
-          <!-- Ver todas -->
-          <button (click)="seleccionarBodega('todas')"
-                  class="px-3 py-2 rounded-xl text-xs font-bold transition-all border"
-                  [class]="filtros.bodegaFiltro() === 'todas'
-                    ? 'border-slate-400 text-slate-700 bg-slate-100'
-                    : 'border-slate-200 text-slate-400 hover:text-slate-600 hover:border-slate-300'">
-            Ver todas
-          </button>
-
-        </div>
+        <!-- Ver todas -->
+        <button (click)="seleccionarBodega('todas')"
+                class="self-center px-3 py-2 rounded-xl text-xs font-bold transition-all border"
+                [class]="filtros.bodegaFiltro() === 'todas'
+                  ? 'border-slate-400 text-slate-700 bg-slate-100'
+                  : 'border-slate-200 text-slate-400 hover:text-slate-600 hover:border-slate-300'">
+          Ver todas
+        </button>
 
       </div>
 
