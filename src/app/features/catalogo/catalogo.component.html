@@ -1,12 +1,12 @@
-<div class="min-h-screen bg-neutral-charcoal text-slate-100">
-  <div class="max-w-7xl mx-auto p-4 md:p-8">
+<div class="min-h-screen bg-neutral-charcoal text-slate-800">
+  <div class="max-w-7xl mx-auto px-3 py-4 sm:p-4 md:p-8">
 
     <!-- Header + búsqueda -->
     <div class="mb-6 flex flex-col gap-3">
 
       <!-- Título -->
-      <h1 class="text-2xl md:text-4xl font-black text-primary leading-tight whitespace-nowrap">
-        Nuestras bodegas disponibles en las plataformas de dropshipping
+      <h1 class="text-lg sm:text-2xl md:text-4xl font-black text-primary-dark leading-tight">
+        Bodegas disponibles en todas las plataformas de Dropshipping
       </h1>
 
       <!-- Logos -->
@@ -15,38 +15,38 @@
 
           <!-- Landazury Importaciones -->
           <button (click)="seleccionarBodega('importaciones')"
-                  class="relative flex items-center justify-center px-4 py-2 rounded-xl border-2 transition-all duration-200"
+                  class="relative flex items-center justify-center px-3 py-2 sm:px-5 sm:py-3 rounded-xl border-2 transition-all duration-200"
                   [class]="filtros.bodegaFiltro() === 'importaciones'
-                    ? 'border-amber-500/60 bg-amber-500/8'
-                    : 'border-white/10 bg-white/3 hover:border-amber-500/30 hover:bg-amber-500/5'">
+                    ? 'border-green-500 bg-green-50'
+                    : 'border-slate-200 bg-white hover:border-green-400 hover:bg-green-50'">
             <img src="/landazury_importaciones.jpg" alt="Landazury Importaciones"
-                 class="h-16 w-auto object-contain transition-all duration-200"
+                 class="h-16 sm:h-24 w-auto object-contain transition-all duration-200"
                  [class]="filtros.bodegaFiltro() === 'importaciones' ? 'opacity-100' : 'opacity-50'"/>
             @if (filtros.bodegaFiltro() === 'importaciones') {
-              <span class="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-amber-500 flex items-center justify-center">
-                <span class="material-symbols-outlined text-[10px] text-[#0a0a08]">check</span>
+              <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shadow">
+                <span class="material-symbols-outlined text-sm text-white">check</span>
               </span>
             }
           </button>
 
           <!-- Moda Landazury -->
           <button (click)="seleccionarBodega('moda')"
-                  class="relative flex items-center justify-center px-4 py-2 rounded-xl border-2 transition-all duration-200"
+                  class="relative flex items-center justify-center px-3 py-2 sm:px-5 sm:py-3 rounded-xl border-2 transition-all duration-200"
                   [class]="filtros.bodegaFiltro() === 'moda'
-                    ? 'border-rose-400/60 bg-rose-400/8'
-                    : 'border-white/10 bg-white/3 hover:border-rose-400/30 hover:bg-rose-400/5'">
+                    ? 'border-green-500 bg-green-50'
+                    : 'border-slate-200 bg-white hover:border-green-400 hover:bg-green-50'">
             <img src="/modalandazury.jpg" alt="Moda Landazury"
-                 class="h-16 w-auto object-contain transition-all duration-200"
+                 class="h-16 sm:h-24 w-auto object-contain transition-all duration-200"
                  [class]="filtros.bodegaFiltro() === 'moda' ? 'opacity-100' : 'opacity-50'"
                  (error)="$any($event.target).style.display='none'; $any($event.target).nextElementSibling.style.display='flex'"/>
             <span class="hidden items-center gap-1.5 transition-all"
-                  [class]="filtros.bodegaFiltro() === 'moda' ? 'text-rose-300' : 'text-slate-500'">
+                  [class]="filtros.bodegaFiltro() === 'moda' ? 'text-green-600' : 'text-slate-500'">
               <span class="material-symbols-outlined text-base">checkroom</span>
               <span class="text-xs font-black leading-tight text-left">Moda<br><span class="text-[9px] font-bold uppercase tracking-widest">Landazury</span></span>
             </span>
             @if (filtros.bodegaFiltro() === 'moda') {
-              <span class="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-rose-400 flex items-center justify-center">
-                <span class="material-symbols-outlined text-[10px] text-white">check</span>
+              <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shadow">
+                <span class="material-symbols-outlined text-sm text-white">check</span>
               </span>
             }
           </button>
@@ -55,8 +55,8 @@
           <button (click)="seleccionarBodega('todas')"
                   class="px-3 py-2 rounded-xl text-xs font-bold transition-all border"
                   [class]="filtros.bodegaFiltro() === 'todas'
-                    ? 'border-white/20 text-slate-200 bg-white/10'
-                    : 'border-white/8 text-slate-500 hover:text-slate-300 hover:border-white/15'">
+                    ? 'border-slate-400 text-slate-700 bg-slate-100'
+                    : 'border-slate-200 text-slate-400 hover:text-slate-600 hover:border-slate-300'">
             Ver todas
           </button>
 
@@ -64,27 +64,54 @@
 
       </div>
 
-      <!-- Búsqueda -->
-      <div class="flex items-stretch rounded-xl bg-neutral-surface border border-neutral-border focus-within:border-primary transition-all w-full md:w-96 mx-auto shrink-0">
-        <div class="text-slate-400 flex items-center justify-center pl-4">
-          <span class="material-symbols-outlined text-xl">search</span>
+      <!-- Categorías + Búsqueda -->
+      <div class="flex flex-col sm:flex-row items-stretch gap-2 sm:gap-3 w-full">
+
+        <!-- Filtro de categorías -->
+        @if (categoriasConProductos().length > 0) {
+          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
+            <button (click)="seleccionarCategoria('')"
+                    class="shrink-0 px-3 py-2 rounded-lg text-xs font-bold transition-all border whitespace-nowrap"
+                    [class]="!filtros.categoriaSeleccionada()
+                      ? 'border-primary bg-amber-50 text-primary-dark'
+                      : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-slate-700'">
+              Todas
+            </button>
+            @for (cat of categoriasConProductos(); track cat.id) {
+              <button (click)="seleccionarCategoria(cat.id)"
+                      class="shrink-0 px-3 py-2 rounded-lg text-xs font-bold transition-all border whitespace-nowrap"
+                      [class]="filtros.categoriaSeleccionada() === cat.id
+                        ? 'border-primary bg-amber-50 text-primary-dark'
+                        : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-slate-700'">
+                @if (cat.icono) { {{ cat.icono }} }
+                {{ cat.nombre }}
+              </button>
+            }
+          </div>
+        }
+
+        <!-- Búsqueda -->
+        <div class="flex items-stretch rounded-xl bg-white border border-slate-200 focus-within:border-primary shadow-sm transition-all w-full sm:flex-1 sm:min-w-0 md:max-w-96 sm:ml-auto shrink-0">
+        <div class="text-slate-400 flex items-center justify-center pl-3 sm:pl-4">
+          <span class="material-symbols-outlined text-lg sm:text-xl">search</span>
         </div>
         <input [(ngModel)]="busqueda" (keyup.enter)="onBuscar()"
-               class="w-full bg-transparent text-slate-100 focus:ring-0 outline-none placeholder:text-slate-500 py-2.5 px-3 text-sm"
+               class="w-full bg-transparent text-slate-800 focus:ring-0 outline-none placeholder:text-slate-400 py-2 sm:py-2.5 px-2.5 sm:px-3 text-sm"
                placeholder="Buscar productos..."/>
+        </div>
       </div>
     </div>
 
     <!-- Skeleton loading -->
     @if (cargando()) {
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5">
         @for (i of [1,2,3,4,5,6,7,8]; track i) {
-          <div class="bg-neutral-surface border border-neutral-border rounded-2xl overflow-hidden animate-pulse">
-            <div class="aspect-[4/5] bg-neutral-border"></div>
-            <div class="p-4 space-y-3">
-              <div class="h-4 bg-neutral-border rounded w-3/4"></div>
-              <div class="h-3 bg-neutral-border rounded w-full"></div>
-              <div class="h-8 bg-neutral-border rounded w-full mt-2"></div>
+          <div class="bg-neutral-surface border border-neutral-border rounded-xl sm:rounded-2xl overflow-hidden animate-pulse">
+            <div class="aspect-square sm:aspect-[4/5] bg-neutral-border"></div>
+            <div class="p-2.5 sm:p-4 space-y-2 sm:space-y-3">
+              <div class="h-3 sm:h-4 bg-neutral-border rounded w-3/4"></div>
+              <div class="h-2.5 sm:h-3 bg-neutral-border rounded w-full"></div>
+              <div class="h-7 sm:h-8 bg-neutral-border rounded w-full mt-1.5 sm:mt-2"></div>
             </div>
           </div>
         }
@@ -112,68 +139,71 @@
 
     @else {
       <!-- Grid de productos -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5">
         @for (producto of productosFiltrados(); track producto.id) {
           <div (click)="abrirModal(producto)"
-               class="bg-neutral-surface border border-neutral-border rounded-2xl overflow-hidden group flex flex-col hover:border-primary/40 transition-all duration-300 cursor-pointer">
-            <div class="relative aspect-[4/5] overflow-hidden">
+               class="bg-white border border-slate-200 rounded-xl sm:rounded-2xl overflow-hidden group flex flex-col hover:border-primary/40 hover:shadow-lg transition-all duration-300 cursor-pointer">
+            <div class="relative aspect-square sm:aspect-[4/5] overflow-hidden bg-white">
               @if (producto.imagenes.length) {
                 <img [src]="producto.imagenes![0]" [alt]="producto.nombre"
                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"/>
               } @else {
                 <div class="w-full h-full bg-neutral-border flex items-center justify-center">
-                  <span class="material-symbols-outlined text-5xl text-slate-600">inventory_2</span>
+                  <span class="material-symbols-outlined text-3xl sm:text-5xl text-slate-600">inventory_2</span>
                 </div>
               }
               <!-- Favorito -->
               <button (click)="toggleFavorito(producto.id, $event)"
-                      class="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all bg-neutral-charcoal/70 backdrop-blur-sm hover:scale-110"
+                      class="absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all bg-white/80 backdrop-blur-sm hover:scale-110 shadow-sm"
                       [class]="esFavorito(producto.id) ? 'text-red-400' : 'text-slate-400'">
-                <span class="material-symbols-outlined text-[18px]">favorite</span>
+                <span class="material-symbols-outlined text-[16px] sm:text-[18px]">favorite</span>
               </button>
-              <!-- Precios sobre la imagen -->
-              @if (producto.precio_final) {
-                <div class="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-2">
-                  <div class="bg-black/60 backdrop-blur-sm rounded-xl px-2.5 py-1.5">
-                    <p class="text-[9px] font-bold uppercase tracking-widest text-slate-400 leading-none mb-0.5">Precio a dropshipper</p>
-                    <p class="text-primary font-black text-base leading-none">{{ producto.precio_final | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
-                  </div>
-                  <div class="bg-black/60 backdrop-blur-sm rounded-xl px-2.5 py-1.5 text-right">
-                    <p class="text-[9px] font-bold uppercase tracking-widest text-slate-400 leading-none mb-0.5">Sugerido</p>
-                    <p class="text-white text-base font-black leading-none">{{ producto.precio_final * 1.5 | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
-                  </div>
-                </div>
-              }
             </div>
-            <div class="p-4 flex-1 flex flex-col gap-3">
+            <!-- Precios debajo de la imagen -->
+            @if (producto.precio_final) {
+              <div class="flex items-stretch justify-between border-b border-slate-100 bg-slate-50">
+                <div class="px-2.5 py-2 sm:px-3 sm:py-2.5 min-w-0 flex-1">
+                  <p class="text-sm sm:text-lg font-bold uppercase tracking-wider sm:tracking-widest text-slate-500 leading-none mb-1.5 truncate">Precio a Dropshiper</p>
+                  <p class="text-primary-dark font-black text-2xl sm:text-3xl leading-none truncate">{{ producto.precio_final | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
+                </div>
+                <div class="px-2.5 py-2 sm:px-3 sm:py-2.5 min-w-0 flex-1 text-right border-l border-slate-200">
+                  <p class="text-sm sm:text-lg font-bold uppercase tracking-wider sm:tracking-widest text-slate-500 leading-none mb-1.5 truncate">Sugerido de venta</p>
+                  <p class="text-slate-800 text-2xl sm:text-3xl font-black leading-none truncate">{{ producto.precio_final * 1.5 | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
+                </div>
+              </div>
+            }
+            <div class="p-2.5 sm:p-4 flex-1 flex flex-col gap-2 sm:gap-3">
               <div>
-                <h3 class="text-slate-100 font-bold group-hover:text-primary transition-colors text-sm">{{ producto.nombre }}</h3>
+                <h3 class="text-slate-800 font-bold group-hover:text-primary-dark transition-colors text-sm sm:text-lg line-clamp-2">{{ producto.nombre }}</h3>
                 <div class="flex items-center justify-between mt-0.5">
                   @if (producto.categoria) {
-                    <p class="text-slate-500 text-[11px]">{{ producto.categoria.nombre }}</p>
+                    <p class="text-slate-500 text-xs sm:text-sm truncate">{{ producto.categoria.nombre }}</p>
                   }
-                  <p class="text-[10px] font-bold text-green-400">Stock: {{ stockAparente(producto.id) }} uds.</p>
+                  <p class="text-lg sm:text-xl font-bold text-green-400 shrink-0">{{ stockAparente(producto.id) }} uds.</p>
                 </div>
               </div>
 
               @if (producto.creativos?.length) {
-                <div class="flex gap-2">
+                <div class="hidden sm:flex gap-2">
                   @for (c of producto.creativos!.slice(0, 4); track c.id) {
-                    <div class="bg-neutral-charcoal/50 p-1.5 rounded-lg border border-neutral-border" [title]="c.nombre">
-                      <span class="material-symbols-outlined text-[14px] text-primary">{{ iconoMaterial(c.tipo) }}</span>
+                    <div class="bg-slate-50 p-1.5 rounded-lg border border-slate-200" [title]="c.nombre">
+                      <span class="material-symbols-outlined text-[14px] text-primary-dark">{{ iconoMaterial(c.tipo) }}</span>
                     </div>
                   }
                 </div>
               }
               @if (producto.creativos?.length) {
                 <button (click)="abrirModal(producto); $event.stopPropagation()"
-                        class="w-full py-2.5 bg-neutral-charcoal hover:bg-neutral-border border border-neutral-border text-primary rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 mt-auto">
-                  <span class="material-symbols-outlined text-[16px]">photo_library</span>
-                  Ver {{ producto.creativos!.length }} Creativos
+                        class="w-full py-2 sm:py-2.5 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-primary-dark rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1.5 sm:gap-2 mt-auto">
+                  <span class="material-symbols-outlined text-[14px] sm:text-[16px]">photo_library</span>
+                  <span class="hidden sm:inline">Ver {{ producto.creativos!.length }} Creativos</span>
+                  <span class="sm:hidden">{{ producto.creativos!.length }} Creativos</span>
                 </button>
               } @else {
-                <div class="w-full py-2.5 border border-neutral-border/50 text-slate-600 rounded-xl text-xs font-bold flex items-center justify-center gap-2 mt-auto">
-                  <span class="material-symbols-outlined text-[16px]">hourglass_empty</span> Sin creativos aún
+                <div class="w-full py-2 sm:py-2.5 border border-slate-200 text-slate-400 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold flex items-center justify-center gap-1.5 sm:gap-2 mt-auto">
+                  <span class="material-symbols-outlined text-[14px] sm:text-[16px]">hourglass_empty</span>
+                  <span class="hidden sm:inline">Sin creativos aún</span>
+                  <span class="sm:hidden">Sin creativos</span>
                 </div>
               }
             </div>

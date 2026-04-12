@@ -145,6 +145,40 @@ export class ImportarProductosComponent {
     this.procesando.set(false);
   }
 
+  async descargarPlantilla() {
+    if (!isPlatformBrowser(this.platformId)) return;
+    const XLSX = await import('xlsx');
+    const categorias = this.filtros.categorias();
+    const catNombres = categorias.map(c => c.nombre).join(', ');
+
+    // Fila de ejemplo
+    const ejemplo = [{
+      'Title': 'Producto ejemplo',
+      'Description': 'Descripción del producto',
+      'Category': categorias.length > 0 ? categorias[0].nombre : '',
+      'SKU': 'SKU-001',
+      'Pricing 1': 25000,
+      'Pricing 2': 45000,
+      'Stock': 100,
+      'Active': 1,
+      'Image URL': 'https://ejemplo.com/imagen.jpg',
+      'Creativos Drive': 'https://drive.google.com/...',
+    }];
+
+    const ws = XLSX.utils.json_to_sheet(ejemplo);
+
+    // Agregar hoja de categorías disponibles
+    const catSheet = XLSX.utils.json_to_sheet(
+      categorias.map(c => ({ 'Categoría': c.nombre, 'Slug': c.slug }))
+    );
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Productos');
+    XLSX.utils.book_append_sheet(wb, catSheet, 'Categorías disponibles');
+
+    XLSX.writeFile(wb, 'plantilla_productos_landazury.xlsx');
+  }
+
   volver() {
     this.paso.set('upload');
     this.filas.set([]);

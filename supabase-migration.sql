@@ -15,6 +15,7 @@ ALTER TABLE perfiles ADD CONSTRAINT perfiles_rol_check
 DROP POLICY IF EXISTS "productos_inventario_insertar"    ON productos;
 DROP POLICY IF EXISTS "productos_inventario_actualizar"  ON productos;
 DROP POLICY IF EXISTS "productos_inventario_eliminar"    ON productos;
+DROP POLICY IF EXISTS "productos_inventario_lectura"     ON productos;
 DROP POLICY IF EXISTS "admin_lectura_perfiles"           ON perfiles;
 DROP POLICY IF EXISTS "admin_actualizacion_perfiles"     ON perfiles;
 DROP POLICY IF EXISTS "perfil_propio_lectura"            ON perfiles;
@@ -34,7 +35,13 @@ CREATE POLICY "perfil_propio_actualizacion" ON perfiles
     (SELECT rol FROM perfiles WHERE id = auth.uid()) = 'admin'
   );
 
--- 5. Políticas de productos — inventario y admin pueden escribir
+-- 5. Políticas de productos — inventario y admin pueden leer TODOS los productos
+CREATE POLICY "productos_inventario_lectura" ON productos
+  FOR SELECT USING (
+    (SELECT rol FROM perfiles WHERE id = auth.uid()) IN ('inventario', 'admin')
+  );
+
+-- 6. Políticas de productos — inventario y admin pueden escribir
 CREATE POLICY "productos_inventario_insertar" ON productos
   FOR INSERT WITH CHECK (
     (SELECT rol FROM perfiles WHERE id = auth.uid()) IN ('inventario', 'admin')

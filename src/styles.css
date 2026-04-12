@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #e0ac29;
-  --color-primary-dark: #B8860B;
+  --color-primary: #b8860b;
+  --color-primary-dark: #8B6508;
   --color-background-dark: #0F0F0F;
   --color-charcoal: #1A1A1A;
-  --color-neutral-charcoal: #171611;
-  --color-neutral-surface: #2d281e;
-  --color-neutral-border: #3d382e;
+  --color-neutral-charcoal: #f8f8f8;
+  --color-neutral-surface: #ffffff;
+  --color-neutral-border: #e5e5e5;
   --font-display: "Manrope", sans-serif;
 }
 
@@ -17,15 +17,15 @@
 
 body {
   font-family: "Manrope", sans-serif;
-  background-color: #0F0F0F;
-  color: #f1f5f9;
+  background-color: #f8f8f8;
+  color: #1a1a1a;
 }
 
 .ultra-glass {
-  background: rgba(26, 26, 26, 0.45);
+  background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
 }
 
 .bg-grid-mesh {
@@ -52,11 +52,11 @@ body {
 }
 
 .glass-card {
-  background: rgba(18, 17, 13, 0.75);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(224, 172, 41, 0.15);
-  box-shadow: inset 0 0 20px rgba(224, 172, 41, 0.05), 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(184, 134, 11, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .gold-gradient {
@@ -69,10 +69,10 @@ body {
 }
 
 .glass {
-  background: rgba(38, 33, 22, 0.7);
+  background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(224, 172, 41, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .drag-area {

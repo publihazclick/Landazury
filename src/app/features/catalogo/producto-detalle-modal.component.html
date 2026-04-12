@@ -1,42 +1,42 @@
 <!-- Backdrop -->
 <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
      data-backdrop="1" (click)="onBackdrop($event)">
-  <div class="absolute inset-0 bg-black/75 backdrop-blur-sm"></div>
+  <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
 
   <!-- Modal panel -->
-  <div class="relative z-10 bg-[#111009] border border-[#3d3524] rounded-t-3xl sm:rounded-3xl w-full sm:max-w-3xl max-h-[94dvh] flex flex-col overflow-hidden shadow-2xl">
+  <div class="relative z-10 bg-white border border-slate-200 rounded-t-3xl sm:rounded-3xl w-full sm:max-w-3xl max-h-[94dvh] flex flex-col overflow-hidden shadow-2xl">
 
     <!-- Header compacto (sin imagen) -->
-    <div class="flex items-start justify-between gap-4 px-6 py-5 border-b border-white/8 shrink-0">
+    <div class="flex items-start justify-between gap-4 px-5 sm:px-6 py-5 border-b border-slate-200 shrink-0 bg-slate-50">
       <div class="flex-1 min-w-0">
         <!-- Categoría -->
         @if (producto.categoria) {
-          <p class="text-[10px] font-bold uppercase tracking-widest text-primary/70 mb-1 flex items-center gap-1">
+          <p class="text-[10px] font-bold uppercase tracking-widest text-primary mb-1 flex items-center gap-1">
             {{ producto.categoria.icono }} {{ producto.categoria.nombre }}
           </p>
         }
         <!-- Badges -->
         <div class="flex flex-wrap gap-1.5 mb-2">
           @if (producto.ganador) {
-            <span class="flex items-center gap-1 bg-primary text-[#0f0f0f] px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider">
+            <span class="flex items-center gap-1 bg-primary text-white px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider">
               <span class="material-symbols-outlined text-[11px]">verified</span> Ganador
             </span>
           }
           @if (producto.exclusivo) {
-            <span class="flex items-center gap-1 bg-purple-500/90 text-white px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider">
+            <span class="flex items-center gap-1 bg-purple-600 text-white px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider">
               <span class="material-symbols-outlined text-[11px]">diamond</span> Exclusivo
             </span>
           }
         </div>
         <!-- Nombre + copiar -->
         <div class="flex items-start gap-2">
-          <h2 class="text-lg sm:text-xl font-black text-slate-100 leading-snug flex-1">{{ producto.nombre }}</h2>
+          <h2 class="text-lg sm:text-xl font-black text-slate-900 leading-snug flex-1">{{ producto.nombre }}</h2>
           <button (click)="copiar('nombre')"
                   title="Copiar nombre"
                   class="shrink-0 mt-0.5 w-7 h-7 flex items-center justify-center rounded-lg transition-all"
                   [class]="copiado() === 'nombre'
-                    ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                    : 'bg-white/5 text-slate-500 hover:text-slate-300 hover:bg-white/10 border border-white/8'">
+                    ? 'bg-green-100 text-green-700 border border-green-300'
+                    : 'bg-white text-slate-500 hover:text-slate-800 hover:bg-slate-100 border border-slate-200'">
             <span class="material-symbols-outlined text-[14px]">
               {{ copiado() === 'nombre' ? 'check' : 'content_copy' }}
             </span>
@@ -45,37 +45,39 @@
       </div>
       <!-- Cerrar -->
       <button (click)="cerrar.emit()"
-              class="shrink-0 w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all">
+              class="shrink-0 w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all">
         <span class="material-symbols-outlined text-base">close</span>
       </button>
     </div>
 
     <!-- Contenido scrolleable -->
-    <div class="overflow-y-auto flex-1 p-5 sm:p-6 space-y-6">
+    <div class="overflow-y-auto flex-1 p-5 sm:p-6 space-y-6 bg-white">
 
       <!-- Precio + margen -->
       @if (producto.precio_final) {
-        <div class="flex items-center gap-4 p-4 bg-white/4 border border-white/8 rounded-2xl">
-          <div>
-            <p class="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-0.5">Precio dropshipping</p>
-            <p class="text-2xl font-black text-primary">
-              ${{ producto.precio_final | number:'1.0-0' }} COP
-            </p>
-            <p class="text-amber-400/80 text-sm font-semibold mt-1">
-              <span class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Precio sugerido </span>
-              ${{ producto.precio_final * 1.5 | number:'1.0-0' }} COP
-            </p>
-          </div>
-          <div class="ml-auto flex flex-col gap-2 items-end">
-            @if (margen > 0) {
-              <div class="text-center bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-2">
-                <p class="text-[10px] font-bold uppercase tracking-widest text-green-600 mb-0.5">Tu ganancia</p>
-                <p class="text-xl font-black text-green-400">+{{ margen }}%</p>
+        <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div class="flex-1">
+              <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-0.5">Precio dropshipping</p>
+              <p class="text-xl sm:text-2xl font-black text-primary">
+                ${{ producto.precio_final | number:'1.0-0' }} COP
+              </p>
+              <p class="text-amber-700 text-sm font-semibold mt-1">
+                <span class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Precio sugerido </span>
+                ${{ producto.precio_final * 1.5 | number:'1.0-0' }} COP
+              </p>
+            </div>
+            <div class="flex gap-2 sm:flex-col sm:items-end">
+              @if (margen > 0) {
+                <div class="text-center bg-green-50 border border-green-200 rounded-xl px-4 py-2 flex-1 sm:flex-initial">
+                  <p class="text-[10px] font-bold uppercase tracking-widest text-green-700 mb-0.5">Tu ganancia</p>
+                  <p class="text-lg sm:text-xl font-black text-green-700">+{{ margen }}%</p>
+                </div>
+              }
+              <div class="text-center bg-white border border-slate-200 rounded-xl px-4 py-2 flex-1 sm:flex-initial">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-0.5">Stock</p>
+                <p class="text-lg font-black text-green-700">{{ stockAparente }} uds.</p>
               </div>
-            }
-            <div class="text-center bg-white/4 border border-white/8 rounded-xl px-4 py-2">
-              <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-0.5">Stock</p>
-              <p class="text-lg font-black text-green-400">{{ stockAparente }} uds.</p>
             </div>
           </div>
         </div>
@@ -86,15 +88,15 @@
         <div class="space-y-1.5">
           <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Descripción del producto</p>
           <div class="relative">
-            <p class="text-slate-400 text-sm leading-relaxed bg-white/3 border border-white/6 rounded-xl px-4 py-3 pr-10">
+            <p class="text-slate-700 text-sm leading-relaxed bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 pr-10">
               {{ producto.descripcion }}
             </p>
             <button (click)="copiar('descripcion')"
                     title="Copiar descripción"
                     class="absolute top-2.5 right-2.5 w-6 h-6 flex items-center justify-center rounded-md transition-all"
                     [class]="copiado() === 'descripcion'
-                      ? 'text-green-400 bg-green-500/20'
-                      : 'text-slate-600 hover:text-slate-300 hover:bg-white/10'">
+                      ? 'text-green-700 bg-green-100'
+                      : 'text-slate-500 hover:text-slate-800 hover:bg-slate-200'">
               <span class="material-symbols-outlined text-[14px]">
                 {{ copiado() === 'descripcion' ? 'check' : 'content_copy' }}
               </span>
@@ -107,9 +109,9 @@
       @if (imagenes.length > 0) {
         <div class="space-y-3">
           <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-sky-400 text-sm">image</span>
-            <h3 class="text-[10px] font-black uppercase tracking-widest text-sky-400">
-              Imágenes <span class="text-slate-600 font-normal">({{ imagenes.length }})</span>
+            <span class="material-symbols-outlined text-sky-600 text-sm">image</span>
+            <h3 class="text-[10px] font-black uppercase tracking-widest text-sky-700">
+              Imágenes <span class="text-slate-400 font-normal">({{ imagenes.length }})</span>
             </h3>
           </div>
 
@@ -117,7 +119,7 @@
           <div class="grid grid-cols-4 gap-2">
             @for (creativo of imagenes; track creativo.id) {
               <button (click)="abrirVisor(creativo)"
-                      class="relative group aspect-square rounded-xl overflow-hidden border border-white/8 bg-[#0d0b06] hover:border-sky-400/40 transition-all">
+                      class="relative group aspect-square rounded-xl overflow-hidden border border-slate-200 bg-slate-100 hover:border-sky-500 transition-all">
                 <img [src]="displayUrl(creativo)" [alt]="creativo.nombre"
                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                      (error)="onMediaError(creativo, $any($event.target))"/>
@@ -133,10 +135,10 @@
                   [disabled]="descargandoLote() !== null"
                   class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all border"
                   [class]="descargandoLote() === 'imagenes'
-                    ? 'bg-sky-500/10 text-sky-400/50 border-sky-500/20 cursor-wait'
-                    : 'bg-sky-500/10 text-sky-400 border-sky-500/20 hover:bg-sky-500/20'">
+                    ? 'bg-sky-50 text-sky-400 border-sky-200 cursor-wait'
+                    : 'bg-sky-50 text-sky-700 border-sky-200 hover:bg-sky-100'">
             @if (descargandoLote() === 'imagenes') {
-              <span class="w-3.5 h-3.5 border-2 border-sky-400/30 border-t-sky-400 rounded-full animate-spin"></span>
+              <span class="w-3.5 h-3.5 border-2 border-sky-300 border-t-sky-600 rounded-full animate-spin"></span>
               Descargando imágenes…
             } @else {
               <span class="material-symbols-outlined text-sm">download</span>
@@ -150,9 +152,9 @@
       @if (videos.length > 0) {
         <div class="space-y-3">
           <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-purple-400 text-sm">videocam</span>
-            <h3 class="text-[10px] font-black uppercase tracking-widest text-purple-400">
-              Videos <span class="text-slate-600 font-normal">({{ videos.length }})</span>
+            <span class="material-symbols-outlined text-purple-600 text-sm">videocam</span>
+            <h3 class="text-[10px] font-black uppercase tracking-widest text-purple-700">
+              Videos <span class="text-slate-400 font-normal">({{ videos.length }})</span>
             </h3>
           </div>
 
@@ -160,7 +162,7 @@
           <div class="grid grid-cols-3 gap-2">
             @for (creativo of videos; track creativo.id) {
               <button (click)="abrirVisor(creativo)"
-                      class="relative group aspect-video rounded-xl overflow-hidden border border-white/8 bg-[#0d0b06] hover:border-purple-400/40 transition-all">
+                      class="relative group aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-100 hover:border-purple-500 transition-all">
                 <video [src]="displayUrl(creativo)"
                        class="w-full h-full object-cover"
                        preload="metadata" muted playsinline
@@ -180,10 +182,10 @@
                   [disabled]="descargandoLote() !== null"
                   class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all border"
                   [class]="descargandoLote() === 'videos'
-                    ? 'bg-purple-500/10 text-purple-400/50 border-purple-500/20 cursor-wait'
-                    : 'bg-purple-500/10 text-purple-400 border-purple-500/20 hover:bg-purple-500/20'">
+                    ? 'bg-purple-50 text-purple-400 border-purple-200 cursor-wait'
+                    : 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100'">
             @if (descargandoLote() === 'videos') {
-              <span class="w-3.5 h-3.5 border-2 border-purple-400/30 border-t-purple-400 rounded-full animate-spin"></span>
+              <span class="w-3.5 h-3.5 border-2 border-purple-300 border-t-purple-600 rounded-full animate-spin"></span>
               Descargando videos…
             } @else {
               <span class="material-symbols-outlined text-sm">download</span>
@@ -195,8 +197,8 @@
 
       <!-- Sin creativos -->
       @if (imagenes.length === 0 && videos.length === 0) {
-        <div class="flex flex-col items-center gap-2 py-10 text-center border border-white/8 rounded-2xl">
-          <span class="material-symbols-outlined text-4xl text-slate-700">photo_library</span>
+        <div class="flex flex-col items-center gap-2 py-10 text-center border border-slate-200 rounded-2xl bg-slate-50">
+          <span class="material-symbols-outlined text-4xl text-slate-300">photo_library</span>
           <p class="text-slate-500 text-sm">Aún no hay creativos para este producto.</p>
         </div>
       }
@@ -204,9 +206,9 @@
 
       <!-- Link de creativos externos -->
       @if (producto.link_creativos) {
-        <div class="border-t border-white/5 pt-4">
+        <div class="border-t border-slate-200 pt-4">
           <button type="button" (click)="abrirLink(producto.link_creativos!)"
-             class="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl bg-primary/10 border border-primary/30 text-primary font-bold text-sm hover:bg-primary/20 hover:border-primary/50 transition-all group">
+             class="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl bg-primary/10 border border-primary/40 text-primary font-bold text-sm hover:bg-primary/20 hover:border-primary/60 transition-all group">
             <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">folder_open</span>
             Descargar creativos del producto
             <span class="material-symbols-outlined text-sm opacity-60">open_in_new</span>
@@ -216,7 +218,7 @@
 
       <!-- Variantes -->
       @if (producto.atributos?.length) {
-        <div class="space-y-3 border-t border-white/5 pt-4">
+        <div class="space-y-3 border-t border-slate-200 pt-4">
           <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
             <span class="material-symbols-outlined text-sm">tune</span>
             Variantes disponibles
@@ -224,10 +226,10 @@
           <div class="space-y-2">
             @for (attr of producto.atributos!; track attr.nombre) {
               <div>
-                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-1.5">{{ attr.nombre }}</p>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5">{{ attr.nombre }}</p>
                 <div class="flex flex-wrap gap-1.5">
                   @for (valor of attr.valores; track valor) {
-                    <span class="text-xs font-semibold px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">{{ valor }}</span>
+                    <span class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700">{{ valor }}</span>
                   }
                 </div>
               </div>
@@ -252,13 +254,13 @@
               <span class="material-symbols-outlined text-purple-400 text-sm">videocam</span>
               <span class="text-[10px] font-black uppercase tracking-widest text-purple-400">Video</span>
             }
-            <span class="text-slate-400 text-xs truncate">· {{ creativoVisor()!.nombre }}</span>
+            <span class="text-slate-300 text-xs truncate">· {{ creativoVisor()!.nombre }}</span>
             @if (creativoVisor()!.tamano) {
-              <span class="text-slate-600 text-[10px]">· {{ tamano(creativoVisor()!.tamano) }}</span>
+              <span class="text-slate-400 text-[10px]">· {{ tamano(creativoVisor()!.tamano) }}</span>
             }
           </div>
           <button (click)="cerrarVisor()"
-                  class="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white transition-all shrink-0">
+                  class="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 text-slate-200 hover:bg-white/20 hover:text-white transition-all shrink-0">
             <span class="material-symbols-outlined text-base">close</span>
           </button>
         </div>

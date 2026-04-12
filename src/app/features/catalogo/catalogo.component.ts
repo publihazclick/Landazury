@@ -41,6 +41,22 @@ export class CatalogoComponent implements OnInit {
   }
   cerrarModal() { this.productoModal.set(null); }
 
+  // ── Categorías que tienen al menos un producto con imagen ────────────
+  readonly categoriasConProductos = computed(() => {
+    const prods = this.productos().filter(p => p.imagenes?.some(img => !!img?.trim()));
+    // Extraer categorías directamente de los productos (más fiable)
+    const catMap = new Map<string, { id: string; nombre: string; icono?: string }>();
+    for (const p of prods) {
+      const cat = p.categoria;
+      if (cat?.id && cat.nombre) catMap.set(cat.id, cat);
+    }
+    return Array.from(catMap.values()).sort((a, b) => a.nombre.localeCompare(b.nombre));
+  });
+
+  seleccionarCategoria(id: string) {
+    this.filtros.categoriaSeleccionada.set(this.filtros.categoriaSeleccionada() === id ? '' : id);
+  }
+
   // ── Qué bodegas tienen productos en el listado base ──────────────────
   readonly bodegasConProductos = computed(() => {
     const todos = this.productos();
@@ -52,7 +68,7 @@ export class CatalogoComponent implements OnInit {
 
   // ── Filtrado completo ─────────────────────────────────────────────────
   readonly productosFiltrados = computed(() => {
-    let result = this.productos();
+    let result = this.productos().filter(p => p.imagenes?.some(img => !!img?.trim()));
     const filtro  = this.filtros.filtroAsset();
     const cat     = this.filtros.categoriaSeleccionada();
     const bodega  = this.filtros.bodegaFiltro();

@@ -69,6 +69,12 @@ CREATE POLICY "categorias_lectura_publica" ON categorias
 CREATE POLICY "productos_lectura_publica" ON productos
   FOR SELECT USING (disponible = true);
 
+-- Productos: inventario/admin puede ver TODOS los productos (incluso no disponibles)
+CREATE POLICY "productos_inventario_lectura" ON productos
+  FOR SELECT USING (
+    EXISTS (SELECT 1 FROM perfiles WHERE id = auth.uid() AND rol IN ('inventario', 'admin'))
+  );
+
 -- Productos: inventario/admin puede insertar, actualizar y eliminar
 CREATE POLICY "productos_inventario_insertar" ON productos
   FOR INSERT WITH CHECK (

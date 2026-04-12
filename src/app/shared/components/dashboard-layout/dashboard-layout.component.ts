@@ -34,9 +34,9 @@ export class DashboardLayoutComponent {
 
   badgeRolClass(): string {
     const rol = this.auth.perfil()?.rol;
-    if (rol === 'admin') return 'bg-red-900/30 text-red-300 border border-red-700/30';
-    if (rol === 'inventario') return 'bg-amber-900/30 text-amber-300 border border-amber-700/30';
-    return 'bg-slate-800/50 text-slate-300 border border-slate-600/30';
+    if (rol === 'admin') return 'bg-red-100 text-red-700 border border-red-200';
+    if (rol === 'inventario') return 'bg-amber-100 text-amber-700 border border-amber-200';
+    return 'bg-slate-100 text-slate-600 border border-slate-200';
   }
 
   iconoRol(): string {

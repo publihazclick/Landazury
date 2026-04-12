@@ -76,6 +76,13 @@
             <input type="file" accept=".xlsx,.xls" class="hidden" (change)="onArchivo($event)"/>
           </label>
 
+          <!-- Descargar plantilla -->
+          <button (click)="descargarPlantilla()"
+                  class="flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-primary border border-primary/30 hover:bg-primary/10 transition-all">
+            <span class="material-symbols-outlined text-base">download</span>
+            Descargar plantilla Excel con categorías
+          </button>
+
           <!-- Opción incluir inactivos -->
           <label class="flex items-center gap-2.5 cursor-pointer">
             <input type="checkbox" [checked]="incluirInactivos()" (change)="incluirInactivos.set($any($event.target).checked)"
