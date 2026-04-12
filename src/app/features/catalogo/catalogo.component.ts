@@ -1,6 +1,6 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, HostListener, PLATFORM_ID } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, isPlatformBrowser } from '@angular/common';
 import { CatalogoService } from '../../core/services/catalogo.service';
 import { CreativosService } from '../../core/services/creativos.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -27,6 +27,8 @@ export class CatalogoComponent implements OnInit {
   readonly auth = inject(AuthService);
   readonly filtros = inject(CatalogoFiltrosService);
 
+  private readonly platformId = inject(PLATFORM_ID);
+
   readonly productos = signal<Producto[]>([]);
   readonly favoritos = signal<Set<string>>(new Set());
   readonly cargando = signal(true);
@@ -38,8 +40,28 @@ export class CatalogoComponent implements OnInit {
   abrirModal(producto: Producto) {
     this.productoModal.set(producto);
     this.catalogoService.registrarVista(producto.id).catch(() => {});
+    if (isPlatformBrowser(this.platformId)) {
+      // Empuja un estado en el historial para que el botón "atrás" del móvil
+      // cierre el modal en vez de salir de la página.
+      history.pushState({ modal: 'producto' }, '');
+    }
   }
-  cerrarModal() { this.productoModal.set(null); }
+
+  cerrarModal() {
+    if (!this.productoModal()) return;
+    this.productoModal.set(null);
+    if (isPlatformBrowser(this.platformId) && history.state?.modal === 'producto') {
+      history.back();
+    }
+  }
+
+  @HostListener('window:popstate')
+  onPopState() {
+    // Si el modal está abierto y el usuario presionó "atrás", solo lo cerramos.
+    if (this.productoModal()) {
+      this.productoModal.set(null);
+    }
+  }
 
   readonly categoriasConProductos = this.filtros.categoriasConProductos;
 

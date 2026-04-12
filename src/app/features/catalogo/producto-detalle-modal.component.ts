@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, inject, signal, PLATFORM_ID } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, inject, signal, PLATFORM_ID, HostListener } from '@angular/core';
 import { isPlatformBrowser, DecimalPipe } from '@angular/common';
 import { CreativosService } from '../../core/services/creativos.service';
 import type { Producto, Creativo } from '../../core/models/producto.model';
@@ -62,8 +62,30 @@ export class ProductoDetalleModalComponent implements OnInit {
     this.imagenPrincipalIdx.set(idx);
   }
 
-  abrirLightbox(idx: number) { this.fotoLightboxIdx.set(idx); }
-  cerrarLightbox() { this.fotoLightboxIdx.set(null); }
+  abrirLightbox(idx: number) {
+    const yaAbierto = this.fotoLightboxIdx() !== null;
+    this.fotoLightboxIdx.set(idx);
+    if (!yaAbierto && isPlatformBrowser(this.platformId)) {
+      history.pushState({ modal: 'lightbox' }, '');
+    }
+  }
+
+  cerrarLightbox() {
+    if (this.fotoLightboxIdx() === null) return;
+    this.fotoLightboxIdx.set(null);
+    if (isPlatformBrowser(this.platformId) && history.state?.modal === 'lightbox') {
+      history.back();
+    }
+  }
+
+  @HostListener('window:popstate')
+  onPopStateLightbox() {
+    if (this.fotoLightboxIdx() !== null) {
+      this.fotoLightboxIdx.set(null);
+    } else if (this.creativoVisor()) {
+      this.creativoVisor.set(null);
+    }
+  }
 
   navegarLightbox(dir: 1 | -1) {
     const actual = this.fotoLightboxIdx();
@@ -75,8 +97,20 @@ export class ProductoDetalleModalComponent implements OnInit {
 
   seleccionarImagenPrincipal(idx: number) { this.imagenPrincipalIdx.set(idx); }
 
-  abrirVisor(creativo: Creativo) { this.creativoVisor.set(creativo); }
-  cerrarVisor() { this.creativoVisor.set(null); }
+  abrirVisor(creativo: Creativo) {
+    const yaAbierto = this.creativoVisor() !== null;
+    this.creativoVisor.set(creativo);
+    if (!yaAbierto && isPlatformBrowser(this.platformId)) {
+      history.pushState({ modal: 'visor' }, '');
+    }
+  }
+  cerrarVisor() {
+    if (!this.creativoVisor()) return;
+    this.creativoVisor.set(null);
+    if (isPlatformBrowser(this.platformId) && history.state?.modal === 'visor') {
+      history.back();
+    }
+  }
 
   navegarVisor(dir: 1 | -1) {
     const actual = this.creativoVisor();
