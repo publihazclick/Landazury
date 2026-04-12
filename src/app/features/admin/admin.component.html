@@ -267,20 +267,20 @@
             <div class="bg-neutral-surface border border-neutral-border rounded-2xl overflow-hidden hover:border-primary/20 transition-all">
 
               <!-- Image -->
-              <div class="relative h-36 bg-white">
+              <div class="relative h-36 bg-neutral-border/20">
                 @if (producto.imagenes.length > 0) {
-                  <img [src]="producto.imagenes[0]" [alt]="producto.nombre" class="w-full h-full object-contain p-2 bg-white"/>
+                  <img [src]="producto.imagenes[0]" [alt]="producto.nombre" class="w-full h-full object-cover"/>
                 } @else if (producto.creativos && producto.creativos.length > 0) {
                   @if (producto.creativos[0].tipo === 'imagen') {
-                    <img [src]="producto.creativos[0].archivo_url" [alt]="producto.nombre" class="w-full h-full object-contain p-2 bg-white"/>
+                    <img [src]="producto.creativos[0].archivo_url" [alt]="producto.nombre" class="w-full h-full object-cover"/>
                   } @else {
-                    <div class="w-full h-full bg-slate-50 flex items-center justify-center">
-                      <span class="text-5xl font-black text-slate-300">{{ producto.nombre.charAt(0).toUpperCase() }}</span>
+                    <div class="w-full h-full flex items-center justify-center">
+                      <span class="text-5xl font-black text-slate-700">{{ producto.nombre.charAt(0).toUpperCase() }}</span>
                     </div>
                   }
                 } @else {
-                  <div class="w-full h-full bg-slate-50 flex items-center justify-center">
-                    <span class="text-5xl font-black text-slate-300">{{ producto.nombre.charAt(0).toUpperCase() }}</span>
+                  <div class="w-full h-full flex items-center justify-center">
+                    <span class="text-5xl font-black text-slate-700">{{ producto.nombre.charAt(0).toUpperCase() }}</span>
                   </div>
                 }
                 <!-- Estado badge -->
