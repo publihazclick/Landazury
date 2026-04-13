@@ -1,21 +1,22 @@
-<div class="min-h-screen bg-slate-50 text-slate-900 p-4 md:p-8">
+<div class="min-h-screen bg-slate-50 text-slate-900 p-3 sm:p-4 md:p-8 pb-24 sm:pb-8">
 
   <!-- Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-5 sm:mb-8">
     <div>
-      <h1 class="text-2xl font-black text-slate-900 tracking-tight">Gestión de Productos</h1>
-      <p class="text-slate-500 text-sm mt-0.5">Crea productos y agrega sus creativos para el catálogo</p>
+      <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Gestión de Productos</h1>
+      <p class="text-slate-500 text-xs sm:text-sm mt-0.5">Crea productos y agrega sus creativos</p>
     </div>
-    <div class="flex items-center gap-2 self-start sm:self-auto">
+    <!-- Acciones escritorio -->
+    <div class="hidden sm:flex items-center gap-2 self-start sm:self-auto">
       @if (auth.esInventario()) {
         <button (click)="mostrarImportar.set(true)"
-                class="flex items-center gap-2 bg-slate-50 border border-slate-200 text-slate-500 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-100 hover:border-white/20 transition-all">
+                class="flex items-center gap-2 bg-white border-2 border-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-100 hover:border-slate-300 transition-all">
           <span class="material-symbols-outlined text-base">upload_file</span>
           Importar Excel
         </button>
       }
       <button (click)="abrirCrear()"
-              class="flex items-center gap-2 bg-primary text-[#1a160f] px-5 py-2.5 rounded-xl text-sm font-black hover:brightness-110 transition-all shadow-lg shadow-primary/20 uppercase tracking-wider">
+              class="flex items-center gap-2 bg-gradient-to-r from-primary to-primary-dark text-white px-5 py-2.5 rounded-xl text-sm font-black hover:brightness-110 transition-all shadow-lg shadow-primary/25 uppercase tracking-wider">
         <span class="material-symbols-outlined text-base">add</span>
         Nuevo Producto
       </button>
@@ -24,85 +25,85 @@
 
   <!-- Alertas -->
   @if (error()) {
-    <div class="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400 flex items-center justify-between gap-3">
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600 flex items-center justify-between gap-3">
       <div class="flex items-center gap-2">
         <span class="material-symbols-outlined text-base shrink-0">error</span>{{ error() }}
       </div>
-      <button (click)="error.set(null)" class="text-red-400 hover:text-red-300 text-xl leading-none shrink-0">×</button>
+      <button (click)="error.set(null)" class="text-red-600 hover:text-red-300 text-xl leading-none shrink-0">×</button>
     </div>
   }
   @if (exito()) {
-    <div class="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-xl text-sm text-green-400 flex items-center gap-2">
+    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl text-sm text-green-600 flex items-center gap-2">
       <span class="material-symbols-outlined text-base">check_circle</span>{{ exito() }}
     </div>
   }
 
   <!-- Stats -->
-  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-8">
-    <div class="glass rounded-2xl p-3 sm:p-4 text-center">
-      <p class="text-xl sm:text-2xl font-black text-slate-900">{{ totalProductos() }}</p>
-      <p class="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-0.5">Total</p>
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 mb-5 sm:mb-8">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-3 sm:p-4 text-center">
+      <p class="text-2xl sm:text-3xl font-black text-slate-900">{{ totalProductos() }}</p>
+      <p class="text-[10px] sm:text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1">Total</p>
     </div>
-    <div class="glass rounded-2xl p-3 sm:p-4 text-center">
-      <p class="text-xl sm:text-2xl font-black text-amber-300">{{ productosPendientes() }}</p>
-      <p class="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-0.5">Pendientes</p>
+    <div class="bg-white rounded-2xl border border-amber-200 shadow-sm p-3 sm:p-4 text-center">
+      <p class="text-2xl sm:text-3xl font-black text-amber-600">{{ productosPendientes() }}</p>
+      <p class="text-[10px] sm:text-[10px] font-bold uppercase tracking-widest text-amber-700 mt-1">Pendientes</p>
     </div>
-    <div class="glass rounded-2xl p-3 sm:p-4 text-center">
-      <p class="text-xl sm:text-2xl font-black text-green-300">{{ productosPublicados() }}</p>
-      <p class="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-0.5">Publicados</p>
+    <div class="bg-white rounded-2xl border border-green-200 shadow-sm p-3 sm:p-4 text-center">
+      <p class="text-2xl sm:text-3xl font-black text-green-600">{{ productosPublicados() }}</p>
+      <p class="text-[10px] sm:text-[10px] font-bold uppercase tracking-widest text-green-700 mt-1">Publicados</p>
     </div>
-    <div class="glass rounded-2xl p-3 sm:p-4 text-center">
-      <p class="text-xl sm:text-2xl font-black text-primary">{{ totalCreativos() }}</p>
-      <p class="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-0.5">Creativos</p>
+    <div class="bg-white rounded-2xl border border-primary/30 shadow-sm p-3 sm:p-4 text-center">
+      <p class="text-2xl sm:text-3xl font-black text-primary-dark">{{ totalCreativos() }}</p>
+      <p class="text-[10px] sm:text-[10px] font-bold uppercase tracking-widest text-primary-dark mt-1">Creativos</p>
     </div>
   </div>
 
   <!-- Product grid -->
   @if (cargando()) {
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-5">
       @for (_ of [1,2,3,4,5,6]; track $index) {
-        <div class="glass rounded-2xl overflow-hidden">
-          <div class="aspect-[16/10] sm:h-44 sm:aspect-auto bg-[#262116] animate-pulse"></div>
+        <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+          <div class="aspect-[16/10] sm:h-44 sm:aspect-auto bg-slate-100 animate-pulse"></div>
           <div class="p-4 space-y-3">
-            <div class="h-4 bg-[#262116] rounded animate-pulse w-3/4"></div>
-            <div class="h-3 bg-[#262116] rounded animate-pulse w-1/2"></div>
-            <div class="h-8 bg-[#262116] rounded-xl animate-pulse"></div>
+            <div class="h-4 bg-slate-100 rounded animate-pulse w-3/4"></div>
+            <div class="h-3 bg-slate-100 rounded animate-pulse w-1/2"></div>
+            <div class="h-8 bg-slate-100 rounded-xl animate-pulse"></div>
           </div>
         </div>
       }
     </div>
   } @else if (productos().length === 0) {
-    <div class="glass rounded-2xl py-20 text-center">
-      <span class="material-symbols-outlined text-6xl text-slate-500 block mb-4">inventory_2</span>
-      <p class="text-slate-500 font-semibold mb-2">Sin productos todavía</p>
-      <p class="text-slate-500 text-sm mb-6">Crea tu primer producto y agrega sus creativos</p>
+    <div class="bg-white border border-slate-200 rounded-2xl py-16 sm:py-20 text-center shadow-sm">
+      <span class="material-symbols-outlined text-6xl text-slate-300 block mb-4">inventory_2</span>
+      <p class="text-slate-800 font-bold text-lg mb-1">Sin productos todavía</p>
+      <p class="text-slate-500 text-sm mb-6 px-4">Crea tu primer producto y agrega sus creativos</p>
       <button (click)="abrirCrear()"
-              class="inline-flex items-center gap-2 bg-primary text-[#1a160f] px-6 py-3 rounded-xl text-sm font-black hover:brightness-110 transition-all uppercase tracking-wider">
+              class="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-primary-dark text-white px-6 py-3 rounded-xl text-sm font-black hover:brightness-110 transition-all uppercase tracking-wider shadow-lg shadow-primary/25">
         <span class="material-symbols-outlined text-base">add</span>
         Crear Primer Producto
       </button>
     </div>
   } @else {
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-5">
       @for (producto of productos(); track producto.id) {
-        <div class="glass rounded-2xl overflow-hidden border border-slate-200 group hover:border-primary/30 transition-all duration-300 flex flex-col">
+        <div class="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm group hover:border-primary/40 hover:shadow-md transition-all duration-300 flex flex-col">
 
           <!-- Image area -->
-          <div class="aspect-[16/10] sm:h-44 sm:aspect-auto relative overflow-hidden shrink-0">
+          <div class="aspect-[16/10] sm:h-44 sm:aspect-auto relative overflow-hidden shrink-0 bg-slate-50">
             @if (primeraImagen(producto)) {
               <img [src]="primeraImagen(producto)!" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"/>
             } @else {
-              <div class="w-full h-full bg-gradient-to-br from-[#2a2116] via-[#1e1a10] to-[#0f0d07] flex items-center justify-center">
-                <span class="text-7xl font-black text-primary/10 select-none">{{ producto.nombre.charAt(0).toUpperCase() }}</span>
+              <div class="w-full h-full bg-slate-100 flex items-center justify-center">
+                <span class="text-7xl font-black text-slate-300 select-none">{{ producto.nombre.charAt(0).toUpperCase() }}</span>
               </div>
             }
-            <!-- Gradient overlay -->
-            <div class="absolute inset-0 bg-gradient-to-t from-[#1a160f]/80 via-transparent to-transparent"></div>
+            <!-- Soft bottom gradient for badge legibility -->
+            <div class="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-slate-900/35 to-transparent"></div>
 
             <!-- Status badges -->
-            <div class="absolute top-3 right-3 flex flex-col items-end gap-1.5">
+            <div class="absolute top-2 right-2 flex flex-col items-end gap-1">
               <!-- Estado de aprobación -->
-              <span class="text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider backdrop-blur-sm border flex items-center gap-1"
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider border flex items-center gap-1 shadow-sm"
                     [class]="badgeEstado(producto.estado)">
                 <span class="material-symbols-outlined text-[11px]">{{ iconoEstado(producto.estado) }}</span>
                 {{ producto.estado }}
@@ -110,45 +111,45 @@
               <!-- Disponible (solo admin lo puede cambiar) -->
               @if (auth.esAdmin() && producto.estado === 'aprobado') {
                 <button (click)="toggleDisponible(producto, $event)"
-                        class="text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider backdrop-blur-sm transition-all border"
+                        class="text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider transition-all border shadow-sm"
                         [class]="producto.disponible
-                          ? 'bg-green-500/20 border-green-500/40 text-green-300 hover:bg-green-500/30'
-                          : 'bg-black/40 border-slate-200 text-slate-500 hover:bg-black/60'">
+                          ? 'bg-green-100 border-green-300 text-green-700'
+                          : 'bg-white border-slate-300 text-slate-600'">
                   <span class="inline-block w-1.5 h-1.5 rounded-full mr-1 align-middle"
-                        [class]="producto.disponible ? 'bg-green-400' : 'bg-slate-600'"></span>
+                        [class]="producto.disponible ? 'bg-green-500' : 'bg-slate-400'"></span>
                   {{ producto.disponible ? 'Visible' : 'Oculto' }}
                 </button>
               }
             </div>
 
-            <!-- Ganador / Exclusivo badges top-left (solo visual para inventario, editables para admin) -->
-            <div class="absolute top-3 left-3 flex flex-col gap-1.5">
+            <!-- Ganador / Exclusivo badges top-left -->
+            <div class="absolute top-2 left-2 flex flex-col gap-1">
               @if (auth.esAdmin()) {
                 <button (click)="toggleGanador(producto, $event)"
-                        class="flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider backdrop-blur-sm border transition-all"
+                        class="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider border transition-all shadow-sm"
                         [class]="producto.ganador
-                          ? 'bg-primary/90 border-primary text-[#0f0f0f]'
-                          : 'bg-black/40 border-slate-200 text-slate-500 hover:border-primary/30 hover:text-primary/60'">
+                          ? 'bg-primary border-primary-dark text-white'
+                          : 'bg-white border-slate-300 text-slate-500 hover:border-primary hover:text-primary-dark'">
                   <span class="material-symbols-outlined text-[11px]">verified</span>
                   Ganador
                 </button>
                 <button (click)="toggleExclusivo(producto, $event)"
-                        class="flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider backdrop-blur-sm border transition-all"
+                        class="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider border transition-all shadow-sm"
                         [class]="producto.exclusivo
-                          ? 'bg-purple-500/90 border-purple-400 text-white'
-                          : 'bg-black/40 border-slate-200 text-slate-500 hover:border-purple-400/30 hover:text-purple-400/60'">
+                          ? 'bg-purple-600 border-purple-700 text-white'
+                          : 'bg-white border-slate-300 text-slate-500 hover:border-purple-500 hover:text-purple-700'">
                   <span class="material-symbols-outlined text-[11px]">diamond</span>
                   Exclusivo
                 </button>
               } @else {
                 @if (producto.ganador) {
-                  <span class="flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider backdrop-blur-sm border bg-primary/90 border-primary text-[#0f0f0f]">
+                  <span class="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider border bg-primary border-primary-dark text-white shadow-sm">
                     <span class="material-symbols-outlined text-[11px]">verified</span>
                     Ganador
                   </span>
                 }
                 @if (producto.exclusivo) {
-                  <span class="flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider backdrop-blur-sm border bg-purple-500/90 border-purple-400 text-white">
+                  <span class="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider border bg-purple-600 border-purple-700 text-white shadow-sm">
                     <span class="material-symbols-outlined text-[11px]">diamond</span>
                     Exclusivo
                   </span>
@@ -158,8 +159,8 @@
 
             <!-- Category badge -->
             @if (producto.categoria) {
-              <div class="absolute bottom-3 left-3">
-                <span class="text-[10px] px-2.5 py-1 rounded-full bg-black/50 border border-slate-200 text-slate-500 backdrop-blur-sm font-medium">
+              <div class="absolute bottom-2 left-2">
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-white/95 border border-slate-200 text-slate-700 font-bold shadow-sm">
                   {{ producto.categoria.icono }} {{ producto.categoria.nombre }}
                 </span>
               </div>
@@ -167,18 +168,18 @@
           </div>
 
           <!-- Body -->
-          <div class="p-4 flex flex-col gap-3 flex-1">
+          <div class="p-3 sm:p-4 flex flex-col gap-2.5 sm:gap-3 flex-1">
             <!-- Name + SKU + stock + subidor -->
             <div>
-              <h3 class="font-bold text-slate-900 text-sm leading-snug line-clamp-2">{{ producto.nombre }}</h3>
-              <div class="flex items-center gap-2 mt-1 flex-wrap">
+              <h3 class="font-black text-slate-900 text-base sm:text-sm leading-snug line-clamp-2">{{ producto.nombre }}</h3>
+              <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
                 @if (producto.sku) {
-                  <span class="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-50 border border-slate-200 text-slate-500">SKU: {{ producto.sku }}</span>
+                  <span class="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-700">SKU: {{ producto.sku }}</span>
                 }
                 @if (producto.stock != null && producto.stock! > 0) {
-                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">Stock: {{ producto.stock }}</span>
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-700">Stock: {{ producto.stock }}</span>
                 } @else if (producto.stock === 0) {
-                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-400">Sin stock</span>
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-50 border border-red-200 text-red-600">Sin stock</span>
                 }
                 @if (auth.esAdmin()) {
                   <span class="text-[10px] text-slate-500">{{ nombreSubidor(producto.bodega_id) }}</span>
@@ -188,25 +189,25 @@
 
             <!-- Prices -->
             <div class="grid grid-cols-3 gap-1.5">
-              <div class="bg-slate-50 rounded-lg px-2 py-1.5">
+              <div class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-2">
                 <p class="text-[8px] font-bold uppercase tracking-widest text-slate-500 leading-none">Costo</p>
-                <p class="text-xs sm:text-sm font-bold text-slate-800 mt-0.5 truncate">$ {{ producto.precio_base | number:'1.0-0' }}</p>
+                <p class="text-sm font-black text-slate-800 mt-1 truncate">$ {{ producto.precio_base | number:'1.0-0' }}</p>
               </div>
               @if (producto.precio_sugerido) {
-                <div class="bg-slate-50 rounded-lg px-2 py-1.5">
+                <div class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-2">
                   <p class="text-[8px] font-bold uppercase tracking-widest text-slate-500 leading-none">Sugerido</p>
-                  <p class="text-xs sm:text-sm text-slate-500 mt-0.5 truncate">$ {{ producto.precio_sugerido | number:'1.0-0' }}</p>
+                  <p class="text-sm font-black text-slate-700 mt-1 truncate">$ {{ producto.precio_sugerido | number:'1.0-0' }}</p>
                 </div>
               }
               @if (producto.precio_final) {
-                <div class="bg-primary/5 border border-primary/10 rounded-lg px-2 py-1.5">
-                  <p class="text-[8px] font-bold uppercase tracking-widest text-primary/70 leading-none">Dropshipper</p>
-                  <p class="text-xs sm:text-sm font-black text-primary mt-0.5 truncate">$ {{ producto.precio_final | number:'1.0-0' }}</p>
+                <div class="bg-primary/10 border border-primary/30 rounded-lg px-2 py-2">
+                  <p class="text-[8px] font-bold uppercase tracking-widest text-primary-dark leading-none">Dropshipper</p>
+                  <p class="text-sm font-black text-primary-dark mt-1 truncate">$ {{ producto.precio_final | number:'1.0-0' }}</p>
                 </div>
               } @else if (auth.esAdmin()) {
-                <div class="bg-amber-500/5 border border-amber-500/10 rounded-lg px-2 py-1.5">
-                  <p class="text-[8px] font-bold uppercase tracking-widest text-amber-600 leading-none">Dropshipper</p>
-                  <p class="text-[10px] text-amber-500 italic mt-0.5">Sin definir</p>
+                <div class="bg-amber-50 border border-amber-200 rounded-lg px-2 py-2">
+                  <p class="text-[8px] font-bold uppercase tracking-widest text-amber-700 leading-none">Dropshipper</p>
+                  <p class="text-[10px] text-amber-700 italic mt-1">Sin definir</p>
                 </div>
               }
             </div>
@@ -238,15 +239,15 @@
             </div>
 
             <!-- Actions -->
-            <div class="flex items-center gap-2 pt-2 border-t border-slate-200/50 mt-auto">
+            <div class="flex items-center gap-2 pt-2.5 border-t border-slate-200 mt-auto">
               <button (click)="abrirEditar(producto)"
-                      class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-all">
-                <span class="material-symbols-outlined text-[14px]">edit</span>
-                Editar / Creativos
+                      class="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-black bg-primary/10 border border-primary/30 text-primary-dark hover:bg-primary/20 active:bg-primary/30 transition-all uppercase tracking-wider">
+                <span class="material-symbols-outlined text-base">edit</span>
+                Editar
               </button>
               <button (click)="confirmarEliminar(producto, $event)"
-                      class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all">
-                <span class="material-symbols-outlined text-base">delete</span>
+                      class="w-11 h-11 flex items-center justify-center rounded-xl text-slate-500 hover:text-red-600 hover:bg-red-50 border border-slate-200 hover:border-red-200 transition-all">
+                <span class="material-symbols-outlined text-lg">delete</span>
               </button>
             </div>
           </div>
@@ -259,12 +260,29 @@
 </div>
 
 <!-- ══════════════════════════════════
+     FLOATING ACTION BAR (mobile only)
+══════════════════════════════════ -->
+<div class="sm:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 py-3 flex items-center gap-2 shadow-2xl">
+  @if (auth.esInventario()) {
+    <button (click)="mostrarImportar.set(true)"
+            class="shrink-0 w-14 h-14 flex items-center justify-center bg-white border-2 border-slate-200 text-slate-700 rounded-2xl hover:bg-slate-100 transition-all">
+      <span class="material-symbols-outlined text-2xl">upload_file</span>
+    </button>
+  }
+  <button (click)="abrirCrear()"
+          class="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-primary-dark text-white py-4 rounded-2xl text-sm font-black shadow-lg shadow-primary/25 uppercase tracking-wider active:brightness-90 transition-all">
+    <span class="material-symbols-outlined text-xl">add</span>
+    Nuevo Producto
+  </button>
+</div>
+
+<!-- ══════════════════════════════════
      MODAL: PRODUCTO + CREATIVOS
 ══════════════════════════════════ -->
 @if (mostrarModal()) {
   <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
        (click)="cerrarModal()">
-    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+    <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm"></div>
 
     <div class="relative w-full sm:max-w-5xl h-[94dvh] sm:h-auto sm:max-h-[94dvh] bg-white border border-slate-200 rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden"
          (click)="$event.stopPropagation()">
@@ -339,7 +357,7 @@
                        class="w-full bg-primary/5 border border-primary/30 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-900 placeholder:text-slate-500 pl-8 pr-4 py-3 outline-none transition-all text-sm"/>
               </div>
               @if (formProducto.precio_final > formProducto.precio_base && formProducto.precio_base > 0) {
-                <p class="text-[11px] text-green-400 flex items-center gap-1">
+                <p class="text-[11px] text-green-600 flex items-center gap-1">
                   <span class="material-symbols-outlined text-sm">trending_up</span>
                   Ganancia: $ {{ (formProducto.precio_final - formProducto.precio_base) | number:'1.0-0' }}
                   · Margen {{ ((formProducto.precio_final - formProducto.precio_base) / formProducto.precio_base * 100) | number:'1.0-0' }}%
@@ -439,7 +457,7 @@
                     {{ atributo.nombre }}
                   </span>
                   <button type="button" (click)="eliminarAtributo(atributo.nombre)"
-                          class="text-slate-500 hover:text-red-400 transition-colors">
+                          class="text-slate-500 hover:text-red-600 transition-colors">
                     <span class="material-symbols-outlined text-sm">delete</span>
                   </button>
                 </div>
@@ -450,7 +468,7 @@
                     <span class="flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary">
                       {{ valor }}
                       <button type="button" (click)="eliminarValor(atributo.nombre, valor)"
-                              class="hover:text-red-400 transition-colors leading-none ml-0.5">×</button>
+                              class="hover:text-red-600 transition-colors leading-none ml-0.5">×</button>
                     </span>
                   }
                   @if (atributo.valores.length === 0) {
@@ -802,13 +820,13 @@
                         <p class="text-[10px] text-slate-500 mt-0.5">
                           <span class="text-slate-500 font-medium">{{ creativo.extension?.toUpperCase() }}</span>
                           @if (creativo.tamano) { · {{ tamano(creativo.tamano) }} }
-                          @if (!creativo.publico) { · <span class="text-amber-500">privado</span> }
+                          @if (!creativo.publico) { · <span class="text-amber-700">privado</span> }
                         </p>
                       </div>
 
                       <!-- Delete -->
                       <button (click)="eliminarCreativoEnModal(creativo)"
-                              class="opacity-0 group-hover:opacity-100 w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all shrink-0">
+                              class="opacity-0 group-hover:opacity-100 w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 hover:text-red-600 hover:bg-red-50 transition-all shrink-0">
                         <span class="material-symbols-outlined text-sm">delete</span>
                       </button>
                     </div>
@@ -831,12 +849,12 @@
 @if (confirmandoEliminar()) {
   <div class="fixed inset-0 z-[60] flex items-center justify-center p-4"
        (click)="cancelarEliminar()">
-    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
-    <div class="relative w-full max-w-sm bg-white border border-red-500/20 rounded-2xl shadow-2xl"
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+    <div class="relative w-full max-w-sm bg-white border border-red-200 rounded-2xl shadow-2xl"
          (click)="$event.stopPropagation()">
       <div class="px-6 pt-8 pb-4 text-center">
-        <div class="w-14 h-14 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4">
-          <span class="material-symbols-outlined text-red-400 text-2xl">delete_forever</span>
+        <div class="w-14 h-14 rounded-full bg-red-50 border border-red-200 flex items-center justify-center mx-auto mb-4">
+          <span class="material-symbols-outlined text-red-600 text-2xl">delete_forever</span>
         </div>
         <h3 class="text-slate-900 font-bold text-base mb-1">Eliminar producto</h3>
         <p class="text-slate-500 text-sm">
@@ -850,7 +868,7 @@
           Cancelar
         </button>
         <button (click)="eliminarProducto()"
-                class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold bg-red-500/20 text-red-300 border border-red-500/30 hover:bg-red-500/30 transition-all">
+                class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold bg-red-500/20 text-red-300 border border-red-200 hover:bg-red-500/30 transition-all">
           <span class="material-symbols-outlined text-base">delete</span>
           Eliminar
         </button>
@@ -861,7 +879,7 @@
 
 <!-- Modal importar Excel -->
 @if (mostrarImportar()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
     <app-importar-productos (cerrar)="onImportarCerrar($event)"></app-importar-productos>
   </div>
 }
