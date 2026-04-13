@@ -1,51 +1,52 @@
-<div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+<div class="fixed inset-0 z-50 flex items-stretch sm:items-center justify-center p-0 sm:p-4"
      (click)="paso() !== 'resultado' && !procesando() && finalizar()">
-  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+  <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
 
-  <div class="relative w-full sm:max-w-5xl h-[96dvh] sm:h-auto sm:max-h-[90vh] bg-[#111009] border border-white/10 rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+  <div class="relative w-full sm:max-w-5xl h-[100dvh] sm:h-auto sm:max-h-[94dvh] bg-white border-0 sm:border sm:border-slate-200 rounded-none sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden"
        (click)="$event.stopPropagation()">
 
     <!-- Header -->
-    <div class="flex items-center justify-between px-6 py-4 border-b border-white/8 shrink-0">
-      <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-          <span class="material-symbols-outlined text-primary text-base">table_view</span>
+    <div class="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200 shrink-0 bg-slate-50">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-10 h-10 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-primary-dark text-xl sm:text-lg">table_view</span>
         </div>
-        <div>
-          <h3 class="text-slate-100 font-bold text-sm">Importar productos desde Excel</h3>
-          <p class="text-slate-500 text-[11px]">
-            @if (paso() === 'upload') { Sube un archivo .xlsx con tus productos }
-            @else if (paso() === 'preview') { {{ filas().length }} productos listos · {{ filasSeleccionadas.length }} seleccionados }
+        <div class="min-w-0">
+          <h3 class="text-slate-900 font-black text-base sm:text-sm leading-tight">Importar productos</h3>
+          <p class="text-slate-500 text-xs sm:text-[11px] truncate">
+            @if (paso() === 'upload') { Sube un archivo Excel con tus productos }
+            @else if (paso() === 'preview') { {{ filas().length }} productos · {{ filasSeleccionadas.length }} seleccionados }
             @else { Importación completada }
           </p>
         </div>
       </div>
       @if (!procesando()) {
-        <button (click)="finalizar()" class="text-slate-500 hover:text-slate-300 transition-colors">
-          <span class="material-symbols-outlined">close</span>
+        <button (click)="finalizar()" aria-label="Cerrar"
+                class="w-11 h-11 flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all shrink-0">
+          <span class="material-symbols-outlined text-2xl sm:text-xl">close</span>
         </button>
       }
     </div>
 
     <!-- Indicador de pasos -->
-    <div class="flex items-center gap-0 px-6 py-3 border-b border-white/8 shrink-0">
-      @for (step of [{l:'Subir archivo'},{l:'Previsualizar'},{l:'Resultado'}]; track $index) {
+    <div class="flex items-center justify-center gap-0 px-3 sm:px-6 py-3 border-b border-slate-200 shrink-0 bg-white">
+      @for (step of [{l:'Subir'},{l:'Revisar'},{l:'Resultado'}]; track $index) {
         <div class="flex items-center gap-2">
           <div class="flex items-center gap-1.5">
-            <div class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black border transition-all"
+            <div class="w-6 h-6 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[11px] font-black border-2 transition-all"
                  [class]="($index === 0 && paso() === 'upload') || ($index === 1 && paso() === 'preview') || ($index === 2 && paso() === 'resultado')
-                   ? 'bg-primary border-primary text-[#0a0a08]'
+                   ? 'bg-primary border-primary-dark text-white'
                    : ($index === 0 && (paso() === 'preview' || paso() === 'resultado')) || ($index === 1 && paso() === 'resultado')
-                   ? 'bg-green-500/20 border-green-500/40 text-green-400'
-                   : 'bg-white/5 border-white/10 text-slate-600'">
+                   ? 'bg-green-100 border-green-400 text-green-700'
+                   : 'bg-slate-100 border-slate-300 text-slate-500'">
               {{ $index + 1 }}
             </div>
-            <span class="text-[11px] font-semibold hidden sm:block"
+            <span class="text-xs font-black uppercase tracking-wider"
                   [class]="($index === 0 && paso() === 'upload') || ($index === 1 && paso() === 'preview') || ($index === 2 && paso() === 'resultado')
-                    ? 'text-primary' : 'text-slate-600'">{{ step.l }}</span>
+                    ? 'text-primary-dark' : 'text-slate-400'">{{ step.l }}</span>
           </div>
           @if ($index < 2) {
-            <div class="w-8 h-px mx-1" [class]="($index === 0 && (paso() === 'preview' || paso() === 'resultado')) || ($index === 1 && paso() === 'resultado') ? 'bg-green-500/40' : 'bg-white/10'"></div>
+            <div class="w-6 sm:w-10 h-0.5 mx-1" [class]="($index === 0 && (paso() === 'preview' || paso() === 'resultado')) || ($index === 1 && paso() === 'resultado') ? 'bg-green-400' : 'bg-slate-200'"></div>
           }
         </div>
       }
@@ -56,72 +57,77 @@
 
       <!-- ══ PASO 1: UPLOAD ══ -->
       @if (paso() === 'upload') {
-        <div class="flex-1 flex flex-col items-center justify-center p-8 gap-5">
+        <div class="flex-1 overflow-y-auto">
+          <div class="flex flex-col items-center p-5 sm:p-8 gap-5 max-w-lg mx-auto w-full">
 
-          <!-- Zona de carga -->
-          <label class="w-full max-w-lg flex flex-col items-center justify-center gap-4 p-10 border-2 border-dashed border-[#3d3524] hover:border-primary/50 rounded-2xl cursor-pointer transition-all group bg-[#0d0b06] hover:bg-primary/3">
-            <div class="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <span class="material-symbols-outlined text-primary text-3xl">upload_file</span>
-            </div>
-            <div class="text-center">
-              <p class="text-slate-300 font-bold text-sm group-hover:text-primary transition-colors">Haz clic o arrastra tu archivo Excel</p>
-              <p class="text-slate-600 text-xs mt-1">Formatos soportados: .xlsx · .xls</p>
-            </div>
-            @if (archivoNombre()) {
-              <p class="text-primary text-sm font-semibold flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-base">description</span>
-                {{ archivoNombre() }}
-              </p>
-            }
-            <input type="file" accept=".xlsx,.xls" class="hidden" (change)="onArchivo($event)"/>
-          </label>
-
-          <!-- Descargar plantilla -->
-          <button (click)="descargarPlantilla()"
-                  class="flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-primary border border-primary/30 hover:bg-primary/10 transition-all">
-            <span class="material-symbols-outlined text-base">download</span>
-            Descargar plantilla Excel con categorías
-          </button>
-
-          <!-- Opción incluir inactivos -->
-          <label class="flex items-center gap-2.5 cursor-pointer">
-            <input type="checkbox" [checked]="incluirInactivos()" (change)="incluirInactivos.set($any($event.target).checked)"
-                   class="w-4 h-4 accent-primary cursor-pointer"/>
-            <span class="text-xs text-slate-400">Incluir productos marcados como inactivos <span class="text-slate-600">(columna Active = 0)</span></span>
-          </label>
-
-          <!-- Mapa de columnas -->
-          <div class="w-full max-w-lg bg-white/3 border border-white/6 rounded-xl p-4">
-            <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Columnas que extrae el servicio</p>
-            <div class="grid grid-cols-2 gap-y-2 gap-x-4">
-              @for (col of [
-                {campo:'Title',            mapea:'Nombre',              req:true},
-                {campo:'Pricing 1',        mapea:'Precio proveedor',    req:true},
-                {campo:'Description',      mapea:'Descripción',         req:false},
-                {campo:'Pricing 2',        mapea:'Precio sugerido',     req:false},
-                {campo:'Category',         mapea:'Categoría',           req:false},
-                {campo:'SKU',              mapea:'Referencia SKU',      req:false},
-                {campo:'Stock',            mapea:'Stock disponible',    req:false},
-                {campo:'Active',           mapea:'Activo (filtro)',     req:false},
-                {campo:'Image URL',        mapea:'Imagen principal',    req:false},
-                {campo:'Creativos Drive',  mapea:'Link creativos Drive',req:false}
-              ]; track col.campo) {
-                <div class="flex items-center gap-2">
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#1a160f] border border-[#3d3524] text-slate-400 shrink-0 whitespace-nowrap">{{ col.campo }}</span>
-                  <span class="text-[10px] text-slate-500">→ {{ col.mapea }}
-                    @if (col.req) { <span class="text-primary font-bold">*</span> }
-                  </span>
-                </div>
+            <!-- Zona de carga -->
+            <label class="w-full flex flex-col items-center justify-center gap-3 sm:gap-4 p-8 sm:p-10 border-2 border-dashed border-slate-300 hover:border-primary rounded-2xl cursor-pointer transition-all group bg-slate-50 hover:bg-amber-50">
+              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-primary-dark text-3xl sm:text-4xl">upload_file</span>
+              </div>
+              <div class="text-center">
+                <p class="text-slate-800 font-black text-base sm:text-lg group-hover:text-primary-dark transition-colors">Toca para seleccionar archivo</p>
+                <p class="text-slate-500 text-xs sm:text-sm mt-1">Formatos .xlsx o .xls</p>
+              </div>
+              @if (archivoNombre()) {
+                <p class="text-primary-dark text-sm font-bold flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 border border-primary/30 rounded-full">
+                  <span class="material-symbols-outlined text-base">description</span>
+                  <span class="truncate max-w-[200px]">{{ archivoNombre() }}</span>
+                </p>
               }
-            </div>
-            <p class="text-[10px] text-slate-600 mt-3">El resto de columnas del Excel se descartan automáticamente.</p>
-          </div>
+              <input type="file" accept=".xlsx,.xls" class="hidden" (change)="onArchivo($event)"/>
+            </label>
 
-          @if (error()) {
-            <div class="w-full max-w-lg p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400 flex items-center gap-2">
-              <span class="material-symbols-outlined text-base shrink-0">error</span>{{ error() }}
+            <!-- Descargar plantilla -->
+            <button (click)="descargarPlantilla()"
+                    class="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl text-sm font-black text-primary-dark border-2 border-primary/40 bg-primary/5 hover:bg-primary/15 active:bg-primary/20 transition-all uppercase tracking-wider">
+              <span class="material-symbols-outlined text-lg">download</span>
+              Descargar plantilla Excel
+            </button>
+
+            <!-- Opción incluir inactivos -->
+            <label class="w-full flex items-center gap-2.5 cursor-pointer p-3 rounded-xl border border-slate-200 bg-white">
+              <input type="checkbox" [checked]="incluirInactivos()" (change)="incluirInactivos.set($any($event.target).checked)"
+                     class="w-5 h-5 accent-primary cursor-pointer shrink-0"/>
+              <span class="text-sm text-slate-700 font-semibold">Incluir productos inactivos
+                <span class="block text-xs text-slate-500 font-normal mt-0.5">(columna Active = 0)</span>
+              </span>
+            </label>
+
+            <!-- Mapa de columnas -->
+            <div class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4">
+              <p class="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">Columnas del archivo</p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
+                @for (col of [
+                  {campo:'Title',            mapea:'Nombre',              req:true},
+                  {campo:'Pricing 1',        mapea:'Precio proveedor',    req:true},
+                  {campo:'Description',      mapea:'Descripción',         req:false},
+                  {campo:'Pricing 2',        mapea:'Precio sugerido',     req:false},
+                  {campo:'Category',         mapea:'Categoría',           req:false},
+                  {campo:'SKU',              mapea:'Referencia SKU',      req:false},
+                  {campo:'Stock',            mapea:'Stock disponible',    req:false},
+                  {campo:'Active',           mapea:'Activo (filtro)',     req:false},
+                  {campo:'Image URL',        mapea:'Imagen principal',    req:false},
+                  {campo:'Creativos Drive',  mapea:'Link creativos Drive',req:false}
+                ]; track col.campo) {
+                  <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-700 shrink-0 whitespace-nowrap">{{ col.campo }}</span>
+                    <span class="text-xs text-slate-600 truncate">→ {{ col.mapea }}
+                      @if (col.req) { <span class="text-primary-dark font-black">*</span> }
+                    </span>
+                  </div>
+                }
+              </div>
+              <p class="text-xs text-slate-500 mt-3">El resto de columnas se descartan automáticamente.</p>
             </div>
-          }
+
+            @if (error()) {
+              <div class="w-full p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 flex items-start gap-2.5">
+                <span class="material-symbols-outlined text-lg shrink-0 mt-0.5 text-red-500">error</span>
+                <p class="flex-1 leading-relaxed font-medium">{{ error() }}</p>
+              </div>
+            }
+          </div>
         </div>
       }
 
@@ -129,142 +135,224 @@
       @if (paso() === 'preview') {
         <div class="flex-1 overflow-hidden flex flex-col">
 
-          <!-- Stats del parseo + acciones -->
-          <div class="px-5 py-3 border-b border-white/8 shrink-0 flex flex-wrap items-center gap-4">
-
-            <!-- Estadísticas de extracción -->
-            <div class="flex items-center gap-4 flex-1 flex-wrap">
-              <div class="text-center">
-                <p class="text-base font-black text-slate-300">{{ statsLeidas() }}</p>
-                <p class="text-[9px] font-bold uppercase tracking-widest text-slate-600">Leídas</p>
+          <!-- Stats del parseo -->
+          <div class="px-4 sm:px-5 py-3 border-b border-slate-200 shrink-0 bg-slate-50 overflow-x-auto no-scrollbar">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-max sm:min-w-0">
+              <div class="text-center shrink-0">
+                <p class="text-base sm:text-lg font-black text-slate-700">{{ statsLeidas() }}</p>
+                <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500">Leídas</p>
               </div>
-              <div class="text-center">
-                <p class="text-base font-black text-primary">{{ filas().length }}</p>
-                <p class="text-[9px] font-bold uppercase tracking-widest text-slate-600">Válidas</p>
+              <div class="text-center shrink-0">
+                <p class="text-base sm:text-lg font-black text-primary-dark">{{ filas().length }}</p>
+                <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500">Válidas</p>
               </div>
-              <div class="text-center">
-                <p class="text-base font-black text-slate-500">{{ statsOmitidas() }}</p>
-                <p class="text-[9px] font-bold uppercase tracking-widest text-slate-600">Omitidas</p>
+              <div class="text-center shrink-0">
+                <p class="text-base sm:text-lg font-black text-slate-500">{{ statsOmitidas() }}</p>
+                <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500">Omitidas</p>
               </div>
               @if (statsInactivas() > 0) {
-                <div class="text-center">
-                  <p class="text-base font-black text-amber-400">{{ statsInactivas() }}</p>
-                  <p class="text-[9px] font-bold uppercase tracking-widest text-slate-600">Inactivas</p>
+                <div class="text-center shrink-0">
+                  <p class="text-base sm:text-lg font-black text-amber-600">{{ statsInactivas() }}</p>
+                  <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500">Inactivas</p>
                 </div>
               }
-              <div class="w-px h-8 bg-white/8 hidden sm:block"></div>
-              <div class="text-center">
-                <p class="text-base font-black text-green-400">{{ totalConCategoria }}</p>
-                <p class="text-[9px] font-bold uppercase tracking-widest text-slate-600">Con categ.</p>
+              <div class="w-px h-8 bg-slate-300 shrink-0"></div>
+              <div class="text-center shrink-0">
+                <p class="text-base sm:text-lg font-black text-green-600">{{ totalConCategoria }}</p>
+                <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500">Con categ.</p>
               </div>
-              <div class="text-center">
-                <p class="text-base font-black text-amber-400">{{ totalSinCategoria }}</p>
-                <p class="text-[9px] font-bold uppercase tracking-widest text-slate-600">Sin categ.</p>
+              <div class="text-center shrink-0">
+                <p class="text-base sm:text-lg font-black text-amber-600">{{ totalSinCategoria }}</p>
+                <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500">Sin categ.</p>
               </div>
-            </div>
-
-            <!-- Acciones -->
-            <div class="flex items-center gap-2 shrink-0">
-              <button (click)="volver()"
-                      class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-400 border border-white/10 hover:bg-white/5 transition-all">
-                <span class="material-symbols-outlined text-sm">arrow_back</span> Volver
-              </button>
-              <button (click)="importar()"
-                      [disabled]="filasSeleccionadas.length === 0"
-                      class="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black bg-primary text-[#0a0a08] hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-lg shadow-primary/20 uppercase tracking-wider">
-                <span class="material-symbols-outlined text-sm">rocket_launch</span>
-                Importar {{ filasSeleccionadas.length }}
-              </button>
             </div>
           </div>
 
-          <!-- Tabla -->
-          <div class="flex-1 overflow-auto">
-            <table class="w-full text-xs">
-              <thead class="sticky top-0 bg-[#0d0b06] border-b border-white/8 z-10">
+          <!-- Seleccionar todas -->
+          <div class="px-4 sm:px-5 py-2.5 border-b border-slate-200 shrink-0 bg-white flex items-center justify-between">
+            <label class="flex items-center gap-2.5 cursor-pointer">
+              <input type="checkbox" [checked]="todasSeleccionadas()" (change)="toggleTodas($any($event.target).checked)"
+                     class="w-5 h-5 accent-primary cursor-pointer"/>
+              <span class="text-sm font-bold text-slate-700">Seleccionar todas</span>
+            </label>
+            <span class="text-xs font-bold text-slate-500">{{ filasSeleccionadas.length }} / {{ filas().length }}</span>
+          </div>
+
+          <!-- Lista móvil (cards) + Tabla desktop -->
+          <div class="flex-1 overflow-auto bg-slate-50">
+
+            <!-- Cards mobile -->
+            <div class="sm:hidden p-3 space-y-2.5">
+              @for (fila of filas(); track $index) {
+                <div class="rounded-xl border-2 p-3 transition-all"
+                     [class]="fila.seleccionada ? 'bg-white border-primary/40 shadow-sm' : 'bg-slate-100 border-slate-200 opacity-60'">
+                  <div class="flex items-start gap-3">
+                    <input type="checkbox" [checked]="fila.seleccionada" (change)="toggleFila($index)"
+                           class="w-5 h-5 accent-primary cursor-pointer mt-0.5 shrink-0"/>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-start justify-between gap-2 mb-2">
+                        <div class="flex-1 min-w-0">
+                          <p class="text-sm font-black text-slate-900 leading-snug">{{ fila.nombre }}</p>
+                          @if (fila.descripcion) {
+                            <p class="text-xs text-slate-500 truncate mt-0.5">{{ fila.descripcion }}</p>
+                          }
+                        </div>
+                        <span class="shrink-0 text-[10px] font-black text-slate-400 px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200">#{{ $index + 1 }}</span>
+                      </div>
+
+                      <!-- Categoría + SKU -->
+                      <div class="flex items-center gap-2 flex-wrap mb-2">
+                        @if (fila.categoriaMatch) {
+                          <span class="flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-green-50 border border-green-200 text-green-700">
+                            <span class="material-symbols-outlined text-[13px]">check_circle</span>
+                            {{ fila.categoriaTexto }}
+                          </span>
+                        } @else if (fila.categoriaTexto) {
+                          <span class="flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700">
+                            <span class="material-symbols-outlined text-[13px]">warning</span>
+                            {{ fila.categoriaTexto }}
+                          </span>
+                        } @else {
+                          <span class="text-[11px] text-slate-400 italic">Sin categoría</span>
+                        }
+                        @if (fila.sku) {
+                          <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-700">SKU: {{ fila.sku }}</span>
+                        }
+                      </div>
+
+                      <!-- Precios + stock -->
+                      <div class="grid grid-cols-3 gap-1.5">
+                        <div class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5">
+                          <p class="text-[8px] font-black uppercase tracking-widest text-slate-500 leading-none">Costo</p>
+                          <p class="text-sm font-black text-slate-800 mt-1 truncate">${{ fila.precio_base | number:'1.0-0' }}</p>
+                        </div>
+                        @if (fila.precio_sugerido) {
+                          <div class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5">
+                            <p class="text-[8px] font-black uppercase tracking-widest text-slate-500 leading-none">Sugerido</p>
+                            <p class="text-sm font-black text-slate-700 mt-1 truncate">${{ fila.precio_sugerido | number:'1.0-0' }}</p>
+                          </div>
+                        } @else {
+                          <div class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5">
+                            <p class="text-[8px] font-black uppercase tracking-widest text-slate-500 leading-none">Sugerido</p>
+                            <p class="text-sm text-slate-400 mt-1">—</p>
+                          </div>
+                        }
+                        <div class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5">
+                          <p class="text-[8px] font-black uppercase tracking-widest text-slate-500 leading-none">Stock</p>
+                          <p class="text-sm font-black text-slate-700 mt-1 truncate">
+                            @if (fila.stock) { {{ fila.stock | number:'1.0-0' }} } @else { — }
+                          </p>
+                        </div>
+                      </div>
+
+                      <!-- Links imagen / creativos -->
+                      @if (fila.imagen_url || fila.link_creativos) {
+                        <div class="flex items-center gap-2 mt-2">
+                          @if (fila.imagen_url) {
+                            <a [href]="fila.imagen_url" target="_blank" rel="noopener"
+                               class="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-sky-50 border border-sky-200 text-sky-700">
+                              <span class="material-symbols-outlined text-[12px]">image</span>
+                              Imagen
+                            </a>
+                          }
+                          @if (fila.link_creativos) {
+                            <a [href]="fila.link_creativos" target="_blank" rel="noopener"
+                               class="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-purple-50 border border-purple-200 text-purple-700">
+                              <span class="material-symbols-outlined text-[12px]">folder_open</span>
+                              Drive
+                            </a>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <!-- Table desktop -->
+            <table class="w-full text-xs hidden sm:table bg-white">
+              <thead class="sticky top-0 bg-slate-50 border-b border-slate-200 z-10">
                 <tr>
-                  <th class="px-4 py-3 text-left">
-                    <input type="checkbox" [checked]="todasSeleccionadas()" (change)="toggleTodas($any($event.target).checked)"
-                           class="w-3.5 h-3.5 accent-primary cursor-pointer"/>
-                  </th>
+                  <th class="px-4 py-3 text-left w-12"></th>
                   <th class="px-3 py-3 text-left text-[10px] font-black uppercase tracking-widest text-slate-500">#</th>
                   <th class="px-3 py-3 text-left text-[10px] font-black uppercase tracking-widest text-slate-500">Nombre</th>
-                  <th class="px-3 py-3 text-left text-[10px] font-black uppercase tracking-widest text-slate-500 hidden md:table-cell">Categoría</th>
+                  <th class="px-3 py-3 text-left text-[10px] font-black uppercase tracking-widest text-slate-500">Categoría</th>
                   <th class="px-3 py-3 text-left text-[10px] font-black uppercase tracking-widest text-slate-500 hidden lg:table-cell">SKU</th>
                   <th class="px-3 py-3 text-right text-[10px] font-black uppercase tracking-widest text-slate-500">Precio prov.</th>
-                  <th class="px-3 py-3 text-right text-[10px] font-black uppercase tracking-widest text-slate-500 hidden sm:table-cell">P. sugerido</th>
-                  <th class="px-3 py-3 text-right text-[10px] font-black uppercase tracking-widest text-slate-500 hidden sm:table-cell">Stock</th>
+                  <th class="px-3 py-3 text-right text-[10px] font-black uppercase tracking-widest text-slate-500">P. sugerido</th>
+                  <th class="px-3 py-3 text-right text-[10px] font-black uppercase tracking-widest text-slate-500">Stock</th>
                   <th class="px-3 py-3 text-center text-[10px] font-black uppercase tracking-widest text-slate-500 hidden lg:table-cell">Imagen</th>
                   <th class="px-3 py-3 text-center text-[10px] font-black uppercase tracking-widest text-slate-500 hidden lg:table-cell">Creativos</th>
                 </tr>
               </thead>
               <tbody>
                 @for (fila of filas(); track $index) {
-                  <tr class="border-b border-white/4 transition-colors"
-                      [class]="fila.seleccionada ? 'bg-primary/3 hover:bg-primary/5' : 'opacity-40 hover:opacity-60'">
+                  <tr class="border-b border-slate-200 transition-colors"
+                      [class]="fila.seleccionada ? 'hover:bg-primary/5' : 'opacity-50 hover:opacity-70'">
                     <td class="px-4 py-2.5">
                       <input type="checkbox" [checked]="fila.seleccionada" (change)="toggleFila($index)"
-                             class="w-3.5 h-3.5 accent-primary cursor-pointer"/>
+                             class="w-4 h-4 accent-primary cursor-pointer"/>
                     </td>
-                    <td class="px-3 py-2.5 text-slate-600">{{ $index + 1 }}</td>
-                    <td class="px-3 py-2.5 max-w-[200px]">
-                      <p class="text-slate-200 font-semibold truncate">{{ fila.nombre }}</p>
+                    <td class="px-3 py-2.5 text-slate-500">{{ $index + 1 }}</td>
+                    <td class="px-3 py-2.5 max-w-[220px]">
+                      <p class="text-slate-900 font-bold truncate">{{ fila.nombre }}</p>
                       @if (fila.descripcion) {
-                        <p class="text-slate-600 truncate text-[10px] mt-0.5">{{ fila.descripcion }}</p>
+                        <p class="text-slate-500 truncate text-[10px] mt-0.5">{{ fila.descripcion }}</p>
                       }
                     </td>
-                    <td class="px-3 py-2.5 hidden md:table-cell">
+                    <td class="px-3 py-2.5">
                       @if (fila.categoriaMatch) {
-                        <span class="flex items-center gap-1 text-green-400 text-[10px] font-semibold">
+                        <span class="flex items-center gap-1 text-green-700 text-[10px] font-bold">
                           <span class="material-symbols-outlined text-[12px]">check_circle</span>
                           {{ fila.categoriaTexto }}
                         </span>
                       } @else if (fila.categoriaTexto) {
-                        <span class="flex items-center gap-1 text-amber-400 text-[10px]" [title]="'No coincide: ' + fila.categoriaTexto">
+                        <span class="flex items-center gap-1 text-amber-700 text-[10px] font-bold" [title]="'No coincide: ' + fila.categoriaTexto">
                           <span class="material-symbols-outlined text-[12px]">warning</span>
                           {{ fila.categoriaTexto }}
                         </span>
                       } @else {
-                        <span class="text-slate-600 text-[10px]">—</span>
+                        <span class="text-slate-400 text-[10px]">—</span>
                       }
                     </td>
-                    <td class="px-3 py-2.5 text-slate-500 font-mono text-[10px] hidden lg:table-cell">
+                    <td class="px-3 py-2.5 text-slate-600 font-mono text-[10px] hidden lg:table-cell">
                       {{ fila.sku || '—' }}
                     </td>
-                    <td class="px-3 py-2.5 text-right font-bold text-slate-200">
+                    <td class="px-3 py-2.5 text-right font-bold text-slate-900">
                       ${{ fila.precio_base | number:'1.0-0' }}
                     </td>
-                    <td class="px-3 py-2.5 text-right text-slate-400 hidden sm:table-cell">
+                    <td class="px-3 py-2.5 text-right text-slate-600">
                       @if (fila.precio_sugerido) { ${{ fila.precio_sugerido | number:'1.0-0' }} }
-                      @else { <span class="text-slate-600">—</span> }
+                      @else { <span class="text-slate-400">—</span> }
                     </td>
-                    <td class="px-3 py-2.5 text-right hidden sm:table-cell">
+                    <td class="px-3 py-2.5 text-right">
                       @if (fila.stock) {
-                        <span class="text-slate-300">{{ fila.stock | number:'1.0-0' }}</span>
+                        <span class="text-slate-700 font-semibold">{{ fila.stock | number:'1.0-0' }}</span>
                       } @else {
-                        <span class="text-slate-600">—</span>
+                        <span class="text-slate-400">—</span>
                       }
                     </td>
                     <td class="px-3 py-2.5 text-center hidden lg:table-cell">
                       @if (fila.imagen_url) {
                         <a [href]="fila.imagen_url" target="_blank" rel="noopener"
-                           class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors"
+                           class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-sky-50 border border-sky-200 hover:bg-sky-100 transition-colors"
                            title="{{ fila.imagen_url }}">
-                          <span class="material-symbols-outlined text-primary text-sm">image</span>
+                          <span class="material-symbols-outlined text-sky-700 text-sm">image</span>
                         </a>
                       } @else {
-                        <span class="text-slate-600">—</span>
+                        <span class="text-slate-400">—</span>
                       }
                     </td>
                     <td class="px-3 py-2.5 text-center hidden lg:table-cell">
                       @if (fila.link_creativos) {
                         <a [href]="fila.link_creativos" target="_blank" rel="noopener"
-                           class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 transition-colors"
+                           class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-purple-50 border border-purple-200 hover:bg-purple-100 transition-colors"
                            title="{{ fila.link_creativos }}">
-                          <span class="material-symbols-outlined text-violet-400 text-sm">folder_open</span>
+                          <span class="material-symbols-outlined text-purple-700 text-sm">folder_open</span>
                         </a>
                       } @else {
-                        <span class="text-slate-600">—</span>
+                        <span class="text-slate-400">—</span>
                       }
                     </td>
                   </tr>
@@ -272,71 +360,93 @@
               </tbody>
             </table>
           </div>
+
+          <!-- Footer con acciones (sticky) -->
+          <div class="px-3 sm:px-5 py-3 border-t border-slate-200 shrink-0 bg-white flex items-center gap-2">
+            <button (click)="volver()"
+                    class="flex items-center justify-center gap-1.5 px-4 py-3 sm:py-2.5 rounded-xl text-sm font-bold text-slate-700 border-2 border-slate-200 bg-white hover:bg-slate-100 transition-all">
+              <span class="material-symbols-outlined text-base">arrow_back</span>
+              <span class="hidden sm:inline">Volver</span>
+            </button>
+            <button (click)="importar()"
+                    [disabled]="filasSeleccionadas.length === 0"
+                    class="flex-1 flex items-center justify-center gap-2 px-4 py-3 sm:py-2.5 rounded-xl text-sm font-black bg-gradient-to-r from-primary to-primary-dark text-white hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-lg shadow-primary/25 uppercase tracking-wider">
+              <span class="material-symbols-outlined text-lg">rocket_launch</span>
+              Importar {{ filasSeleccionadas.length }}
+            </button>
+          </div>
         </div>
       }
 
       <!-- ══ PROCESANDO ══ -->
       @if (procesando()) {
-        <div class="absolute inset-0 bg-[#111009]/95 flex flex-col items-center justify-center gap-5 z-10">
-          <div class="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-            <span class="material-symbols-outlined text-primary text-3xl animate-pulse">rocket_launch</span>
+        <div class="absolute inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center gap-5 z-20 p-6">
+          <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/30 flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary-dark text-4xl animate-pulse">rocket_launch</span>
           </div>
           <div class="text-center">
-            <p class="text-slate-200 font-bold text-sm">Importando productos…</p>
-            <p class="text-slate-500 text-xs mt-1">Por favor no cierres esta ventana</p>
+            <p class="text-slate-900 font-black text-lg">Importando productos…</p>
+            <p class="text-slate-500 text-sm mt-1">Por favor no cierres esta ventana</p>
           </div>
-          <div class="w-64 bg-white/10 rounded-full h-2 overflow-hidden">
-            <div class="h-full bg-primary rounded-full transition-all duration-300"
+          <div class="w-full max-w-xs bg-slate-200 rounded-full h-3 overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-primary to-primary-dark rounded-full transition-all duration-300"
                  [style.width.%]="progreso()"></div>
           </div>
-          <p class="text-primary font-black text-lg">{{ progreso() }}%</p>
+          <p class="text-primary-dark font-black text-2xl">{{ progreso() }}%</p>
         </div>
       }
 
       <!-- ══ PASO 3: RESULTADO ══ -->
       @if (paso() === 'resultado' && resultado()) {
-        <div class="flex-1 flex flex-col items-center justify-center p-8 gap-6 text-center">
-          <div class="w-20 h-20 rounded-2xl flex items-center justify-center"
-               [class]="resultado()!.errores === 0 ? 'bg-green-500/15 border border-green-500/30' : 'bg-amber-500/15 border border-amber-500/30'">
-            <span class="material-symbols-outlined text-4xl"
-                  [class]="resultado()!.errores === 0 ? 'text-green-400' : 'text-amber-400'">
-              {{ resultado()!.errores === 0 ? 'check_circle' : 'warning' }}
-            </span>
-          </div>
-
-          <div>
-            <h3 class="text-slate-100 font-black text-xl">
-              {{ resultado()!.errores === 0 ? '¡Importación exitosa!' : 'Importación completada' }}
-            </h3>
-            <p class="text-slate-400 text-sm mt-2">
-              Los productos se crearon en estado <span class="text-amber-300 font-semibold">pendiente de revisión</span>
-            </p>
-          </div>
-
-          <div class="flex gap-6">
-            <div class="text-center px-6 py-4 bg-green-500/10 border border-green-500/20 rounded-2xl">
-              <p class="text-3xl font-black text-green-400">{{ resultado()!.exitosos }}</p>
-              <p class="text-[10px] font-black uppercase tracking-widest text-green-600 mt-1">Creados</p>
+        <div class="flex-1 overflow-y-auto">
+          <div class="flex flex-col items-center justify-center p-6 sm:p-8 gap-5 sm:gap-6 text-center max-w-md mx-auto min-h-full">
+            <div class="w-24 h-24 rounded-3xl flex items-center justify-center"
+                 [class]="resultado()!.errores === 0 ? 'bg-green-50 border-2 border-green-200' : 'bg-amber-50 border-2 border-amber-200'">
+              <span class="material-symbols-outlined text-5xl"
+                    [class]="resultado()!.errores === 0 ? 'text-green-600' : 'text-amber-600'">
+                {{ resultado()!.errores === 0 ? 'check_circle' : 'warning' }}
+              </span>
             </div>
-            @if (resultado()!.errores > 0) {
-              <div class="text-center px-6 py-4 bg-red-500/10 border border-red-500/20 rounded-2xl">
-                <p class="text-3xl font-black text-red-400">{{ resultado()!.errores }}</p>
-                <p class="text-[10px] font-black uppercase tracking-widest text-red-600 mt-1">Con error</p>
-              </div>
-            }
-          </div>
 
-          <div class="flex gap-3">
-            <button (click)="volver()"
-                    class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm text-slate-400 border border-white/10 hover:bg-white/5 transition-all">
-              <span class="material-symbols-outlined text-base">upload_file</span>
-              Importar otro archivo
-            </button>
-            <button (click)="finalizar()"
-                    class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black bg-primary text-[#0a0a08] hover:brightness-110 transition-all uppercase tracking-wider">
-              <span class="material-symbols-outlined text-base">check</span>
-              Listo
-            </button>
+            <div>
+              <h3 class="text-slate-900 font-black text-2xl sm:text-2xl">
+                {{ resultado()!.errores === 0 ? '¡Importación exitosa!' : 'Importación completada' }}
+              </h3>
+              <p class="text-slate-600 text-sm sm:text-base mt-2">
+                Los productos se crearon correctamente.
+              </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 w-full max-w-xs">
+              <div class="text-center px-4 py-4 bg-green-50 border-2 border-green-200 rounded-2xl">
+                <p class="text-3xl font-black text-green-600">{{ resultado()!.exitosos }}</p>
+                <p class="text-[10px] font-black uppercase tracking-widest text-green-700 mt-1">Creados</p>
+              </div>
+              @if (resultado()!.errores > 0) {
+                <div class="text-center px-4 py-4 bg-red-50 border-2 border-red-200 rounded-2xl">
+                  <p class="text-3xl font-black text-red-600">{{ resultado()!.errores }}</p>
+                  <p class="text-[10px] font-black uppercase tracking-widest text-red-700 mt-1">Con error</p>
+                </div>
+              } @else {
+                <div class="text-center px-4 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl">
+                  <p class="text-3xl font-black text-slate-400">0</p>
+                  <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-1">Errores</p>
+                </div>
+              }
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-2.5 w-full max-w-xs">
+              <button (click)="volver()"
+                      class="flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm text-slate-700 border-2 border-slate-200 bg-white hover:bg-slate-100 transition-all font-bold">
+                <span class="material-symbols-outlined text-base">upload_file</span>
+                Otro archivo
+              </button>
+              <button (click)="finalizar()"
+                      class="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-black bg-gradient-to-r from-primary to-primary-dark text-white hover:brightness-110 transition-all uppercase tracking-wider shadow-lg shadow-primary/25">
+                <span class="material-symbols-outlined text-base">check</span>
+                Listo
+              </button>
+            </div>
           </div>
         </div>
       }
