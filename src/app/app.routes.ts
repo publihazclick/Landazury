@@ -44,10 +44,11 @@ export const routes: Routes = [
       import('./features/dev/acceso-rapido.component').then((m) => m.AccesoRapidoComponent),
   },
   {
-    // Ruta secreta privada para los subidores de productos.
-    // NO está linkeada en ningún sidebar ni navegación.
-    // Usa un layout mínimo sin accesos a /admin, /catalogo, /perfil, etc.
-    path: 'zona-bodega-7k3m9n',
+    // Zona privada para los subidores de productos.
+    // Sirve como ruta interna de la app, pero se expone al usuario
+    // final mediante el subdominio tienda-lz.vercel.app que re-escribe
+    // a esta ruta vía vercel.json.
+    path: 'bodega-privada',
     loadComponent: () =>
       import('./features/bodega-privada/bodega-privada-layout.component').then(
         (m) => m.BodegaPrivadaLayoutComponent
