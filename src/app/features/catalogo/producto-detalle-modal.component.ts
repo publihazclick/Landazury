@@ -142,6 +142,27 @@ export class ProductoDetalleModalComponent implements OnInit {
     return (this.producto.creativos ?? []).filter(c => c.tipo === 'imagen');
   }
 
+  /** Link de WhatsApp con mensaje pre-llenado: saludo + referencia + imagen actual del producto */
+  get urlWhatsapp(): string {
+    const numero = '573148487506';
+    const imagen = this.fotosProducto[this.imagenPrincipalIdx()] ?? this.producto.imagenes?.[0] ?? '';
+    const refParts: string[] = [];
+    if (this.producto.sku) refParts.push(`SKU: ${this.producto.sku}`);
+    refParts.push(`Nombre: ${this.producto.nombre}`);
+    const ref = refParts.join(' — ');
+    const lineas = [
+      'Hola LANDAZURY, estoy interesado/a en vender este producto.',
+      '',
+      ref,
+    ];
+    if (imagen) {
+      lineas.push('');
+      lineas.push(`Foto: ${imagen}`);
+    }
+    const texto = encodeURIComponent(lineas.join('\n'));
+    return `https://wa.me/${numero}?text=${texto}`;
+  }
+
   get videos(): Creativo[] {
     return (this.producto.creativos ?? []).filter(c => c.tipo === 'video');
   }
