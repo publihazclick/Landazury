@@ -111,13 +111,22 @@
         }
 
         <!-- Búsqueda -->
-        <div class="flex items-stretch rounded-xl bg-white border border-slate-200 focus-within:border-primary shadow-sm transition-all w-full sm:flex-1 sm:min-w-0 md:max-w-96 sm:ml-auto shrink-0">
-        <div class="text-slate-400 flex items-center justify-center pl-3 sm:pl-4">
-          <span class="material-symbols-outlined text-lg sm:text-xl">search</span>
-        </div>
-        <input [(ngModel)]="busqueda" (keyup.enter)="onBuscar()"
-               class="w-full bg-transparent text-slate-800 focus:ring-0 outline-none placeholder:text-slate-400 py-2 sm:py-2.5 px-2.5 sm:px-3 text-sm"
-               placeholder="Buscar productos..."/>
+        <div class="flex items-stretch rounded-xl bg-white border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 shadow-sm transition-all w-full sm:flex-1 sm:min-w-0 md:max-w-96 sm:ml-auto shrink-0">
+          <div class="text-slate-400 flex items-center justify-center pl-3 sm:pl-4 shrink-0">
+            <span class="material-symbols-outlined text-lg sm:text-xl">search</span>
+          </div>
+          <input [(ngModel)]="busqueda"
+                 type="search"
+                 inputmode="search"
+                 autocomplete="off"
+                 class="w-full bg-transparent text-slate-800 focus:ring-0 outline-none placeholder:text-slate-400 py-2 sm:py-2.5 px-2.5 sm:px-3 text-sm min-w-0"
+                 placeholder="Buscar por nombre, SKU, categoría..."/>
+          @if (busquedaSignal()) {
+            <button type="button" (click)="limpiarBusqueda()" aria-label="Limpiar búsqueda"
+                    class="shrink-0 flex items-center justify-center w-9 sm:w-10 text-slate-400 hover:text-slate-700 active:text-slate-900 transition-colors">
+              <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+          }
         </div>
       </div>
     </div>

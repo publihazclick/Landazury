@@ -35,7 +35,12 @@ export class CatalogoComponent implements OnInit {
   readonly error = signal<string | null>(null);
   readonly productoModal = signal<Producto | null>(null);
 
-  busqueda = '';
+  // Búsqueda reactiva: se actualiza en cada tecla del input
+  readonly busquedaSignal = signal('');
+  get busqueda() { return this.busquedaSignal(); }
+  set busqueda(v: string) { this.busquedaSignal.set(v ?? ''); }
+
+  limpiarBusqueda() { this.busquedaSignal.set(''); }
 
   abrirModal(producto: Producto) {
     this.productoModal.set(producto);
@@ -84,9 +89,28 @@ export class CatalogoComponent implements OnInit {
     const filtro  = this.filtros.filtroAsset();
     const cat     = this.filtros.categoriaSeleccionada();
     const bodega  = this.filtros.bodegaFiltro();
+    const query   = this.busquedaSignal().trim().toLowerCase();
 
     if (cat)    result = result.filter(p => p.categoria_id === cat || p.categoria?.id === cat);
     if (bodega !== 'todas') result = result.filter(p => bodegaDeProducto(p) === bodega);
+
+    // Búsqueda por texto: SKU, nombre, descripción, categoría, bodega, atributos
+    if (query) {
+      const terms = query.split(/\s+/).filter(Boolean);
+      result = result.filter(p => {
+        const haystack = [
+          p.nombre,
+          p.sku,
+          p.descripcion,
+          p.categoria?.nombre,
+          p.categoria?.slug,
+          bodegaDeProducto(p),
+          ...(p.atributos?.flatMap(a => [a.nombre, ...a.valores]) ?? []),
+        ].filter(Boolean).join(' ').toLowerCase();
+        // Todas las palabras del query deben estar presentes (AND)
+        return terms.every(t => haystack.includes(t));
+      });
+    }
 
     if (filtro === 'todos') return result;
     return result.filter(p => {
@@ -117,7 +141,9 @@ export class CatalogoComponent implements OnInit {
     this.cargando.set(true);
     this.error.set(null);
     try {
-      const data = await this.catalogoService.obtenerProductos({ busqueda: this.busqueda || undefined });
+      // Siempre cargamos todos los productos; la búsqueda se hace en cliente
+      // para que al borrar el query vuelva a la vista normal al instante.
+      const data = await this.catalogoService.obtenerProductos();
       this.productos.set(data);
       this.filtros.productosCatalogo.set(data);
       // Al entrar al catálogo, siempre seleccionar "Ver todas" por defecto
@@ -208,7 +234,7 @@ export class CatalogoComponent implements OnInit {
     return map[tipo] ?? 'download';
   }
 
-  onBuscar() { this.cargarProductos(); }
+  onBuscar() { /* noop: filtrado en cliente vía signal */ }
 }
 
 function calcularMargen(producto: Producto): number {
