@@ -7,6 +7,11 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Client,
   },
   {
+    // Zona privada de subidores — no pre-renderizar
+    path: 'zona-bodega-7k3m9n',
+    renderMode: RenderMode.Client,
+  },
+  {
     path: '**',
     renderMode: RenderMode.Prerender
   }

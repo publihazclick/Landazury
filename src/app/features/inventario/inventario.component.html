@@ -199,16 +199,18 @@
                   <p class="text-sm font-black text-slate-700 mt-1 truncate">$ {{ producto.precio_sugerido | number:'1.0-0' }}</p>
                 </div>
               }
-              @if (producto.precio_final) {
-                <div class="bg-primary/10 border border-primary/30 rounded-lg px-2 py-2">
-                  <p class="text-[8px] font-bold uppercase tracking-widest text-primary-dark leading-none">Dropshipper</p>
-                  <p class="text-sm font-black text-primary-dark mt-1 truncate">$ {{ producto.precio_final | number:'1.0-0' }}</p>
-                </div>
-              } @else if (auth.esAdmin()) {
-                <div class="bg-amber-50 border border-amber-200 rounded-lg px-2 py-2">
-                  <p class="text-[8px] font-bold uppercase tracking-widest text-amber-700 leading-none">Dropshipper</p>
-                  <p class="text-[10px] text-amber-700 italic mt-1">Sin definir</p>
-                </div>
+              @if (auth.esAdmin()) {
+                @if (producto.precio_final) {
+                  <div class="bg-primary/10 border border-primary/30 rounded-lg px-2 py-2">
+                    <p class="text-[8px] font-bold uppercase tracking-widest text-primary-dark leading-none">Dropshipper</p>
+                    <p class="text-sm font-black text-primary-dark mt-1 truncate">$ {{ producto.precio_final | number:'1.0-0' }}</p>
+                  </div>
+                } @else {
+                  <div class="bg-amber-50 border border-amber-200 rounded-lg px-2 py-2">
+                    <p class="text-[8px] font-bold uppercase tracking-widest text-amber-700 leading-none">Dropshipper</p>
+                    <p class="text-[10px] text-amber-700 italic mt-1">Sin definir</p>
+                  </div>
+                }
               }
             </div>
 

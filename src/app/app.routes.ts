@@ -44,6 +44,17 @@ export const routes: Routes = [
       import('./features/dev/acceso-rapido.component').then((m) => m.AccesoRapidoComponent),
   },
   {
+    // Ruta secreta privada para los subidores de productos.
+    // NO está linkeada en ningún sidebar ni navegación.
+    // Usa un layout mínimo sin accesos a /admin, /catalogo, /perfil, etc.
+    path: 'zona-bodega-7k3m9n',
+    loadComponent: () =>
+      import('./features/bodega-privada/bodega-privada-layout.component').then(
+        (m) => m.BodegaPrivadaLayoutComponent
+      ),
+    canActivate: [bodegaGuard],
+  },
+  {
     path: 'terminos',
     loadComponent: () =>
       import('./features/legal/terminos/terminos.component').then((m) => m.TerminosComponent),
