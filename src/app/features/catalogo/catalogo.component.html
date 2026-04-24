@@ -1,5 +1,10 @@
-<div class="min-h-screen bg-neutral-charcoal text-slate-800">
-  <div class="max-w-7xl mx-auto px-3 py-4 sm:p-4 md:p-8">
+<!--
+  overflow-x-hidden en el wrapper raíz + min-w-0 en cada subgrupo
+  garantiza que ningún nombre de categoría largo, emoji sin renderizar o
+  dato anómalo pueda empujar el ancho del viewport en móvil.
+-->
+<div class="min-h-screen bg-neutral-charcoal text-slate-800 overflow-x-hidden">
+  <div class="max-w-7xl mx-auto px-3 py-4 sm:p-4 md:p-8 min-w-0">
 
     <!-- Header + búsqueda -->
     <div class="mb-6 flex flex-col gap-3">
@@ -14,22 +19,41 @@
           <span class="block sm:inline">las plataformas de Dropshipping</span>
         </h1>
         <div class="mx-auto sm:mx-0 h-1 w-16 sm:w-24 rounded-full bg-gradient-to-r from-primary to-primary-dark"></div>
+
+        <!-- Promesa de valor: tú vendes, nosotros despachamos -->
+        <div class="mt-3 sm:mt-4 inline-flex items-center gap-3 p-3 sm:p-3.5 pr-4 sm:pr-5 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/60 shadow-sm max-w-2xl text-left">
+          <div class="shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-md ring-2 ring-white">
+            <span class="material-symbols-outlined text-white text-[22px] sm:text-[24px]">storefront</span>
+          </div>
+          <p class="text-[13px] sm:text-sm md:text-base text-slate-700 leading-snug">
+            <span class="font-extrabold text-emerald-700">Tú vendes</span> por donde prefieras y
+            <span class="font-bold text-slate-900">nosotros despachamos</span>
+            directo a tu cliente o a ti.
+          </p>
+        </div>
       </div>
 
       <!-- Selector de bodega -->
-      <div class="grid grid-cols-3 gap-2 sm:flex sm:items-end sm:gap-5 sm:justify-start">
+      <!--
+        ring-2 ring-transparent se mantiene SIEMPRE (activo e inactivo) para que al
+        seleccionar no haya saltos de layout. El hover/translate solo aplica en sm+
+        para que en móvil no "rebote" al tocar.
+      -->
+      <div class="grid grid-cols-[repeat(3,minmax(0,1fr))] gap-2 items-stretch w-full sm:flex sm:items-end sm:gap-5 sm:justify-start sm:w-auto">
 
         <!-- Landazury Importaciones -->
         <button (click)="seleccionarBodega('importaciones')"
                 type="button"
-                class="group w-full sm:w-auto sm:shrink-0 relative flex flex-col items-center gap-1.5 sm:gap-2 px-2 py-2.5 sm:px-5 sm:py-4 rounded-2xl border-2 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+                class="group w-full min-w-0 h-full sm:h-auto sm:w-auto sm:shrink-0 relative flex flex-col items-center justify-between gap-1.5 sm:gap-2 px-2 py-2.5 sm:px-5 sm:py-4 rounded-2xl border-2 ring-2 ring-transparent shadow-md sm:hover:shadow-lg sm:hover:-translate-y-0.5 active:scale-[0.97] transition-[transform,box-shadow,border-color,background-color] duration-200 cursor-pointer"
                 [class]="filtros.bodegaFiltro() === 'importaciones'
-                  ? 'border-green-500 bg-green-50 ring-2 ring-green-200'
-                  : 'border-sky-300 bg-sky-50 hover:border-sky-500 hover:bg-sky-100'">
-          <img src="/landazury_importaciones.jpg" alt="Landazury Importaciones"
-               class="h-14 sm:h-24 max-w-full object-contain transition-all duration-200"
-               [class]="filtros.bodegaFiltro() === 'importaciones' ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'"/>
-          <span class="flex items-center gap-0.5 px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-primary text-[#0f0f0f] text-[7px] sm:text-xs font-black uppercase tracking-wide sm:tracking-widest shadow-md group-hover:brightness-110 group-hover:shadow-lg transition-all whitespace-nowrap max-w-full">
+                  ? 'border-green-500 bg-green-50 !ring-green-200'
+                  : 'border-sky-300 bg-sky-50 sm:hover:border-sky-500 sm:hover:bg-sky-100'">
+          <div class="w-full h-14 sm:h-24 flex items-center justify-center">
+            <img src="/landazury_importaciones.jpg" alt="Landazury Importaciones"
+                 class="max-h-full max-w-full object-contain transition-opacity duration-200"
+                 [class]="filtros.bodegaFiltro() === 'importaciones' ? 'opacity-100' : 'opacity-70 sm:group-hover:opacity-100'"/>
+          </div>
+          <span class="flex items-center gap-0.5 px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-primary text-[#0f0f0f] text-[7px] sm:text-xs font-black uppercase tracking-wide sm:tracking-widest shadow-md transition-all whitespace-nowrap max-w-full">
             <span class="material-symbols-outlined text-[9px] sm:text-sm">touch_app</span>
             Ver Bodega
           </span>
@@ -43,20 +67,22 @@
         <!-- Moda Landazury -->
         <button (click)="seleccionarBodega('moda')"
                 type="button"
-                class="group w-full sm:w-auto sm:shrink-0 relative flex flex-col items-center gap-1.5 sm:gap-2 px-2 py-2.5 sm:px-5 sm:py-4 rounded-2xl border-2 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+                class="group w-full min-w-0 h-full sm:h-auto sm:w-auto sm:shrink-0 relative flex flex-col items-center justify-between gap-1.5 sm:gap-2 px-2 py-2.5 sm:px-5 sm:py-4 rounded-2xl border-2 ring-2 ring-transparent shadow-md sm:hover:shadow-lg sm:hover:-translate-y-0.5 active:scale-[0.97] transition-[transform,box-shadow,border-color,background-color] duration-200 cursor-pointer"
                 [class]="filtros.bodegaFiltro() === 'moda'
-                  ? 'border-green-500 bg-green-50 ring-2 ring-green-200'
-                  : 'border-sky-300 bg-sky-50 hover:border-sky-500 hover:bg-sky-100'">
-          <img src="/modalandazury.jpg" alt="Moda Landazury"
-               class="h-14 sm:h-24 max-w-full object-contain transition-all duration-200"
-               [class]="filtros.bodegaFiltro() === 'moda' ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'"
-               (error)="$any($event.target).style.display='none'; $any($event.target).nextElementSibling.style.display='flex'"/>
-          <span class="hidden items-center gap-1.5 transition-all"
-                [class]="filtros.bodegaFiltro() === 'moda' ? 'text-green-600' : 'text-slate-500'">
-            <span class="material-symbols-outlined text-base">checkroom</span>
-            <span class="text-xs font-black leading-tight text-left">Moda<br><span class="text-[9px] font-bold uppercase tracking-widest">Landazury</span></span>
-          </span>
-          <span class="flex items-center gap-0.5 px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-primary text-[#0f0f0f] text-[7px] sm:text-xs font-black uppercase tracking-wide sm:tracking-widest shadow-md group-hover:brightness-110 group-hover:shadow-lg transition-all whitespace-nowrap max-w-full">
+                  ? 'border-green-500 bg-green-50 !ring-green-200'
+                  : 'border-sky-300 bg-sky-50 sm:hover:border-sky-500 sm:hover:bg-sky-100'">
+          <div class="w-full h-14 sm:h-24 flex items-center justify-center">
+            <img src="/modalandazury.jpg" alt="Moda Landazury"
+                 class="max-h-full max-w-full object-contain transition-opacity duration-200"
+                 [class]="filtros.bodegaFiltro() === 'moda' ? 'opacity-100' : 'opacity-70 sm:group-hover:opacity-100'"
+                 (error)="$any($event.target).style.display='none'; $any($event.target).nextElementSibling.style.display='flex'"/>
+            <span class="hidden items-center gap-1.5 transition-all"
+                  [class]="filtros.bodegaFiltro() === 'moda' ? 'text-green-600' : 'text-slate-500'">
+              <span class="material-symbols-outlined text-base">checkroom</span>
+              <span class="text-xs font-black leading-tight text-left">Moda<br><span class="text-[9px] font-bold uppercase tracking-widest">Landazury</span></span>
+            </span>
+          </div>
+          <span class="flex items-center gap-0.5 px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-primary text-[#0f0f0f] text-[7px] sm:text-xs font-black uppercase tracking-wide sm:tracking-widest shadow-md transition-all whitespace-nowrap max-w-full">
             <span class="material-symbols-outlined text-[9px] sm:text-sm">touch_app</span>
             Ver Bodega
           </span>
@@ -69,12 +95,15 @@
 
         <!-- Ver todas -->
         <button (click)="seleccionarBodega('todas')"
-                class="relative w-full sm:w-auto sm:shrink-0 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 px-2 py-2.5 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-xl text-[11px] sm:text-sm font-black uppercase tracking-wider transition-all border-2 shadow-md hover:shadow-lg hover:-translate-y-0.5"
+                type="button"
+                class="group w-full min-w-0 h-full sm:h-auto sm:w-auto sm:shrink-0 relative flex flex-col items-center justify-between sm:flex-row sm:justify-center gap-1.5 sm:gap-1.5 px-2 py-2.5 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-xl border-2 ring-2 ring-transparent shadow-md sm:hover:shadow-lg sm:hover:-translate-y-0.5 active:scale-[0.97] transition-[transform,box-shadow,border-color,background-color] duration-200 cursor-pointer"
                 [class]="filtros.bodegaFiltro() === 'todas'
-                  ? 'border-green-500 bg-green-50 text-green-700 ring-2 ring-green-200'
-                  : 'border-sky-300 bg-sky-50 text-sky-700 hover:border-sky-500 hover:bg-sky-100'">
-          <span class="material-symbols-outlined text-3xl sm:text-base">apps</span>
-          Ver todas
+                  ? 'border-green-500 bg-green-50 text-green-700 !ring-green-200'
+                  : 'border-sky-300 bg-sky-50 text-sky-700 sm:hover:border-sky-500 sm:hover:bg-sky-100'">
+          <div class="w-full h-14 sm:h-auto flex items-center justify-center">
+            <span class="material-symbols-outlined text-[44px] leading-none sm:text-base">apps</span>
+          </div>
+          <span class="text-[11px] sm:text-sm font-black uppercase tracking-wider whitespace-nowrap">Ver todas</span>
           @if (filtros.bodegaFiltro() === 'todas') {
             <span class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shadow">
               <span class="material-symbols-outlined text-sm text-white">check</span>
@@ -88,8 +117,15 @@
       <div class="flex flex-col sm:flex-row items-stretch gap-2 sm:gap-3 w-full">
 
         <!-- Filtro de categorías -->
+        <!--
+          El contenedor del scroll horizontal NO puede tener shrink-0, porque si
+          la suma de los botones excede el viewport empuja el ancho de la página.
+          w-full + min-w-0 + overflow-x-auto lo mantiene contenido al padre y
+          solo permite scroll interno. En sm+ vuelve a shrink-0 para no robarle
+          espacio al buscador.
+        -->
         @if (categoriasConProductos().length > 0) {
-          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
+          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar w-full min-w-0 max-w-full sm:w-auto sm:shrink-0">
             <button (click)="seleccionarCategoria('')"
                     class="shrink-0 px-3 py-2 rounded-lg text-xs font-bold transition-all border whitespace-nowrap"
                     [class]="!filtros.categoriaSeleccionada()
@@ -99,19 +135,19 @@
             </button>
             @for (cat of categoriasConProductos(); track cat.id) {
               <button (click)="seleccionarCategoria(cat.id)"
-                      class="shrink-0 px-3 py-2 rounded-lg text-xs font-bold transition-all border whitespace-nowrap"
+                      class="shrink-0 inline-flex items-center gap-1 max-w-[160px] px-3 py-2 rounded-lg text-xs font-bold transition-all border whitespace-nowrap"
                       [class]="filtros.categoriaSeleccionada() === cat.id
                         ? 'border-primary bg-amber-50 text-primary-dark'
                         : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-slate-700'">
-                @if (cat.icono) { {{ cat.icono }} }
-                {{ cat.nombre }}
+                @if (cat.icono) { <span class="shrink-0">{{ cat.icono }}</span> }
+                <span class="truncate">{{ cat.nombre }}</span>
               </button>
             }
           </div>
         }
 
         <!-- Búsqueda -->
-        <div class="flex items-stretch rounded-xl bg-white border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 shadow-sm transition-all w-full sm:flex-1 sm:min-w-0 md:max-w-96 sm:ml-auto shrink-0">
+        <div class="flex items-stretch rounded-xl bg-white border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 shadow-sm transition-all w-full min-w-0 sm:flex-1 md:max-w-96 sm:ml-auto">
           <div class="text-slate-400 flex items-center justify-center pl-3 sm:pl-4 shrink-0">
             <span class="material-symbols-outlined text-lg sm:text-xl">search</span>
           </div>
@@ -133,7 +169,7 @@
 
     <!-- Skeleton loading -->
     @if (cargando()) {
-      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5">
+      <div class="grid grid-cols-[repeat(2,minmax(0,1fr))] lg:grid-cols-[repeat(3,minmax(0,1fr))] xl:grid-cols-[repeat(4,minmax(0,1fr))] gap-2.5 sm:gap-5 w-full">
         @for (i of [1,2,3,4,5,6,7,8]; track i) {
           <div class="bg-neutral-surface border border-neutral-border rounded-xl sm:rounded-2xl overflow-hidden animate-pulse">
             <div class="aspect-square sm:aspect-[4/5] bg-neutral-border"></div>
@@ -167,15 +203,17 @@
     }
 
     @else {
-      <!-- Grid de productos -->
-      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5">
+      <!-- Grid de productos (2 cols en móvil SIEMPRE, con minmax(0,1fr) para que
+           ningún contenido ancho pueda empujar las columnas fuera del viewport) -->
+      <div class="grid grid-cols-[repeat(2,minmax(0,1fr))] lg:grid-cols-[repeat(3,minmax(0,1fr))] xl:grid-cols-[repeat(4,minmax(0,1fr))] gap-2.5 sm:gap-5 w-full">
         @for (producto of productosFiltrados(); track producto.id) {
           <div (click)="abrirModal(producto)"
-               class="bg-white border border-slate-200 rounded-xl sm:rounded-2xl overflow-hidden group flex flex-col hover:border-primary/40 hover:shadow-lg transition-all duration-300 cursor-pointer">
+               class="bg-white border border-slate-200 rounded-xl sm:rounded-2xl overflow-hidden group flex flex-col sm:hover:border-primary/40 sm:hover:shadow-lg transition-all duration-300 cursor-pointer min-w-0">
             <div class="relative aspect-square sm:aspect-[4/5] overflow-hidden bg-white">
               @if (producto.imagenes.length) {
                 <img [src]="producto.imagenes![0]" [alt]="producto.nombre"
-                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"/>
+                     loading="lazy" decoding="async"
+                     class="w-full h-full object-cover sm:group-hover:scale-110 transition-transform duration-500"/>
               } @else {
                 <div class="w-full h-full bg-neutral-border flex items-center justify-center">
                   <span class="material-symbols-outlined text-3xl sm:text-5xl text-slate-600">inventory_2</span>
@@ -183,39 +221,48 @@
               }
               <!-- Favorito -->
               <button (click)="toggleFavorito(producto.id, $event)"
-                      class="absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all bg-white/80 backdrop-blur-sm hover:scale-110 shadow-sm"
+                      class="absolute top-1.5 right-1.5 sm:top-3 sm:right-3 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all bg-white/80 backdrop-blur-sm sm:hover:scale-110 shadow-sm"
                       [class]="esFavorito(producto.id) ? 'text-red-400' : 'text-slate-400'">
-                <span class="material-symbols-outlined text-[16px] sm:text-[18px]">favorite</span>
+                <span class="material-symbols-outlined text-[15px] sm:text-[18px]">favorite</span>
               </button>
               <!-- Badge de cantidad de fotos -->
               @if (producto.imagenes.length > 1) {
-                <div class="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-900/70 text-white text-[10px] font-bold backdrop-blur-sm">
-                  <span class="material-symbols-outlined text-[12px]">photo_library</span>
+                <div class="absolute bottom-1.5 right-1.5 sm:bottom-3 sm:right-3 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-slate-900/70 text-white text-[9px] sm:text-[10px] font-bold backdrop-blur-sm">
+                  <span class="material-symbols-outlined text-[11px] sm:text-[12px]">photo_library</span>
                   {{ producto.imagenes.length }}
                 </div>
               }
             </div>
             <!-- Precios debajo de la imagen -->
             @if (producto.precio_final) {
-              <div class="flex items-stretch justify-between border-b border-slate-100 bg-slate-50">
-                <div class="px-2 py-2 sm:px-3 sm:py-2.5 min-w-0 flex-1">
-                  <p class="text-[9px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 leading-tight mb-1 truncate">Precio a Dropshippers</p>
-                  <p class="text-primary-dark font-black text-base sm:text-2xl leading-none whitespace-nowrap">{{ producto.precio_final | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
+              <div class="flex items-stretch border-b border-slate-100 bg-slate-50">
+                <div class="px-1.5 py-1.5 sm:px-3 sm:py-2.5 min-w-0 flex-1 overflow-hidden">
+                  <p class="text-[8px] sm:text-xs font-bold uppercase tracking-wide text-slate-500 leading-tight mb-0.5 sm:mb-1 truncate">
+                    <span class="sm:hidden">Dropshipper</span>
+                    <span class="hidden sm:inline">Precio a Dropshippers</span>
+                  </p>
+                  <p class="text-primary-dark font-black text-[13px] sm:text-2xl leading-none truncate">{{ producto.precio_final | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
                 </div>
-                <div class="px-2 py-2 sm:px-3 sm:py-2.5 min-w-0 flex-1 text-right border-l border-slate-200">
-                  <p class="text-[9px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 leading-tight mb-1 truncate">Precio sugerido de venta</p>
-                  <p class="text-slate-800 font-black text-base sm:text-2xl leading-none whitespace-nowrap">{{ precioSugerido(producto) | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
+                <div class="px-1.5 py-1.5 sm:px-3 sm:py-2.5 min-w-0 flex-1 text-right border-l border-slate-200 overflow-hidden">
+                  <p class="text-[8px] sm:text-xs font-bold uppercase tracking-wide text-slate-500 leading-tight mb-0.5 sm:mb-1 truncate">
+                    <span class="sm:hidden">Sugerido</span>
+                    <span class="hidden sm:inline">Precio sugerido de venta</span>
+                  </p>
+                  <p class="text-slate-800 font-black text-[13px] sm:text-2xl leading-none truncate">{{ precioSugerido(producto) | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
                 </div>
               </div>
             }
-            <div class="p-2.5 sm:p-4 flex-1 flex flex-col gap-2 sm:gap-3">
-              <div>
-                <h3 class="text-slate-800 font-bold group-hover:text-primary-dark transition-colors text-sm sm:text-lg line-clamp-2">{{ producto.nombre }}</h3>
-                <div class="flex items-center justify-between mt-0.5">
+            <div class="p-2 sm:p-4 flex-1 flex flex-col gap-1.5 sm:gap-3 min-w-0">
+              <div class="min-w-0">
+                <h3 class="text-slate-800 font-bold sm:group-hover:text-primary-dark transition-colors text-[13px] sm:text-lg leading-snug line-clamp-2 min-h-[2lh] break-words">{{ producto.nombre }}</h3>
+                <div class="flex items-center justify-between gap-1 mt-0.5 min-w-0">
                   @if (producto.categoria) {
-                    <p class="text-slate-500 text-xs sm:text-sm truncate">{{ producto.categoria.nombre }}</p>
+                    <p class="text-slate-500 text-[11px] sm:text-sm truncate min-w-0">{{ producto.categoria.nombre }}</p>
                   }
-                  <p class="text-lg sm:text-xl font-bold text-green-400 shrink-0">{{ stockAparente(producto.id) }} uds.</p>
+                  <p class="shrink-0 flex items-baseline gap-0.5 sm:gap-1 text-green-500 font-bold">
+                    <span class="text-[13px] sm:text-xl leading-none">{{ stockAparente(producto) | number:'1.0-0' }}</span>
+                    <span class="text-[8px] sm:text-xs uppercase tracking-wider">Stock</span>
+                  </p>
                 </div>
               </div>
 
@@ -230,17 +277,19 @@
               }
               @if (producto.creativos?.length) {
                 <button (click)="abrirModal(producto); $event.stopPropagation()"
-                        class="w-full py-2 sm:py-2.5 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-primary-dark rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1.5 sm:gap-2 mt-auto">
-                  <span class="material-symbols-outlined text-[14px] sm:text-[16px]">photo_library</span>
+                        class="w-full py-1.5 sm:py-2.5 bg-amber-50 sm:hover:bg-amber-100 active:bg-amber-100 border border-amber-200 text-primary-dark rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1 sm:gap-2 mt-auto">
+                  <span class="material-symbols-outlined text-[13px] sm:text-[16px]">photo_library</span>
                   <span class="hidden sm:inline">Ver {{ producto.creativos!.length }} Creativos</span>
-                  <span class="sm:hidden">{{ producto.creativos!.length }} Creativos</span>
+                  <span class="sm:hidden">{{ producto.creativos!.length }} creativos</span>
                 </button>
-              } @else {
-                <div class="w-full py-2 sm:py-2.5 border border-slate-200 text-slate-400 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold flex items-center justify-center gap-1.5 sm:gap-2 mt-auto">
-                  <span class="material-symbols-outlined text-[14px] sm:text-[16px]">hourglass_empty</span>
-                  <span class="hidden sm:inline">Sin creativos aún</span>
-                  <span class="sm:hidden">Sin creativos</span>
-                </div>
+              } @else if (producto.link_creativos) {
+                <a [href]="producto.link_creativos" target="_blank" rel="noopener noreferrer"
+                   (click)="$event.stopPropagation()"
+                   class="w-full py-1.5 sm:py-2.5 bg-amber-50 sm:hover:bg-amber-100 active:bg-amber-100 border border-amber-200 text-primary-dark rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1 sm:gap-2 mt-auto">
+                  <span class="material-symbols-outlined text-[13px] sm:text-[16px]">folder_open</span>
+                  <span class="hidden sm:inline">Ver Creativos</span>
+                  <span class="sm:hidden">Creativos</span>
+                </a>
               }
             </div>
           </div>
@@ -250,6 +299,19 @@
 
   </div>
 </div>
+
+<!-- Botón flotante de WhatsApp (oculto cuando hay un producto abierto en el modal) -->
+@if (!productoModal()) {
+<a href="https://wa.me/573148487506?text=Hola%20Landazury"
+   target="_blank"
+   rel="noopener noreferrer"
+   aria-label="Contactar a Landazury por WhatsApp"
+   class="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-[60] w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#25D366] hover:bg-[#1ebe57] text-white flex items-center justify-center shadow-2xl shadow-green-600/40 transition-all hover:scale-110 active:scale-95 ring-4 ring-white">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 sm:w-8 sm:h-8">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+  </svg>
+</a>
+}
 
 <!-- Modal de detalle de producto -->
 @if (productoModal()) {
