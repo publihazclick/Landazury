@@ -188,18 +188,23 @@
             </div>
 
             <!-- Prices -->
-            <div class="grid grid-cols-3 gap-1.5">
-              <div class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-2">
-                <p class="text-[8px] font-bold uppercase tracking-widest text-slate-500 leading-none">Costo</p>
-                <p class="text-sm font-black text-slate-800 mt-1 truncate">$ {{ producto.precio_base | number:'1.0-0' }}</p>
-              </div>
-              @if (producto.precio_sugerido) {
+            @if (auth.esAdmin()) {
+              <div class="grid grid-cols-3 gap-1.5">
                 <div class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-2">
-                  <p class="text-[8px] font-bold uppercase tracking-widest text-slate-500 leading-none">Sugerido</p>
-                  <p class="text-sm font-black text-slate-700 mt-1 truncate">$ {{ producto.precio_sugerido | number:'1.0-0' }}</p>
+                  <p class="text-[8px] font-bold uppercase tracking-widest text-slate-500 leading-none">Costo</p>
+                  <p class="text-sm font-black text-slate-800 mt-1 truncate">$ {{ producto.precio_base | number:'1.0-0' }}</p>
                 </div>
-              }
-              @if (auth.esAdmin()) {
+                @if (producto.precio_sugerido) {
+                  <div class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-2">
+                    <p class="text-[8px] font-bold uppercase tracking-widest text-slate-500 leading-none">Sugerido</p>
+                    <p class="text-sm font-black text-slate-700 mt-1 truncate">$ {{ producto.precio_sugerido | number:'1.0-0' }}</p>
+                  </div>
+                } @else {
+                  <div class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-2">
+                    <p class="text-[8px] font-bold uppercase tracking-widest text-slate-500 leading-none">Sugerido</p>
+                    <p class="text-[10px] text-slate-400 italic mt-1">—</p>
+                  </div>
+                }
                 @if (producto.precio_final) {
                   <div class="bg-primary/10 border border-primary/30 rounded-lg px-2 py-2">
                     <p class="text-[8px] font-bold uppercase tracking-widest text-primary-dark leading-none">Dropshipper</p>
@@ -211,8 +216,22 @@
                     <p class="text-[10px] text-amber-700 italic mt-1">Sin definir</p>
                   </div>
                 }
-              }
-            </div>
+              </div>
+            } @else {
+              <!-- Subidor: su precio + el sugerido, sin referencias a otros -->
+              <div class="grid grid-cols-2 gap-1.5 w-fit">
+                <div class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                  <p class="text-[8px] font-bold uppercase tracking-widest text-slate-500 leading-none">Mi precio</p>
+                  <p class="text-sm font-black text-slate-800 mt-1">$ {{ producto.precio_base | number:'1.0-0' }}</p>
+                </div>
+                @if (producto.precio_sugerido) {
+                  <div class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                    <p class="text-[8px] font-bold uppercase tracking-widest text-slate-500 leading-none">Sugerido</p>
+                    <p class="text-sm font-black text-slate-700 mt-1">$ {{ producto.precio_sugerido | number:'1.0-0' }}</p>
+                  </div>
+                }
+              </div>
+            }
 
             <!-- Variantes chips -->
             @if (producto.atributos?.length) {
@@ -283,7 +302,7 @@
 ══════════════════════════════════ -->
 @if (mostrarModal()) {
   <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
-       (click)="cerrarModal()">
+       (click)="intentarCerrarModal()">
     <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm"></div>
 
     <div class="relative w-full sm:max-w-5xl h-[94dvh] sm:h-auto sm:max-h-[94dvh] bg-white border border-slate-200 rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden"
@@ -306,17 +325,17 @@
             }
           </div>
         </div>
-        <button (click)="cerrarModal()" aria-label="Cerrar"
+        <button (click)="intentarCerrarModal()" aria-label="Cerrar"
                 class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all shrink-0">
           <span class="material-symbols-outlined text-2xl sm:text-xl">close</span>
         </button>
       </div>
 
       <!-- Modal body: two panels -->
-      <div class="flex-1 overflow-hidden flex flex-col lg:flex-row">
+      <div class="flex-1 overflow-y-auto lg:overflow-hidden flex flex-col lg:flex-row">
 
         <!-- ── LEFT: Product details ── -->
-        <div class="lg:w-3/5 overflow-y-auto p-4 sm:p-6 space-y-5 border-b lg:border-b-0 lg:border-r border-slate-200">
+        <div class="lg:w-3/5 lg:overflow-y-auto p-4 sm:p-6 space-y-5 border-b lg:border-b-0 lg:border-r border-slate-200">
 
           <!-- Nombre -->
           <div class="space-y-1.5">
@@ -367,34 +386,57 @@
               }
             </div>
           } @else {
-            <!-- Inventario: solo precio proveedor -->
-            <div class="space-y-1.5">
-              <label class="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-slate-500">Precio proveedor (COP) *</label>
-              <div class="relative">
-                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-semibold">$</span>
-                <input [(ngModel)]="formProducto.precio_base" type="number" min="0" step="100" placeholder="0"
-                       class="w-full bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-900 placeholder:text-slate-500 pl-8 pr-4 py-3 outline-none transition-all text-sm"/>
+            <!-- Subidor: su precio + precio de venta sugerido, sin referencias a otros -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1.5">
+                <label class="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-slate-500">Mi precio (COP) *</label>
+                <div class="relative">
+                  <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-semibold">$</span>
+                  <input [(ngModel)]="formProducto.precio_base" type="number" min="0" step="100" placeholder="0"
+                         class="w-full bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-900 placeholder:text-slate-500 pl-8 pr-4 py-3 outline-none transition-all text-sm"/>
+                </div>
+              </div>
+              <div class="space-y-1.5">
+                <label class="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-slate-500">Precio de venta sugerido (COP)</label>
+                <div class="relative">
+                  <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-semibold">$</span>
+                  <input [(ngModel)]="formProducto.precio_sugerido" type="number" min="0" step="100" placeholder="0"
+                         class="w-full bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-900 placeholder:text-slate-500 pl-8 pr-4 py-3 outline-none transition-all text-sm"/>
+                </div>
               </div>
             </div>
           }
 
-          <!-- Categoría + SKU -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="space-y-1.5">
-              <label class="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-slate-500">Categoría</label>
-              <select [(ngModel)]="formProducto.categoria_id"
-                      class="w-full bg-slate-50 border border-slate-200 rounded-xl focus:border-primary text-slate-900 px-4 py-3 outline-none transition-all text-base sm:text-sm appearance-none cursor-pointer">
-                <option value="" style="background:#111009">Sin categoría</option>
-                @for (cat of categorias(); track cat.id) {
-                  <option [value]="cat.id" style="background:#111009">{{ cat.icono }} {{ cat.nombre }}</option>
-                }
-              </select>
+          <!-- Categoría -->
+          <div class="space-y-2">
+            <label class="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-slate-500">Categoría</label>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" (click)="formProducto.categoria_id = ''"
+                      class="px-4 py-2.5 rounded-xl text-sm font-bold transition-all border-2"
+                      [style.background]="formProducto.categoria_id ? '#f8fafc' : '#0f172a'"
+                      [style.borderColor]="formProducto.categoria_id ? '#e2e8f0' : '#0f172a'"
+                      [style.color]="formProducto.categoria_id ? '#64748b' : '#ffffff'">
+                Sin categoría
+              </button>
+              @for (cat of categorias(); track cat.id; let i = $index) {
+                <button type="button" (click)="seleccionarCategoria(cat.id)"
+                        class="px-4 py-2.5 rounded-xl text-sm font-bold transition-all border-2 flex items-center gap-2 shadow-sm hover:scale-105"
+                        [style.background]="formProducto.categoria_id === cat.id ? colorCategoria(i) : colorCategoriaTenue(i)"
+                        [style.borderColor]="colorCategoria(i)"
+                        [style.color]="formProducto.categoria_id === cat.id ? '#ffffff' : colorCategoria(i)"
+                        [style.boxShadow]="formProducto.categoria_id === cat.id ? '0 6px 16px -4px ' + colorCategoria(i) : 'none'">
+                  <span class="text-base">{{ cat.icono }}</span>
+                  {{ cat.nombre }}
+                </button>
+              }
             </div>
-            <div class="space-y-1.5">
-              <label class="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-slate-500">SKU</label>
-              <input [(ngModel)]="formProducto.sku" type="text" placeholder="Ej: TK-0042"
-                     class="w-full bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-900 placeholder:text-slate-500 px-4 py-3 outline-none transition-all text-base sm:text-sm"/>
-            </div>
+          </div>
+
+          <!-- SKU -->
+          <div class="space-y-1.5">
+            <label class="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-slate-500">SKU</label>
+            <input [(ngModel)]="formProducto.sku" type="text" placeholder="Ej: TK-0042"
+                   class="w-full bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-900 placeholder:text-slate-500 px-4 py-3 outline-none transition-all text-base sm:text-sm"/>
           </div>
 
           <!-- Stock -->
@@ -571,25 +613,78 @@
             </label>
           </div>
 
-          <!-- Link de creativos externos -->
-          <div class="space-y-1.5">
+          <!-- Selector de tipo de creativos -->
+          <div class="space-y-2">
             <label class="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-sm">link</span>
-              Link de creativos (Drive, Dropbox, etc.)
+              <span class="material-symbols-outlined text-sm">photo_library</span>
+              ¿Cómo quieres compartir los creativos?
             </label>
-            <div class="relative">
-              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-500 text-base">folder_open</span>
-              <input [(ngModel)]="formProducto.link_creativos" type="url"
-                     placeholder="https://drive.google.com/..."
-                     class="w-full bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-900 placeholder:text-slate-500 pl-10 pr-4 py-3 outline-none transition-all text-sm"/>
+            <div class="grid grid-cols-3 gap-2">
+              <button type="button" (click)="modoCreativos.set('sin')"
+                      class="px-2 py-3 rounded-xl border-2 text-xs font-bold transition-all flex flex-col items-center gap-1"
+                      [class]="modoCreativos() === 'sin' ? 'border-slate-800 bg-slate-800 text-white shadow-md' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'">
+                <span class="material-symbols-outlined text-lg">block</span>
+                Sin creativos
+              </button>
+              <button type="button" (click)="modoCreativos.set('url')"
+                      class="px-2 py-3 rounded-xl border-2 text-xs font-bold transition-all flex flex-col items-center gap-1"
+                      [class]="modoCreativos() === 'url' ? 'border-primary bg-primary text-[#1a160f] shadow-md' : 'border-slate-200 bg-white text-slate-600 hover:border-primary/40'">
+                <span class="material-symbols-outlined text-lg">link</span>
+                URL
+              </button>
+              <button type="button" (click)="modoCreativos.set('imagenes')"
+                      class="px-2 py-3 rounded-xl border-2 text-xs font-bold transition-all flex flex-col items-center gap-1"
+                      [class]="modoCreativos() === 'imagenes' ? 'border-primary bg-primary text-[#1a160f] shadow-md' : 'border-slate-200 bg-white text-slate-600 hover:border-primary/40'">
+                <span class="material-symbols-outlined text-lg">collections</span>
+                Imágenes
+              </button>
             </div>
-            @if (formProducto.link_creativos) {
-              <p class="text-[11px] text-primary/70 flex items-center gap-1">
-                <span class="material-symbols-outlined text-sm">check_circle</span>
-                Los usuarios verán un botón para descargar desde este link
-              </p>
-            }
           </div>
+
+          <!-- Link de creativos externos (solo si modo === url) -->
+          @if (modoCreativos() === 'url') {
+            <div class="space-y-1.5">
+              <label class="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">link</span>
+                Link de creativos (Drive, Dropbox, etc.)
+              </label>
+              <div class="relative">
+                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-500 text-base">folder_open</span>
+                <input [(ngModel)]="formProducto.link_creativos" type="url"
+                       placeholder="https://drive.google.com/..."
+                       class="w-full bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary/20 text-slate-900 placeholder:text-slate-500 pl-10 pr-4 py-3 outline-none transition-all text-sm"/>
+              </div>
+              @if (formProducto.link_creativos) {
+                <p class="text-[11px] text-primary/70 flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">check_circle</span>
+                  Los usuarios verán un botón para descargar desde este link
+                </p>
+              }
+            </div>
+          }
+
+          <!-- Sucursal de despacho -->
+          @if (sucursalesUsuario().length > 1) {
+            <div class="space-y-1.5">
+              <label class="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">warehouse</span>
+                Sucursal de despacho *
+              </label>
+              <select [(ngModel)]="formProducto.sucursal_id" name="sucursal_id"
+                      class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-all">
+                <option [ngValue]="null">— Selecciona una sucursal —</option>
+                @for (s of sucursalesUsuario(); track s.id) {
+                  <option [ngValue]="s.id">{{ s.nombre }} · {{ s.ciudad }}</option>
+                }
+              </select>
+              <p class="text-[11px] text-slate-400">El origen de salida del paquete se toma de esta sucursal.</p>
+            </div>
+          } @else if (sucursalesUsuario().length === 1) {
+            <div class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600">
+              <span class="material-symbols-outlined text-[16px] text-slate-400">warehouse</span>
+              <span>Despacha desde: <strong>{{ sucursalesUsuario()[0].nombre }}</strong> · {{ sucursalesUsuario()[0].ciudad }}</span>
+            </div>
+          }
 
           <!-- Disponible toggle -->
           <label class="flex items-center gap-3.5 cursor-pointer p-3.5 rounded-xl border border-slate-200 hover:border-primary/20 transition-all">
@@ -620,33 +715,37 @@
           </button>
         </div>
 
-        <!-- ── RIGHT: Creativos ── -->
-        <div class="lg:w-2/5 bg-slate-50 flex flex-col overflow-hidden">
+        <!-- ── RIGHT: Creativos (sólo cuando el modo es 'imagenes') ── -->
+        @if (modoCreativos() === 'imagenes') {
+        <div class="lg:w-2/5 bg-slate-50 flex flex-col lg:overflow-hidden">
 
           <!-- Panel header -->
-          <div class="px-5 py-4 border-b border-slate-200 shrink-0 flex items-center justify-between">
-            <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+          <div class="px-4 py-3 border-b border-slate-200 shrink-0 flex items-center gap-2">
+            <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2 flex-1 min-w-0">
               <span class="material-symbols-outlined text-primary text-base">photo_library</span>
               Creativos
               @if (productoEnModal()) {
                 <span class="text-xs font-normal text-slate-500">({{ creativosEnModal().length }})</span>
               }
+              @if (sugeridos().length > 0) {
+                <span class="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">
+                  {{ sugeridos().length }} sugeridos
+                </span>
+              }
             </h4>
             @if (productoEnModal()) {
-              <div class="flex gap-1">
-                @if (contarTipo(productoEnModal()!, 'imagen') > 0) {
-                  <span class="flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded border text-sky-400 bg-sky-400/10 border-sky-400/20">
-                    <span class="material-symbols-outlined text-[11px]">image</span>
-                    {{ contarTipo(productoEnModal()!, 'imagen') }}
-                  </span>
+              <button (click)="buscarCreativosEnWeb()"
+                      [disabled]="buscandoEnWeb()"
+                      title="Buscar imágenes y videos en internet"
+                      class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold border transition-all disabled:opacity-50 disabled:cursor-not-allowed border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 shrink-0">
+                @if (buscandoEnWeb()) {
+                  <span class="w-3 h-3 border-2 border-emerald-400/30 border-t-emerald-500 rounded-full animate-spin"></span>
+                  Buscando…
+                } @else {
+                  <span class="material-symbols-outlined text-sm">travel_explore</span>
+                  Web
                 }
-                @if (contarTipo(productoEnModal()!, 'video') > 0) {
-                  <span class="flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded border text-purple-400 bg-purple-400/10 border-purple-400/20">
-                    <span class="material-symbols-outlined text-[11px]">videocam</span>
-                    {{ contarTipo(productoEnModal()!, 'video') }}
-                  </span>
-                }
-              </div>
+              </button>
             }
           </div>
 
@@ -661,7 +760,7 @@
             </div>
           } @else {
 
-            <div class="flex-1 overflow-y-auto">
+            <div class="flex-1 lg:overflow-y-auto">
 
               <!-- ── Sección Imágenes ── -->
               <div class="p-4 border-b border-slate-200 space-y-3">
@@ -789,48 +888,43 @@
                 }
               </div>
 
-              <!-- ── Lista de creativos ── -->
+              <!-- ── Grilla de creativos aprobados ── -->
               @if (cargandoModal()) {
-                <div class="p-4 space-y-2">
-                  @for (_ of [1,2,3]; track $index) {
-                    <div class="h-14 bg-slate-50 rounded-xl animate-pulse"></div>
+                <div class="p-3 grid grid-cols-3 gap-2">
+                  @for (_ of [1,2,3,4,5,6]; track $index) {
+                    <div class="aspect-square rounded-xl bg-slate-100 animate-pulse"></div>
                   }
                 </div>
               } @else if (creativosEnModal().length === 0) {
                 <div class="flex flex-col items-center justify-center py-10 text-center px-4">
-                  <span class="material-symbols-outlined text-4xl text-slate-500 mb-2">folder_open</span>
-                  <p class="text-slate-500 text-sm">Sin creativos todavía</p>
-                  <p class="text-slate-500 text-xs mt-1">Sube imágenes o videos arriba</p>
+                  <span class="material-symbols-outlined text-4xl text-slate-300 mb-2">add_photo_alternate</span>
+                  <p class="text-slate-500 text-sm">Sin imágenes todavía</p>
+                  <p class="text-slate-400 text-xs mt-1">Sube imágenes arriba o busca en internet</p>
                 </div>
               } @else {
-                <div class="p-4 space-y-2">
+                <div class="p-3 grid grid-cols-3 gap-2">
                   @for (creativo of creativosEnModal(); track creativo.id) {
-                    <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200 hover:border-slate-300 transition-all group">
-
-                      <!-- Type icon -->
-                      <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                           [class]="tipoInfo(creativo.tipo).bgClass">
-                        <span class="material-symbols-outlined text-sm"
-                              [class]="tipoInfo(creativo.tipo).iconColor">
-                          {{ tipoInfo(creativo.tipo).icono }}
-                        </span>
+                    <div class="relative group aspect-square rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-sm">
+                      @if (creativo.tipo === 'imagen') {
+                        <img [src]="creativo.archivo_url" [alt]="creativo.nombre"
+                             class="w-full h-full object-cover"
+                             loading="lazy"/>
+                      } @else {
+                        <!-- No-imagen: icono centrado -->
+                        <div class="w-full h-full flex flex-col items-center justify-center gap-1 bg-slate-50">
+                          <span class="material-symbols-outlined text-2xl text-slate-400">{{ tipoInfo(creativo.tipo).icono }}</span>
+                          <span class="text-[9px] text-slate-400 font-bold uppercase">{{ creativo.extension }}</span>
+                        </div>
+                      }
+                      <!-- Botón eliminar: siempre visible en móvil, hover en desktop -->
+                      <div class="absolute inset-0 flex items-end justify-end p-1
+                                  opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity
+                                  bg-gradient-to-t from-black/60 to-transparent">
+                        <button (click)="eliminarCreativoEnModal(creativo)"
+                                class="w-7 h-7 flex items-center justify-center rounded-lg bg-red-500 text-white active:scale-95 transition-all">
+                          <span class="material-symbols-outlined text-sm">delete</span>
+                        </button>
                       </div>
-
-                      <!-- Info -->
-                      <div class="flex-1 min-w-0">
-                        <p class="text-xs font-semibold text-slate-800 truncate">{{ creativo.nombre }}</p>
-                        <p class="text-[10px] text-slate-500 mt-0.5">
-                          <span class="text-slate-500 font-medium">{{ creativo.extension?.toUpperCase() }}</span>
-                          @if (creativo.tamano) { · {{ tamano(creativo.tamano) }} }
-                          @if (!creativo.publico) { · <span class="text-amber-700">privado</span> }
-                        </p>
-                      </div>
-
-                      <!-- Delete -->
-                      <button (click)="eliminarCreativoEnModal(creativo)"
-                              class="opacity-0 group-hover:opacity-100 w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 hover:text-red-600 hover:bg-red-50 transition-all shrink-0">
-                        <span class="material-symbols-outlined text-sm">delete</span>
-                      </button>
                     </div>
                   }
                 </div>
@@ -838,11 +932,208 @@
 
             </div>
 
+            <!-- ── Sugerencias de internet ── -->
+            @if (sugeridos().length > 0) {
+              <div class="border-t border-amber-200 bg-amber-50/40">
+
+                <!-- Header -->
+                <div class="px-3 pt-3 pb-2 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-amber-600 text-base shrink-0">travel_explore</span>
+                  <p class="text-[10px] font-black uppercase tracking-widest text-amber-700 flex-1 min-w-0">
+                    Sugerencias ({{ sugeridos().length }})
+                  </p>
+                  <button (click)="sugeridos().forEach(s => aprobarSugerido(s))"
+                          class="text-[10px] font-bold px-2 py-1 rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 hover:bg-emerald-200 transition-all shrink-0">
+                    Aprobar todo
+                  </button>
+                </div>
+
+                <!-- Grid de miniaturas -->
+                <div class="px-3 pb-3 grid grid-cols-3 gap-2">
+                  @for (s of sugeridos(); track s.id) {
+                    <div class="relative group rounded-xl overflow-hidden bg-slate-200 aspect-square border border-slate-200 shadow-sm cursor-pointer"
+                         (click)="abrirPreview(s)">
+
+                      <!-- Thumbnail -->
+                      @if (s.tipo === 'imagen') {
+                        <img [src]="s.archivo_url" [alt]="s.nombre"
+                             class="w-full h-full object-cover"
+                             loading="lazy"/>
+                      } @else {
+                        <img [src]="videoThumb(s)" [alt]="s.nombre"
+                             class="w-full h-full object-cover"
+                             loading="lazy"/>
+                        <!-- play badge -->
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <div class="w-7 h-7 rounded-full bg-black/50 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-white text-base">play_arrow</span>
+                          </div>
+                        </div>
+                      }
+
+                      <!-- Overlay con botones (siempre visible en móvil, hover en desktop) -->
+                      <div class="absolute inset-x-0 bottom-0 flex gap-1 p-1
+                                  opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity
+                                  bg-gradient-to-t from-black/70 to-transparent pt-4">
+                        <button (click)="$event.stopPropagation(); aprobarSugerido(s)"
+                                class="flex-1 flex items-center justify-center gap-0.5 py-1 rounded-lg bg-emerald-500 text-white text-[10px] font-bold hover:bg-emerald-600 transition-all active:scale-95">
+                          <span class="material-symbols-outlined text-xs">check</span>
+                        </button>
+                        <button (click)="$event.stopPropagation(); rechazarSugerido(s)"
+                                class="flex-1 flex items-center justify-center gap-0.5 py-1 rounded-lg bg-white/20 text-white text-[10px] font-bold hover:bg-red-500 transition-all active:scale-95">
+                          <span class="material-symbols-outlined text-xs">close</span>
+                        </button>
+                      </div>
+
+                    </div>
+                  }
+                </div>
+
+              </div>
+            }
+
           }
         </div>
+        }
       </div>
     </div>
   </div>
+
+  <!-- ══════════════════════════════════
+       MODAL PREVIEW SUGERIDO
+  ══════════════════════════════════ -->
+  @if (sugeridoPreview(); as s) {
+    <div class="fixed inset-0 z-[80] flex flex-col"
+         (click)="cerrarPreview()">
+
+      <!-- Fondo -->
+      <div class="absolute inset-0 bg-black/92 backdrop-blur-sm"></div>
+
+      <!-- Contenido -->
+      <div class="relative flex flex-col h-full" (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="flex items-center gap-3 px-4 py-3 shrink-0 bg-black/40">
+          <!-- Fuente badge -->
+          <span class="text-[10px] font-black px-2 py-1 rounded-full border"
+                [class]="s.fuente_nombre === 'YouTube' ? 'bg-red-500/20 border-red-500/40 text-red-400' : 'bg-blue-500/20 border-blue-500/40 text-blue-400'">
+            {{ s.fuente_nombre }}
+          </span>
+          <p class="flex-1 text-sm font-semibold text-white truncate">{{ s.nombre }}</p>
+          <!-- Contador -->
+          <span class="text-xs text-slate-400 shrink-0">{{ previewIdx() + 1 }} / {{ sugeridos().length }}</span>
+          <!-- Cerrar -->
+          <button (click)="cerrarPreview()"
+                  class="w-9 h-9 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-all shrink-0">
+            <span class="material-symbols-outlined text-xl">close</span>
+          </button>
+        </div>
+
+        <!-- Media -->
+        <div class="flex-1 flex items-center justify-center relative overflow-hidden px-2 py-2 min-h-0">
+
+          <!-- Flecha anterior -->
+          @if (previewIdx() > 0) {
+            <button (click)="previewAnterior()"
+                    class="absolute left-2 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/70 text-white transition-all border border-white/10">
+              <span class="material-symbols-outlined text-xl">chevron_left</span>
+            </button>
+          }
+
+          <!-- Imagen -->
+          @if (s.tipo === 'imagen') {
+            <img [src]="s.archivo_url" [alt]="s.nombre"
+                 class="max-w-full max-h-full object-contain rounded-xl shadow-2xl"
+                 style="max-height: calc(100vh - 180px)"
+                 (error)="onPreviewImgError($event)"/>
+          }
+
+          <!-- Video YouTube -->
+          @if (s.tipo === 'video' && s.fuente_nombre === 'YouTube' && ytVideoId(s.archivo_url)) {
+            <div class="w-full max-w-2xl aspect-video rounded-xl overflow-hidden shadow-2xl">
+              <iframe
+                [src]="'https://www.youtube.com/embed/' + ytVideoId(s.archivo_url) + '?autoplay=1&rel=0' | trustedUrl"
+                class="w-full h-full"
+                frameborder="0"
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowfullscreen>
+              </iframe>
+            </div>
+          }
+
+          <!-- Video Pexels (mp4) -->
+          @if (s.tipo === 'video' && s.fuente_nombre !== 'YouTube') {
+            <div class="w-full max-w-2xl aspect-video rounded-xl overflow-hidden shadow-2xl">
+              <video [src]="s.archivo_url" controls autoplay
+                     class="w-full h-full bg-black"
+                     preload="metadata">
+              </video>
+            </div>
+          }
+
+          <!-- Flecha siguiente -->
+          @if (previewIdx() < sugeridos().length - 1) {
+            <button (click)="previewSiguiente()"
+                    class="absolute right-2 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/70 text-white transition-all border border-white/10">
+              <span class="material-symbols-outlined text-xl">chevron_right</span>
+            </button>
+          }
+
+        </div>
+
+        <!-- Footer: aprobar / descartar -->
+        <div class="shrink-0 px-4 py-4 bg-black/40 flex items-center gap-3">
+          <button (click)="rechazarYCerrarPreview(s)"
+                  class="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl border border-white/10 bg-white/5 text-slate-300 hover:bg-red-500/20 hover:border-red-500/30 hover:text-red-400 transition-all font-bold text-sm active:scale-95">
+            <span class="material-symbols-outlined text-lg">close</span>
+            Descartar
+          </button>
+          <button (click)="aprobarYCerrarPreview(s)"
+                  class="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-white transition-all font-bold text-sm shadow-lg shadow-emerald-500/30 active:scale-95">
+            <span class="material-symbols-outlined text-lg">check</span>
+            Usar este
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
+
+  <!-- Diálogo: confirmar salida con cambios sin guardar (solo al crear nuevo) -->
+  @if (mostrarConfirmacionSalida()) {
+    <div class="fixed inset-0 z-[70] flex items-center justify-center p-4"
+         (click)="seguirEditando()">
+      <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm"></div>
+      <div class="relative w-full max-w-sm bg-white border border-slate-200 rounded-2xl shadow-2xl"
+           (click)="$event.stopPropagation()">
+        <div class="px-6 pt-8 pb-4 text-center">
+          <div class="w-14 h-14 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto mb-4">
+            <span class="material-symbols-outlined text-amber-600 text-2xl">save_as</span>
+          </div>
+          <h3 class="text-slate-900 font-bold text-base mb-1">¿Quieres guardar un borrador?</h3>
+          <p class="text-slate-500 text-sm">
+            Tienes cambios sin terminar. Puedes guardarlos como borrador para continuar después, o descartarlos y salir.
+          </p>
+        </div>
+        <div class="flex flex-col gap-2 px-6 pb-6">
+          <button (click)="guardarComoBorrador()"
+                  class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold bg-primary text-[#1a160f] hover:brightness-110 transition-all shadow-md shadow-primary/20">
+            <span class="material-symbols-outlined text-base">save</span>
+            Guardar borrador
+          </button>
+          <button (click)="descartarYSalir()"
+                  class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition-all">
+            <span class="material-symbols-outlined text-base">delete</span>
+            Descartar y salir
+          </button>
+          <button (click)="seguirEditando()"
+                  class="w-full px-4 py-2.5 rounded-xl text-sm text-slate-500 border border-slate-200 hover:text-slate-800 hover:bg-slate-50 transition-all">
+            Seguir editando
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 }
 
 <!-- ══════════════════════════════════

@@ -82,9 +82,49 @@ export const routes: Routes = [
           import('./features/catalogo/catalogo.component').then((m) => m.CatalogoComponent),
       },
       {
+        path: 'wallet',
+        canActivate: [catalogoGuard],
+        loadComponent: () =>
+          import('./features/wallet/wallet.component').then((m) => m.WalletComponent),
+      },
+      {
+        path: 'mis-pedidos',
+        canActivate: [catalogoGuard],
+        loadComponent: () =>
+          import('./features/pedidos/mis-pedidos.component').then((m) => m.MisPedidosComponent),
+      },
+      {
+        path: 'integraciones',
+        canActivate: [catalogoGuard],
+        loadComponent: () =>
+          import('./features/integraciones/integraciones.component').then((m) => m.IntegracionesComponent),
+      },
+      {
+        path: 'mis-ganancias',
+        canActivate: [catalogoGuard],
+        loadComponent: () =>
+          import('./features/ganancias/ganancias.component').then((m) => m.GananciasComponent),
+      },
+      {
+        path: 'admin-pedidos',
+        canActivate: [inventarioGuard],
+        loadComponent: () =>
+          import('./features/pedidos/admin-pedidos.component').then((m) => m.AdminPedidosComponent),
+      },
+      {
         path: 'perfil',
         loadComponent: () =>
           import('./features/perfil/perfil.component').then((m) => m.PerfilComponent),
+      },
+      {
+        path: 'recomienda',
+        loadComponent: () =>
+          import('./features/referidos/recomienda.component').then((m) => m.RecomiendaComponent),
+      },
+      {
+        path: 'mi-whatsapp',
+        loadComponent: () =>
+          import('./features/whatsapp/mi-whatsapp.component').then((m) => m.MiWhatsappComponent),
       },
       {
         path: 'inventario',

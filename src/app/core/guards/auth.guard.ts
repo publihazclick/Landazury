@@ -63,7 +63,7 @@ export const catalogoGuard: CanActivateFn = () => {
   const router = inject(Router);
   return whenReady(auth, router, () => {
     if (!auth.estaAutenticado()) return '/auth/login';
-    return auth.perfil()?.rol === 'usuario' ? true : rutaPorRol(auth);
+    return true;
   });
 };
 

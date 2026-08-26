@@ -6,7 +6,7 @@ import { CatalogoFiltrosService } from '../../core/services/catalogo-filtros.ser
 import { AuthService } from '../../core/services/auth.service';
 import { ExcelProductosService } from '../../core/services/excel-productos.service';
 import type { FilaImport } from '../../core/services/excel-productos.service';
-import type { EstadoProducto } from '../../core/models/producto.model';
+import type { EstadoProducto, Producto } from '../../core/models/producto.model';
 
 export type { FilaImport };
 
@@ -17,11 +17,11 @@ export type { FilaImport };
   templateUrl: './importar-productos.component.html',
 })
 export class ImportarProductosComponent {
-  @Output() cerrar = new EventEmitter<number>();
+  @Output() cerrar = new EventEmitter<Producto[]>();
 
   private readonly catalogoService  = inject(CatalogoService);
   private readonly filtros          = inject(CatalogoFiltrosService);
-  private readonly auth             = inject(AuthService);
+  readonly auth                     = inject(AuthService);
   private readonly excelService     = inject(ExcelProductosService);
   private readonly platformId       = inject(PLATFORM_ID);
 
@@ -29,7 +29,7 @@ export class ImportarProductosComponent {
   readonly filas       = signal<FilaImport[]>([]);
   readonly procesando  = signal(false);
   readonly progreso    = signal(0);
-  readonly resultado   = signal<{ exitosos: number; errores: number } | null>(null);
+  readonly resultado   = signal<{ exitosos: number; errores: number; mensajeError?: string } | null>(null);
   readonly error       = signal<string | null>(null);
   readonly archivoNombre = signal('');
   readonly incluirInactivos = signal(false);
@@ -133,46 +133,78 @@ export class ImportarProductosComponent {
 
     const filasFinales = this.filasSeleccionadas;
 
-    // Todos los productos importados se auto-aprueban con margen del 30% sobre precio_base
-    const payload = filasFinales.map(f => ({
-      nombre:          f.nombre,
-      descripcion:     f.descripcion ?? null,
-      sku:             f.sku ?? null,
-      stock:           f.stock ?? null,
-      precio_base:     f.precio_base,
-      precio_sugerido: f.precio_sugerido ?? null,
-      precio_final:    Math.round(f.precio_base * 1.30),
-      categoria_id:    f.categoria_id ?? null,
-      imagenes:        f.imagen_url ? [f.imagen_url] : [] as string[],
-      link_creativos:  f.link_creativos ?? null,
-      disponible:      true,
-      ganador:         false,
-      exclusivo:       false,
-      estado:          'aprobado' as EstadoProducto,
-      bodega_id:       userId ?? null,
-      vistas:          0,
-      descargas:       0,
-    }));
+    // Productos importados: solo se publican si tienen imagen Y categoría.
+    // Si les falta algo quedan como borrador (disponible=false) hasta que el
+    // subidor los complete desde el inventario — así no contaminan el catálogo público.
+    // Defaults de dimensiones por slug — si el Excel no trajo las medidas se aplican
+    // los mismos valores que el backfill SQL, por categoría.
+    const cats = this.filtros.categorias();
+    const slugDe = (id: string | null | undefined) =>
+      (cats.find(c => c.id === id)?.slug ?? '').toLowerCase();
+    const dimDef = (slug: string) => {
+      if (slug === 'calzado')    return { alto: 18, ancho: 21, largo: 29, peso: 0.800 };
+      if (slug === 'billeteras') return { alto:  5, ancho: 15, largo: 18, peso: 0.200 };
+      return { alto: 18, ancho: 29, largo: 30, peso: 1.000 };
+    };
+
+    const payload = filasFinales.map(f => {
+      const imagenValida = !!f.imagen_url?.trim();
+      const tieneCategoria = !!f.categoria_id;
+      const publicable = imagenValida && tieneCategoria;
+      const def = dimDef(slugDe(f.categoria_id));
+      return {
+        nombre:          f.nombre,
+        descripcion:     f.descripcion ?? null,
+        sku:             f.sku ?? null,
+        stock:           f.stock ?? null,
+        precio_base:     f.precio_base,
+        precio_sugerido: f.precio_sugerido ?? null,
+        precio_final:    f.precio_base,
+        categoria_id:    f.categoria_id ?? null,
+        imagenes:        imagenValida ? [f.imagen_url!] : [] as string[],
+        link_creativos:  f.link_creativos ?? null,
+        alto_cm:         f.alto_cm  ?? def.alto,
+        ancho_cm:        f.ancho_cm ?? def.ancho,
+        largo_cm:        f.largo_cm ?? def.largo,
+        peso_kg:         f.peso_kg  ?? def.peso,
+        disponible:      publicable,
+        ganador:         false,
+        exclusivo:       false,
+        estado:          'aprobado' as EstadoProducto,
+        bodega_id:       userId ?? null,
+        vistas:          0,
+        descargas:       0,
+      };
+    });
 
     const CHUNK = 50;
     let exitosos = 0;
     let errores  = 0;
+    let mensajeError: string | undefined;
+    this.productosCreados = [];
 
     for (let i = 0; i < payload.length; i += CHUNK) {
       const chunk = payload.slice(i, i + CHUNK);
       try {
-        await this.catalogoService.insertarProductosBatch(chunk);
-        exitosos += chunk.length;
-      } catch {
+        const creados = await this.catalogoService.insertarProductosBatch(chunk);
+        this.productosCreados.push(...creados);
+        exitosos += creados.length;
+      } catch (err: any) {
         errores += chunk.length;
+        console.error('[importar-productos] Insert batch falló:', err, { chunkSample: chunk[0] });
+        if (!mensajeError) {
+          mensajeError = err?.message || err?.error_description || err?.hint || JSON.stringify(err);
+        }
       }
       this.progreso.set(Math.round(((i + chunk.length) / payload.length) * 100));
     }
 
-    this.resultado.set({ exitosos, errores });
+    this.resultado.set({ exitosos, errores, mensajeError });
     this.paso.set('resultado');
     this.procesando.set(false);
   }
+
+  private productosCreados: Producto[] = [];
 
   async descargarPlantilla() {
     if (!isPlatformBrowser(this.platformId)) return;
@@ -192,6 +224,12 @@ export class ImportarProductosComponent {
       'Active': 1,
       'Image URL': 'https://ejemplo.com/imagen.jpg',
       'Creativos Drive': 'https://drive.google.com/...',
+      // Dimensiones del paquete — opcional. Si se dejan vacías se aplican
+      // defaults por categoría (calzado / billeteras / resto).
+      'Height (cm)': 18,
+      'Width (cm)':  29,
+      'Length (cm)': 30,
+      'Weight (kg)': 1,
     }];
 
     const ws = XLSX.utils.json_to_sheet(ejemplo);
@@ -216,6 +254,7 @@ export class ImportarProductosComponent {
   }
 
   finalizar() {
-    this.cerrar.emit(this.resultado()?.exitosos ?? 0);
+    this.cerrar.emit(this.productosCreados);
+    this.productosCreados = [];
   }
 }

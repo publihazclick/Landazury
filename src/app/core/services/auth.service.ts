@@ -20,6 +20,7 @@ export class AuthService {
   readonly rol = computed<Rol | null>(() => this.perfil()?.rol ?? null);
   readonly esAdmin = computed(() => this.perfil()?.rol === 'admin');
   readonly esInventario = computed(() => this.perfil()?.rol === 'inventario');
+  readonly esTestUser = computed(() => !!this.perfil()?.test_user);
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {

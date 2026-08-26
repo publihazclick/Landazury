@@ -64,9 +64,24 @@ export class CatalogoService {
     return this.normalizar([data])[0];
   }
 
-  async insertarProductosBatch(productos: Record<string, any>[]) {
-    const { error } = await this.supabase.cliente.from('productos').insert(productos);
+  async insertarProductosBatch(productos: Record<string, any>[]): Promise<Producto[]> {
+    const { data, error } = await this.supabase.cliente
+      .from('productos')
+      .insert(productos)
+      .select('*, categoria:categorias(*)');
     if (error) throw error;
+    return this.normalizar(data ?? []);
+  }
+
+  async obtenerSucursalesUsuario(): Promise<{ id: string; nombre: string; ciudad: string; direccion: string; dane_code: string }[]> {
+    const { data, error } = await this.supabase.cliente
+      .from('sucursales')
+      .select('id, nombre, ciudad, direccion, dane_code')
+      .eq('propietario_id', this.auth.usuario()!.id)
+      .eq('activa', true)
+      .order('created_at');
+    if (error) return [];
+    return (data ?? []) as { id: string; nombre: string; ciudad: string; direccion: string; dane_code: string }[];
   }
 
   async crearProducto(producto: Omit<Producto, 'id' | 'creado_en' | 'categoria' | 'creativos'>) {
@@ -92,17 +107,21 @@ export class CatalogoService {
     const usuario = this.auth.usuario();
     if (!usuario) throw new Error('Debes iniciar sesión');
     const compressed = file.type.startsWith('image/') ? await this.comprimirImagen(file, 1400, 0.82) : file;
-    const path = `productos/${usuario.id}/${Date.now()}.jpg`;
+    const ext = (compressed.name.match(/\.([a-z0-9]+)$/i)?.[1] || 'jpg').toLowerCase();
+    const mime = compressed.type || 'image/jpeg';
+    const rand = (globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2)).replace(/-/g, '');
+    const path = `productos/${usuario.id}/${Date.now()}_${rand.slice(0, 8)}.${ext}`;
     const { error } = await this.supabase.cliente.storage
       .from(this.BUCKET_IMAGENES)
-      .upload(path, compressed, { upsert: false, contentType: 'image/jpeg' });
+      .upload(path, compressed, { upsert: false, contentType: mime });
     if (error) throw error;
     const { data } = this.supabase.cliente.storage.from(this.BUCKET_IMAGENES).getPublicUrl(path);
     return data.publicUrl;
   }
 
-  /** Comprime una imagen usando Canvas antes de subirla */
+  /** Comprime una imagen antes de subirla (Image + canvas, compatible con todos los browsers) */
   async comprimirImagen(file: File, maxPx = 1400, calidad = 0.82): Promise<File> {
+    if (file.size < 500 * 1024) return file;
     return new Promise((resolve) => {
       const img = new Image();
       const objectUrl = URL.createObjectURL(file);
@@ -112,7 +131,7 @@ export class CatalogoService {
           let { width, height } = img;
           if (width > maxPx || height > maxPx) {
             if (width >= height) { height = Math.round((height * maxPx) / width); width = maxPx; }
-            else { width = Math.round((width * maxPx) / height); height = maxPx; }
+            else                 { width  = Math.round((width  * maxPx) / height); height = maxPx; }
           }
           const canvas = document.createElement('canvas');
           canvas.width = width;
@@ -125,7 +144,7 @@ export class CatalogoService {
               if (!blob || blob.size >= file.size) { resolve(file); return; }
               resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }));
             },
-            'image/jpeg', calidad
+            'image/jpeg', calidad,
           );
         } catch { resolve(file); }
       };

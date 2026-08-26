@@ -7,11 +7,11 @@
   <div class="relative z-10 bg-white border border-slate-200 rounded-t-3xl sm:rounded-3xl w-full sm:max-w-5xl max-h-[96dvh] flex flex-col overflow-hidden shadow-2xl">
 
     <!-- Header compacto (sin imagen) -->
-    <div class="flex items-start justify-between gap-4 px-5 sm:px-6 py-5 border-b border-slate-200 shrink-0 bg-slate-50">
+    <div class="flex items-start justify-between gap-3 px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-200 shrink-0 bg-slate-50">
       <div class="flex-1 min-w-0">
         <!-- Categoría -->
         @if (producto.categoria) {
-          <p class="text-xs font-bold uppercase tracking-widest text-primary mb-1.5 flex items-center gap-1">
+          <p class="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-primary mb-1.5 flex items-center gap-1 truncate">
             {{ producto.categoria.icono }} {{ producto.categoria.nombre }}
           </p>
         }
@@ -30,10 +30,10 @@
         </div>
         <!-- Nombre + copiar -->
         <div class="flex items-start gap-2">
-          <h2 class="text-xl sm:text-2xl font-black text-slate-900 leading-snug flex-1">{{ producto.nombre }}</h2>
+          <h2 class="text-base sm:text-2xl font-black text-slate-900 leading-snug flex-1 break-words">{{ producto.nombre }}</h2>
           <button (click)="copiar('nombre')"
                   title="Copiar nombre"
-                  class="shrink-0 mt-0.5 w-7 h-7 flex items-center justify-center rounded-lg transition-all"
+                  class="shrink-0 mt-0.5 w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded-lg transition-all"
                   [class]="copiado() === 'nombre'
                     ? 'bg-green-100 text-green-700 border border-green-300'
                     : 'bg-white text-slate-500 hover:text-slate-800 hover:bg-slate-100 border border-slate-200'">
@@ -45,13 +45,14 @@
       </div>
       <!-- Cerrar -->
       <button (click)="cerrar.emit()"
-              class="shrink-0 w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all">
-        <span class="material-symbols-outlined text-base">close</span>
+              aria-label="Cerrar"
+              class="shrink-0 w-10 h-10 sm:w-9 sm:h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all">
+        <span class="material-symbols-outlined text-xl sm:text-lg">close</span>
       </button>
     </div>
 
     <!-- Contenido scrolleable -->
-    <div class="overflow-y-auto flex-1 p-5 sm:p-6 space-y-6 bg-white">
+    <div class="overflow-y-auto flex-1 p-4 sm:p-6 space-y-5 sm:space-y-6 bg-white" style="padding-bottom: max(env(safe-area-inset-bottom), 1rem);">
 
       <!-- ══ GALERÍA DE FOTOS DEL PRODUCTO ══ -->
       @if (fotosProducto.length > 0) {
@@ -104,8 +105,18 @@
             </div>
           }
 
-          <!-- Más info por WhatsApp (alineado a la izquierda) -->
-          <div class="flex justify-start pt-1">
+          <!-- Acciones: Hacer pedido + WhatsApp -->
+          <div class="flex flex-wrap gap-2 justify-start pt-1">
+            <button (click)="hacerPedido.emit(producto)" type="button"
+                    class="group inline-flex items-center gap-2 pl-1.5 pr-4 py-1.5 rounded-full bg-primary text-white hover:bg-primary/90 active:scale-[.98] transition-all shadow-sm hover:shadow">
+              <span class="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform bg-white/20">
+                <span class="material-symbols-outlined text-white text-[18px]">shopping_cart_checkout</span>
+              </span>
+              <span class="flex flex-col leading-tight">
+                <span class="text-[10px] font-bold uppercase tracking-widest opacity-90">Dropshipping</span>
+                <span class="text-xs sm:text-sm font-black">Hacer pedido ahora</span>
+              </span>
+            </button>
             <a [href]="urlWhatsapp" target="_blank" rel="noopener noreferrer"
                class="group inline-flex items-center gap-2 pl-1.5 pr-4 py-1.5 rounded-full bg-green-50 border border-green-200 hover:bg-green-100 active:bg-green-200 hover:border-green-300 transition-all shadow-sm hover:shadow">
               <span class="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform"
@@ -127,26 +138,26 @@
       @if (producto.precio_final) {
         <div class="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
           <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-            <div class="flex-1">
-              <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-1">Precio a Dropshippers</p>
-              <p class="text-2xl sm:text-3xl font-black text-primary">
+            <div class="flex-1 min-w-0">
+              <p class="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-slate-500 mb-1">Precio a Dropshippers</p>
+              <p class="text-xl sm:text-3xl font-black text-primary break-words">
                 ${{ producto.precio_final | number:'1.0-0' }} COP
               </p>
-              <p class="text-amber-700 text-base font-semibold mt-1.5">
+              <p class="text-amber-700 text-sm sm:text-base font-semibold mt-1.5 break-words">
                 <span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Precio sugerido de venta </span>
                 ${{ precioSugerido | number:'1.0-0' }} COP
               </p>
             </div>
-            <div class="flex gap-2 sm:flex-col sm:items-end">
+            <div class="flex gap-2 sm:flex-col sm:items-end shrink-0">
               @if (margen > 0) {
-                <div class="text-center bg-green-50 border border-green-200 rounded-xl px-4 py-2.5 flex-1 sm:flex-initial">
-                  <p class="text-xs font-bold uppercase tracking-widest text-green-700 mb-0.5">Tu ganancia</p>
-                  <p class="text-xl sm:text-2xl font-black text-green-700">+{{ margen }}%</p>
+                <div class="text-center bg-green-50 border border-green-200 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 flex-1 sm:flex-initial">
+                  <p class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-green-700 mb-0.5">Tu ganancia</p>
+                  <p class="text-lg sm:text-2xl font-black text-green-700">+{{ margen }}%</p>
                 </div>
               }
-              <div class="text-center bg-white border border-slate-200 rounded-xl px-4 py-2.5 flex-1 sm:flex-initial">
-                <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-0.5">Stock</p>
-                <p class="text-xl font-black text-green-700">{{ stockAparente }} uds.</p>
+              <div class="text-center bg-white border border-slate-200 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 flex-1 sm:flex-initial">
+                <p class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-slate-500 mb-0.5">Stock</p>
+                <p class="text-lg sm:text-xl font-black text-green-700">{{ stockAparente | number:'1.0-0' }}</p>
               </div>
             </div>
           </div>
@@ -186,7 +197,7 @@
           </div>
 
           <!-- Thumbnails pequeños -->
-          <div class="grid grid-cols-4 gap-2">
+          <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
             @for (creativo of imagenes; track creativo.id) {
               <button (click)="abrirVisor(creativo)"
                       class="relative group aspect-square rounded-xl overflow-hidden border border-slate-200 bg-slate-100 hover:border-sky-500 transition-all">
@@ -229,20 +240,31 @@
           </div>
 
           <!-- Thumbnails pequeños -->
-          <div class="grid grid-cols-3 gap-2">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
             @for (creativo of videos; track creativo.id) {
               <button (click)="abrirVisor(creativo)"
                       class="relative group aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-100 hover:border-purple-500 transition-all">
-                <video [src]="displayUrl(creativo)"
+                @if (esYoutube(creativo) || creativo.fuente === 'web') {
+                  <!-- YouTube y videos web: mostrar thumbnail -->
+                  <img [src]="videoThumb(creativo)" [alt]="creativo.nombre"
                        class="w-full h-full object-cover"
-                       preload="metadata" muted playsinline
-                       (error)="onMediaError(creativo, $any($event.target))">
-                </video>
+                       loading="lazy"/>
+                } @else {
+                  <!-- Video subido directamente -->
+                  <video [src]="displayUrl(creativo)"
+                         class="w-full h-full object-cover"
+                         preload="metadata" muted playsinline
+                         (error)="onMediaError(creativo, $any($event.target))">
+                  </video>
+                }
                 <div class="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/20 transition-all">
                   <div class="w-8 h-8 rounded-full bg-black/60 border border-white/20 flex items-center justify-center">
                     <span class="material-symbols-outlined text-white text-base">play_arrow</span>
                   </div>
                 </div>
+                @if (esYoutube(creativo)) {
+                  <span class="absolute top-1.5 left-1.5 text-[9px] font-black px-1.5 py-0.5 rounded bg-red-600 text-white leading-none">YT</span>
+                }
               </button>
             }
           </div>
@@ -283,6 +305,42 @@
             Descargar creativos del producto
             <span class="material-symbols-outlined text-sm opacity-60">open_in_new</span>
           </button>
+        </div>
+      }
+
+      <!-- Dimensiones del paquete — solo visible para admin e inventario -->
+      @if ((auth.esAdmin() || auth.esInventario()) && (producto.alto_cm || producto.ancho_cm || producto.largo_cm || producto.peso_kg)) {
+        <div class="space-y-2 border-t border-slate-200 pt-4">
+          <p class="text-xs font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-base">inventory_2</span>
+            Dimensiones del paquete
+          </p>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            @if (producto.alto_cm) {
+              <div class="rounded-xl bg-slate-50 border border-slate-200 px-3 py-2">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Alto</p>
+                <p class="text-sm font-black text-slate-900">{{ producto.alto_cm }} cm</p>
+              </div>
+            }
+            @if (producto.ancho_cm) {
+              <div class="rounded-xl bg-slate-50 border border-slate-200 px-3 py-2">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Ancho</p>
+                <p class="text-sm font-black text-slate-900">{{ producto.ancho_cm }} cm</p>
+              </div>
+            }
+            @if (producto.largo_cm) {
+              <div class="rounded-xl bg-slate-50 border border-slate-200 px-3 py-2">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Largo</p>
+                <p class="text-sm font-black text-slate-900">{{ producto.largo_cm }} cm</p>
+              </div>
+            }
+            @if (producto.peso_kg) {
+              <div class="rounded-xl bg-slate-50 border border-slate-200 px-3 py-2">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Peso</p>
+                <p class="text-sm font-black text-slate-900">{{ producto.peso_kg }} kg</p>
+              </div>
+            }
+          </div>
         </div>
       }
 
@@ -386,7 +444,7 @@
         }
 
         <!-- Más info por WhatsApp dentro del lightbox -->
-        <div class="px-4 pb-4 sm:pb-5 shrink-0 flex justify-start" (click)="$event.stopPropagation()">
+        <div class="px-4 shrink-0 flex justify-start" style="padding-bottom: max(env(safe-area-inset-bottom), 1rem);" (click)="$event.stopPropagation()">
           <a [href]="urlWhatsapp" target="_blank" rel="noopener noreferrer"
              class="group inline-flex items-center gap-2 pl-1.5 pr-4 py-1.5 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 active:bg-white/30 transition-all shadow-md backdrop-blur-sm">
             <span class="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform"
@@ -444,7 +502,18 @@
             <img [src]="displayUrl(creativoVisor()!)" [alt]="creativoVisor()!.nombre"
                  class="max-h-full max-w-full object-contain rounded-xl"
                  (error)="onMediaError(creativoVisor()!, $any($event.target))"/>
+          } @else if (esYoutube(creativoVisor()!)) {
+            <!-- YouTube: iframe embed -->
+            <div class="w-full max-w-2xl aspect-video rounded-xl overflow-hidden shadow-2xl">
+              <iframe [src]="ytEmbedUrl(creativoVisor()!) | trustedUrl"
+                      class="w-full h-full"
+                      frameborder="0"
+                      allow="autoplay; fullscreen; picture-in-picture"
+                      allowfullscreen>
+              </iframe>
+            </div>
           } @else {
+            <!-- Video mp4 u otro formato directo -->
             <video [src]="displayUrl(creativoVisor()!)"
                    class="max-h-full max-w-full rounded-xl"
                    controls autoplay playsinline
@@ -462,7 +531,7 @@
         </div>
 
         <!-- Visor footer: botón descargar -->
-        <div class="px-4 py-4 shrink-0" (click)="$event.stopPropagation()">
+        <div class="px-4 pt-4 shrink-0" style="padding-bottom: max(env(safe-area-inset-bottom), 1rem);" (click)="$event.stopPropagation()">
           <button (click)="descargar(creativoVisor()!)"
                   [disabled]="estaDescargando(creativoVisor()!.id)"
                   class="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-bold transition-all"
@@ -479,6 +548,23 @@
           </button>
         </div>
 
+      </div>
+    }
+
+    <!-- ══ TOAST DE DESCARGA ══ -->
+    @if (toastMsg(); as t) {
+      <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
+        <div class="flex items-center gap-2 px-4 py-2.5 rounded-full shadow-xl text-sm font-bold whitespace-nowrap animate-fade-in"
+             [class]="t.ok
+               ? 'bg-slate-900 text-white border border-white/10'
+               : 'bg-red-600 text-white'">
+          @if (t.ok) {
+            <span class="material-symbols-outlined text-base text-emerald-400">check_circle</span>
+          } @else {
+            <span class="material-symbols-outlined text-base text-red-200">error</span>
+          }
+          {{ t.texto }}
+        </div>
       </div>
     }
 

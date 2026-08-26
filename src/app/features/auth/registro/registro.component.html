@@ -166,7 +166,8 @@
               <div class="relative group">
                 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-dark transition-colors text-xl">lock</span>
                 <input formControlName="contrasena" [type]="mostrarContrasena() ? 'text' : 'password'"
-                       placeholder="Mínimo 6 caracteres" autocomplete="new-password"
+                       placeholder="Mínimo 6 caracteres" autocomplete="off"
+                       data-lpignore="true" data-form-type="other"
                        class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl py-3.5 pl-12 pr-12 text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-primary/15 focus:border-primary focus:bg-white transition-all"
                        [class.border-red-400]="form.get('contrasena')?.invalid && form.get('contrasena')?.touched"/>
                 <button type="button" (click)="mostrarContrasena.update(v => !v)"

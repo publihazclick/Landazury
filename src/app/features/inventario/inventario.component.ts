@@ -1,6 +1,8 @@
-import { Component, inject, signal, OnInit, computed } from '@angular/core';
+import { Component, inject, signal, OnInit, computed, PLATFORM_ID } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, isPlatformBrowser } from '@angular/common';
+import { TrustedUrlPipe } from '../../core/pipes/trusted-url.pipe';
+import { ActivatedRoute } from '@angular/router';
 import { CreativosService } from '../../core/services/creativos.service';
 import { CatalogoService } from '../../core/services/catalogo.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -19,17 +21,32 @@ interface FormProducto {
   disponible: boolean;
   atributos: AtributoProducto[];
   link_creativos: string;
+  // Dimensiones del paquete (internas — Mipaquete)
+  alto_cm: number;
+  ancho_cm: number;
+  largo_cm: number;
+  peso_kg: number;
+  sucursal_id: string | null;
 }
+
+// Defaults por categoría cuando el subidor no llena las dimensiones.
+// Coincide con el backfill de 20260430020000_dimensiones_y_cobro.sql.
+const DIM_DEFAULTS_POR_SLUG: Record<string, { alto: number; ancho: number; largo: number; peso: number }> = {
+  calzado:    { alto: 18, ancho: 21, largo: 29, peso: 0.800 },
+  billeteras: { alto:  5, ancho: 15, largo: 18, peso: 0.200 },
+};
+const DIM_DEFAULT_GENERICO = { alto: 18, ancho: 29, largo: 30, peso: 1.000 };
 
 @Component({
   selector: 'app-inventario',
   standalone: true,
-  imports: [FormsModule, DecimalPipe, ImportarProductosComponent],
+  imports: [FormsModule, DecimalPipe, ImportarProductosComponent, TrustedUrlPipe],
   templateUrl: './inventario.component.html',
 })
 export class InventarioComponent implements OnInit {
   private readonly creativosService = inject(CreativosService);
   private readonly catalogoService = inject(CatalogoService);
+  private readonly route = inject(ActivatedRoute);
   readonly auth = inject(AuthService);
 
   readonly productos = signal<Producto[]>([]);
@@ -41,26 +58,48 @@ export class InventarioComponent implements OnInit {
   // Modal importar
   readonly mostrarImportar = signal(false);
 
-  onImportarCerrar(creados: number) {
+  onImportarCerrar(creados: Producto[]) {
     this.mostrarImportar.set(false);
-    if (creados > 0) {
-      this.cargarProductos();
-      this.exito.set(`${creados} producto${creados > 1 ? 's' : ''} importado${creados > 1 ? 's' : ''} correctamente.`);
+    const n = creados.length;
+    if (n > 0) {
+      const cats = this.categorias();
+      const nuevos = creados.map(p => ({
+        ...p,
+        categoria: p.categoria ?? cats.find(c => c.id === p.categoria_id),
+        creativos: p.creativos ?? [],
+      }));
+      this.productos.update(list => [...nuevos, ...list]);
+      this.exito.set(`${n} producto${n > 1 ? 's' : ''} importado${n > 1 ? 's' : ''} correctamente.`);
       setTimeout(() => this.exito.set(null), 4000);
     }
   }
 
   // Modal
   readonly mostrarModal = signal(false);
+  readonly mostrarConfirmacionSalida = signal(false);
   readonly productoEnModal = signal<Producto | null>(null);
   readonly creativosEnModal = signal<Creativo[]>([]);
   readonly guardandoProducto = signal(false);
+  readonly modoCreativos = signal<'sin' | 'url' | 'imagenes'>('sin');
+  private readonly platformId = inject(PLATFORM_ID);
   readonly subiendoImagenCreativo = signal(false);
   readonly subiendoVideoCreativo = signal(false);
   readonly subiendoImagen = signal(false);
   readonly cargandoModal = signal(false);
   readonly confirmandoEliminar = signal<Producto | null>(null);
   readonly perfilesMap = signal<Map<string, string>>(new Map());
+
+  // Búsqueda web de creativos
+  readonly sugeridos = signal<Creativo[]>([]);
+  readonly buscandoEnWeb = signal(false);
+
+  // Preview de sugerido
+  readonly sugeridoPreview = signal<Creativo | null>(null);
+  readonly previewIdx = computed(() => {
+    const s = this.sugeridoPreview();
+    if (!s) return -1;
+    return this.sugeridos().findIndex(x => x.id === s.id);
+  });
 
   // Imágenes del producto (edición local antes de guardar)
   imagenesEnModal: string[] = [];
@@ -71,6 +110,22 @@ export class InventarioComponent implements OnInit {
   atributoPersonalizadoNombre = '';
 
   readonly mostrarSelectorAtributo = signal(false);
+
+  // Sucursales del subidor
+  readonly sucursalesUsuario = signal<{ id: string; nombre: string; ciudad: string; direccion: string; dane_code: string }[]>([]);
+
+  // Paleta de colores para los chips de categoría en el formulario
+  private readonly PALETA_CATEGORIAS = [
+    '#f97316', '#ec4899', '#8b5cf6', '#3b82f6', '#06b6d4',
+    '#10b981', '#84cc16', '#eab308', '#ef4444', '#14b8a6',
+    '#f43f5e', '#a855f7',
+  ];
+  colorCategoria(i: number): string {
+    return this.PALETA_CATEGORIAS[i % this.PALETA_CATEGORIAS.length];
+  }
+  colorCategoriaTenue(i: number): string {
+    return this.colorCategoria(i) + '22';
+  }
 
   readonly ATRIBUTOS_CONFIG: { nombre: string; icono: string; sugeridos: string[] }[] = [
     { nombre: 'Color',         icono: 'palette',      sugeridos: ['Negro', 'Blanco', 'Rojo', 'Azul', 'Verde', 'Amarillo', 'Rosa', 'Gris', 'Dorado', 'Plateado', 'Naranja', 'Morado'] },
@@ -114,9 +169,16 @@ export class InventarioComponent implements OnInit {
   ];
 
   async ngOnInit() {
-    const tasks: Promise<any>[] = [this.cargarProductos(), this.cargarCategorias()];
+    const tasks: Promise<any>[] = [this.cargarProductos(), this.cargarCategorias(), this.cargarSucursales()];
     if (this.auth.esAdmin()) tasks.push(this.cargarPerfiles());
     await Promise.all(tasks);
+
+    // Auto-abrir modal de edición si viene de admin con ?editar=<id>
+    const editarId = this.route.snapshot.queryParamMap.get('editar');
+    if (editarId) {
+      const producto = this.productos().find(p => p.id === editarId);
+      if (producto) this.abrirEditar(producto);
+    }
   }
 
   async cargarProductos() {
@@ -147,19 +209,53 @@ export class InventarioComponent implements OnInit {
     } catch {}
   }
 
+  async cargarSucursales() {
+    try {
+      const suc = await this.catalogoService.obtenerSucursalesUsuario();
+      this.sucursalesUsuario.set(suc);
+    } catch {}
+  }
+
   // ── Modal ───────────────────────────────────────────
 
+  private draftKey(): string {
+    return `landazury:borrador-producto:${this.auth.usuario()?.id ?? 'anon'}`;
+  }
+
+  private cargarBorradorGuardado(): { form: FormProducto; imagenes: string[] } | null {
+    if (!isPlatformBrowser(this.platformId)) return null;
+    try {
+      const raw = localStorage.getItem(this.draftKey());
+      if (!raw) return null;
+      const b = JSON.parse(raw);
+      if (!b?.form) return null;
+      return { form: b.form as FormProducto, imagenes: Array.isArray(b.imagenes) ? b.imagenes : [] };
+    } catch { return null; }
+  }
+
+  private eliminarBorradorGuardado() {
+    if (!isPlatformBrowser(this.platformId)) return;
+    try { localStorage.removeItem(this.draftKey()); } catch {}
+  }
+
   abrirCrear() {
-    this.formProducto = this.formVacio();
+    const borrador = this.cargarBorradorGuardado();
+    this.formProducto = borrador?.form ?? this.formVacio();
+    this.imagenesEnModal = borrador?.imagenes ?? [];
     this.productoEnModal.set(null);
     this.creativosEnModal.set([]);
-    this.imagenesEnModal = [];
     this.urlsAEliminar = [];
+    this.modoCreativos.set('sin');
     this.limpiarArchivoModal();
     this.mostrarModal.set(true);
+    if (borrador) {
+      this.exito.set('Se restauró tu borrador. Continúa editando donde lo dejaste.');
+      setTimeout(() => this.exito.set(null), 4000);
+    }
   }
 
   async abrirEditar(producto: Producto) {
+    const sucs = this.sucursalesUsuario();
     this.formProducto = {
       nombre: producto.nombre,
       descripcion: producto.descripcion ?? '',
@@ -172,31 +268,92 @@ export class InventarioComponent implements OnInit {
       disponible: producto.disponible,
       atributos: producto.atributos ? JSON.parse(JSON.stringify(producto.atributos)) : [],
       link_creativos: producto.link_creativos ?? '',
+      alto_cm:  producto.alto_cm  ?? 0,
+      ancho_cm: producto.ancho_cm ?? 0,
+      largo_cm: producto.largo_cm ?? 0,
+      peso_kg:  producto.peso_kg  ?? 0,
+      sucursal_id: (producto as any).sucursal_id ?? (sucs.length === 1 ? sucs[0].id : null),
     };
     this.atributoNuevoValor = {};
     this.mostrarSelectorAtributo.set(false);
     this.productoEnModal.set(producto);
     this.creativosEnModal.set(producto.creativos ?? []);
+    this.sugeridos.set([]);
     this.imagenesEnModal = [...(producto.imagenes ?? [])];
     this.urlsAEliminar = [];
+    // Derivar el modo de creativos desde el estado existente del producto
+    if (producto.link_creativos) this.modoCreativos.set('url');
+    else if ((producto.creativos?.length ?? 0) > 0) this.modoCreativos.set('imagenes');
+    else this.modoCreativos.set('sin');
     this.limpiarArchivoModal();
     this.mostrarModal.set(true);
-    this.cargandoModal.set(true);
-    try {
-      const creativos = await this.creativosService.obtenerCreativos({ productoId: producto.id });
-      this.creativosEnModal.set(creativos);
-    } catch {} finally {
-      this.cargandoModal.set(false);
+    // Recargar creativos aprobados frescos desde la BD (incluye los aprobados de internet)
+    this.creativosService.obtenerCreativos({ productoId: producto.id })
+      .then(c => this.creativosEnModal.set(c))
+      .catch(() => {});
+    // Cargar sugerencias web previas en background
+    this.creativosService.obtenerSugeridos(producto.id).then(s => this.sugeridos.set(s)).catch(() => {});
+  }
+
+  /** Verifica si el formulario tiene contenido del usuario (solo relevante al crear nuevo) */
+  private formTieneCambios(): boolean {
+    const f = this.formProducto;
+    return !!(
+      f.nombre.trim() ||
+      f.descripcion.trim() ||
+      Number(f.precio_base) ||
+      Number(f.precio_sugerido) ||
+      f.sku.trim() ||
+      Number(f.stock) ||
+      f.categoria_id ||
+      f.link_creativos.trim() ||
+      (f.atributos && f.atributos.length > 0) ||
+      this.imagenesEnModal.length > 0
+    );
+  }
+
+  /** Intent de cerrar: si es un producto nuevo y hay cambios, pregunta primero */
+  intentarCerrarModal() {
+    const esNuevo = !this.productoEnModal();
+    if (esNuevo && this.formTieneCambios()) {
+      this.mostrarConfirmacionSalida.set(true);
+      return;
     }
+    this.cerrarModal();
   }
 
   cerrarModal() {
     this.mostrarModal.set(false);
+    this.mostrarConfirmacionSalida.set(false);
     setTimeout(() => {
       this.productoEnModal.set(null);
       this.creativosEnModal.set([]);
       this.limpiarArchivoModal();
     }, 200);
+  }
+
+  guardarComoBorrador() {
+    if (isPlatformBrowser(this.platformId)) {
+      try {
+        localStorage.setItem(this.draftKey(), JSON.stringify({
+          form: this.formProducto,
+          imagenes: this.imagenesEnModal,
+          guardadoEn: Date.now(),
+        }));
+      } catch {}
+    }
+    this.cerrarModal();
+    this.exito.set('Borrador guardado. Cuando vuelvas a "Nuevo producto" podrás seguir editándolo.');
+    setTimeout(() => this.exito.set(null), 5000);
+  }
+
+  descartarYSalir() {
+    this.eliminarBorradorGuardado();
+    this.cerrarModal();
+  }
+
+  seguirEditando() {
+    this.mostrarConfirmacionSalida.set(false);
   }
 
   async guardarProducto() {
@@ -211,11 +368,30 @@ export class InventarioComponent implements OnInit {
       const esAdmin = this.auth.esAdmin();
       const userId = this.auth.usuario()?.id;
 
-      // Todos los productos se auto-aprueban; inventario aplica margen 30% sobre precio_base
+      // Para poder publicar (disponible=true) se exige imagen y categoría.
+      // Sin esto el producto rompe la primera vista del catálogo móvil
+      // (placeholder sin imagen, sin etiqueta de categoría, bodega mal asignada).
+      const tieneImagen = this.imagenesEnModal.some(url => !!url?.trim());
+      const tieneCategoria = !!this.formProducto.categoria_id;
+      const publicable = tieneImagen && tieneCategoria;
+
+      // Todos los productos se auto-aprueban; el precio al dropshipper es el mismo
+      // que escribió el subidor (sin recargos automáticos). El admin puede
+      // sobreescribirlo manualmente si lo necesita.
       const precioBase = Number(this.formProducto.precio_base);
       const precioFinal = esAdmin && Number(this.formProducto.precio_final)
         ? Number(this.formProducto.precio_final)
-        : Math.round(precioBase * 1.30);
+        : precioBase;
+
+      // Dimensiones: si el subidor dejó algún campo en 0 lo completamos con
+      // el default por categoría para no romper la cotización Mipaquete.
+      const cat = this.categorias().find(c => c.id === this.formProducto.categoria_id);
+      const slug = (cat?.slug ?? '').toLowerCase();
+      const def = DIM_DEFAULTS_POR_SLUG[slug] ?? DIM_DEFAULT_GENERICO;
+      const alto  = Number(this.formProducto.alto_cm)  || def.alto;
+      const ancho = Number(this.formProducto.ancho_cm) || def.ancho;
+      const largo = Number(this.formProducto.largo_cm) || def.largo;
+      const peso  = Number(this.formProducto.peso_kg)  || def.peso;
 
       const payload = {
         nombre: this.formProducto.nombre.trim(),
@@ -226,7 +402,7 @@ export class InventarioComponent implements OnInit {
         sku: this.formProducto.sku || undefined,
         stock: Number(this.formProducto.stock) || undefined,
         categoria_id: this.formProducto.categoria_id || undefined,
-        disponible: esAdmin ? this.formProducto.disponible : true,
+        disponible: esAdmin ? this.formProducto.disponible : publicable,
         ganador: existente?.ganador ?? false,
         exclusivo: existente?.exclusivo ?? false,
         imagenes: this.imagenesEnModal,
@@ -235,7 +411,14 @@ export class InventarioComponent implements OnInit {
         vistas: existente?.vistas ?? 0,
         descargas: existente?.descargas ?? 0,
         atributos: this.formProducto.atributos,
-        link_creativos: this.formProducto.link_creativos || undefined,
+        alto_cm:  alto,
+        ancho_cm: ancho,
+        largo_cm: largo,
+        peso_kg:  peso,
+        link_creativos: this.modoCreativos() === 'url'
+          ? (this.formProducto.link_creativos || null)
+          : null,
+        sucursal_id: this.formProducto.sucursal_id || null,
       };
 
       let mensaje: string;
@@ -249,7 +432,21 @@ export class InventarioComponent implements OnInit {
       } else {
         const creado = await this.catalogoService.crearProducto(payload);
         const cat = this.categorias().find(c => c.id === payload.categoria_id);
-        this.productos.update(list => [{ ...creado, categoria: cat, creativos: [] as Creativo[] }, ...list]);
+        // Preservar en la vista del subidor los precios que él escribió,
+        // aunque el trigger aplicar_markup_calzado los haya modificado en DB.
+        // El trigger modifica precio_final y precio_sugerido; precio_base no se toca.
+        this.productos.update(list => [
+          {
+            ...creado,
+            precio_base: payload.precio_base,
+            precio_final: payload.precio_final,
+            precio_sugerido: payload.precio_sugerido ?? creado.precio_sugerido,
+            categoria: cat,
+            creativos: [] as Creativo[],
+          },
+          ...list,
+        ]);
+        this.eliminarBorradorGuardado();
         mensaje = 'Producto creado y aprobado automáticamente.';
       }
       // Limpiar imágenes eliminadas del storage en background
@@ -261,7 +458,9 @@ export class InventarioComponent implements OnInit {
       this.exito.set(mensaje);
       setTimeout(() => this.exito.set(null), 4000);
     } catch (e: any) {
-      this.error.set(e?.message ?? 'Error al guardar el producto.');
+      console.error('[guardarProducto] error', e);
+      const msg = e?.message ?? e?.error?.message ?? JSON.stringify(e);
+      this.error.set('Error al guardar: ' + msg);
     } finally {
       this.guardandoProducto.set(false);
     }
@@ -364,6 +563,111 @@ export class InventarioComponent implements OnInit {
     }
   }
 
+  // ── Búsqueda web de creativos ────────────────────────
+
+  async buscarCreativosEnWeb() {
+    const producto = this.productoEnModal();
+    if (!producto) return;
+    this.buscandoEnWeb.set(true);
+    this.error.set(null);
+    try {
+      const res = await this.creativosService.buscarEnWeb(producto.id);
+      const sugeridos = await this.creativosService.obtenerSugeridos(producto.id);
+      this.sugeridos.set(sugeridos);
+      if (res.total === 0) {
+        this.exito.set('No se encontraron resultados en internet para este producto.');
+      } else {
+        this.exito.set(`${res.imagenes} imagen${res.imagenes !== 1 ? 'es' : ''} y ${res.videos} video${res.videos !== 1 ? 's' : ''} encontrados. Revisa las sugerencias.`);
+      }
+      setTimeout(() => this.exito.set(null), 4000);
+    } catch (e: any) {
+      this.error.set(e?.message ?? 'Error al buscar en internet.');
+    } finally {
+      this.buscandoEnWeb.set(false);
+    }
+  }
+
+  async aprobarSugerido(sugerido: Creativo) {
+    try {
+      await this.creativosService.aprobarSugerido(sugerido.id);
+      const aprobado: Creativo = { ...sugerido, estado_revision: 'aprobado', publico: true };
+      this.sugeridos.update(list => list.filter(s => s.id !== sugerido.id));
+      this.creativosEnModal.update(list => [aprobado, ...list]);
+      const producto = this.productoEnModal();
+      if (producto) {
+        this.productos.update(list => list.map(p =>
+          p.id === producto.id
+            ? { ...p, creativos: [aprobado, ...(p.creativos ?? [])] }
+            : p
+        ));
+      }
+    } catch (e: any) {
+      this.error.set(e?.message ?? 'Error al aprobar.');
+    }
+  }
+
+  async rechazarSugerido(sugerido: Creativo) {
+    try {
+      await this.creativosService.rechazarSugerido(sugerido.id);
+      this.sugeridos.update(list => list.filter(s => s.id !== sugerido.id));
+    } catch (e: any) {
+      this.error.set(e?.message ?? 'Error al rechazar.');
+    }
+  }
+
+  abrirPreview(s: Creativo) { this.sugeridoPreview.set(s); }
+  cerrarPreview() { this.sugeridoPreview.set(null); }
+
+  previewAnterior() {
+    const idx = this.previewIdx();
+    const list = this.sugeridos();
+    if (idx > 0) this.sugeridoPreview.set(list[idx - 1]);
+  }
+
+  previewSiguiente() {
+    const idx = this.previewIdx();
+    const list = this.sugeridos();
+    if (idx < list.length - 1) this.sugeridoPreview.set(list[idx + 1]);
+  }
+
+  async aprobarYCerrarPreview(s: Creativo) {
+    await this.aprobarSugerido(s);
+    const list = this.sugeridos();
+    if (list.length > 0) this.sugeridoPreview.set(list[Math.min(this.previewIdx(), list.length - 1)]);
+    else this.cerrarPreview();
+  }
+
+  async rechazarYCerrarPreview(s: Creativo) {
+    const idx = this.previewIdx();
+    await this.rechazarSugerido(s);
+    const list = this.sugeridos();
+    if (list.length === 0) { this.cerrarPreview(); return; }
+    this.sugeridoPreview.set(list[Math.min(idx, list.length - 1)]);
+  }
+
+  onPreviewImgError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    img.style.display = 'none';
+  }
+
+  ytVideoId(url: string): string {
+    return url.match(/[?&]v=([^&]+)/)?.[1] ?? '';
+  }
+
+  // descripcion formato: "<thumbnail_url>||<texto>" para creativos web con video
+  videoThumb(creativo: Creativo): string {
+    const desc = creativo.descripcion ?? '';
+    if (desc.includes('||')) return desc.split('||')[0];
+    // YouTube fallback
+    const match = creativo.archivo_url.match(/[?&]v=([^&]+)/);
+    return match ? `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg` : '';
+  }
+
+  videoDesc(creativo: Creativo): string {
+    const desc = creativo.descripcion ?? '';
+    return desc.includes('||') ? desc.split('||')[1] : desc;
+  }
+
   // ── Producto: toggle + eliminar ─────────────────────
 
   async toggleDisponible(producto: Producto, event: Event) {
@@ -444,14 +748,35 @@ export class InventarioComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     const files = input.files;
     if (!files || files.length === 0) return;
+    const filesArr = Array.from(files);
     this.subiendoImagen.set(true);
     this.error.set(null);
     try {
-      const urls = await Promise.all(Array.from(files).map(f => this.catalogoService.subirImagenProducto(f)));
-      this.imagenesEnModal = [...this.imagenesEnModal, ...urls];
-      this.sincronizarColoresConImagenes();
-    } catch {
-      this.error.set('Error al subir la imagen.');
+      const resultados = await Promise.allSettled(
+        filesArr.map(f => this.catalogoService.subirImagenProducto(f)),
+      );
+      const urls: string[] = [];
+      const errores: string[] = [];
+      resultados.forEach((r, i) => {
+        const nombre = filesArr[i]?.name ?? `imagen-${i + 1}`;
+        if (r.status === 'fulfilled') {
+          urls.push(r.value);
+        } else {
+          const msg = r.reason?.message ?? r.reason?.error?.message ?? JSON.stringify(r.reason) ?? 'error desconocido';
+          console.error('[subirImagen] falló', nombre, r.reason);
+          errores.push(`${nombre} → ${msg}`);
+        }
+      });
+      if (urls.length > 0) {
+        this.imagenesEnModal = [...this.imagenesEnModal, ...urls];
+        this.sincronizarColoresConImagenes();
+      }
+      if (errores.length > 0) {
+        this.error.set(`No se pudieron subir ${errores.length} imagen(es): ${errores.join(' · ')}`);
+      }
+    } catch (e: any) {
+      console.error('[subirImagen] error inesperado', e);
+      this.error.set('Error inesperado: ' + (e?.message ?? JSON.stringify(e)));
     } finally {
       this.subiendoImagen.set(false);
       input.value = '';
@@ -579,7 +904,30 @@ export class InventarioComponent implements OnInit {
   }
 
   formVacio(): FormProducto {
-    return { nombre: '', descripcion: '', precio_base: 0, precio_sugerido: 0, precio_final: 0, sku: '', stock: 0, categoria_id: '', disponible: false, atributos: [], link_creativos: '' };
+    const sucs = this.sucursalesUsuario();
+    return {
+      nombre: '', descripcion: '', precio_base: 0, precio_sugerido: 0, precio_final: 0,
+      sku: '', stock: 0, categoria_id: '', disponible: false, atributos: [], link_creativos: '',
+      alto_cm: 0, ancho_cm: 0, largo_cm: 0, peso_kg: 0,
+      sucursal_id: sucs.length === 1 ? sucs[0].id : null,
+    };
+  }
+
+  /** Aplica los defaults de dimensiones por categoría sobre el formulario actual,
+   *  pero sólo en los campos que el subidor todavía no haya llenado. */
+  aplicarDefaultsCategoria(categoriaId: string) {
+    const cat = this.categorias().find(c => c.id === categoriaId);
+    const slug = (cat?.slug ?? '').toLowerCase();
+    const def = DIM_DEFAULTS_POR_SLUG[slug] ?? DIM_DEFAULT_GENERICO;
+    if (!Number(this.formProducto.alto_cm))  this.formProducto.alto_cm  = def.alto;
+    if (!Number(this.formProducto.ancho_cm)) this.formProducto.ancho_cm = def.ancho;
+    if (!Number(this.formProducto.largo_cm)) this.formProducto.largo_cm = def.largo;
+    if (!Number(this.formProducto.peso_kg))  this.formProducto.peso_kg  = def.peso;
+  }
+
+  seleccionarCategoria(catId: string) {
+    this.formProducto.categoria_id = catId;
+    if (catId) this.aplicarDefaultsCategoria(catId);
   }
 
   limpiarArchivoModal() {

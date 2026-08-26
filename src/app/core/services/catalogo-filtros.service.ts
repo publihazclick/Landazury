@@ -4,9 +4,11 @@ import type { Categoria, Producto } from '../models/producto.model';
 export type FiltroAsset = 'todos' | 'video' | 'copy' | 'imagen' | 'ganador';
 export type BodegaFiltro = 'todas' | 'importaciones' | 'moda';
 
+const SLUGS_MODA_LANDAZURY = new Set(['moda-ropa', 'calzado']);
+
 function bodegaDeProducto(p: Producto): 'importaciones' | 'moda' {
   const slug = (p.categoria?.slug ?? '').toLowerCase();
-  return slug === 'moda-ropa' ? 'moda' : 'importaciones';
+  return SLUGS_MODA_LANDAZURY.has(slug) ? 'moda' : 'importaciones';
 }
 
 @Injectable({ providedIn: 'root' })

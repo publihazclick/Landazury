@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 import { AuthService } from './auth.service';
+import { environment } from '../../../environments/environment';
 import type { Creativo, TipoCreativo } from '../models/producto.model';
 
 const BUCKET = 'creativos';
@@ -77,6 +78,7 @@ export class CreativosService {
     let query = this.supabase.cliente
       .from('creativos')
       .select('*')
+      .eq('estado_revision', 'aprobado')
       .order('creado_en', { ascending: false });
 
     if (filtros?.productoId) query = query.eq('producto_id', filtros.productoId);
@@ -87,10 +89,60 @@ export class CreativosService {
     return data as Creativo[];
   }
 
-  async obtenerUrlDescarga(path: string): Promise<string> {
+  async obtenerSugeridos(productoId: string): Promise<Creativo[]> {
+    const { data, error } = await this.supabase.cliente
+      .from('creativos')
+      .select('*')
+      .eq('producto_id', productoId)
+      .eq('fuente', 'web')
+      .eq('estado_revision', 'sugerido')
+      .order('creado_en', { ascending: false });
+    if (error) throw error;
+    return data as Creativo[];
+  }
+
+  async buscarEnWeb(productoId: string): Promise<{ imagenes: number; videos: number; total: number }> {
+    const { data, error } = await this.supabase.cliente.functions.invoke('buscar-creativos-web', {
+      body: { producto_id: productoId },
+    });
+    if (error) throw error;
+    if (data?.error) throw new Error(data.error);
+    return data;
+  }
+
+  async aprobarSugerido(id: string): Promise<void> {
+    const { error } = await this.supabase.cliente.rpc('aprobar_sugerido', { p_id: id });
+    if (error) throw error;
+  }
+
+  async rechazarSugerido(id: string): Promise<void> {
+    const { error } = await this.supabase.cliente.rpc('rechazar_sugerido', { p_id: id });
+    if (error) throw error;
+  }
+
+  async descargarExterno(url: string, filename: string): Promise<Blob> {
+    const proxyUrl = `${environment.supabaseUrl}/functions/v1/proxy-download`;
+    const res = await fetch(proxyUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': environment.supabaseAnonKey,
+        'Authorization': `Bearer ${environment.supabaseAnonKey}`,
+      },
+      body: JSON.stringify({ url, filename }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `Error ${res.status}`);
+    }
+    return res.blob();
+  }
+
+  async obtenerUrlDescarga(path: string | null): Promise<string> {
+    if (!path) throw new Error('Creativo externo — usa archivo_url directamente');
     const { data, error } = await this.supabase.cliente.storage
       .from(BUCKET)
-      .createSignedUrl(path, 3600); // 1 hora
+      .createSignedUrl(path, 3600);
     if (error) throw error;
     return data.signedUrl;
   }
@@ -103,17 +155,19 @@ export class CreativosService {
     if (error) throw error;
   }
 
-  async eliminarCreativo(id: string, path: string) {
-    const { error: storageError } = await this.supabase.cliente.storage
-      .from(BUCKET)
-      .remove([path]);
-    if (storageError) throw storageError;
-
+  async eliminarCreativo(id: string, path: string | null) {
+    if (path) {
+      const { error: storageError } = await this.supabase.cliente.storage
+        .from(BUCKET)
+        .remove([path]);
+      if (storageError) throw storageError;
+    }
     const { error } = await this.supabase.cliente.from('creativos').delete().eq('id', id);
     if (error) throw error;
   }
 
   async comprimirImagen(file: File, maxPx = 1600, calidad = 0.85): Promise<File> {
+    if (file.size < 500 * 1024) return file;
     return new Promise((resolve) => {
       const img = new Image();
       const objectUrl = URL.createObjectURL(file);
@@ -123,7 +177,7 @@ export class CreativosService {
           let { width, height } = img;
           if (width > maxPx || height > maxPx) {
             if (width >= height) { height = Math.round((height * maxPx) / width); width = maxPx; }
-            else { width = Math.round((width * maxPx) / height); height = maxPx; }
+            else                 { width  = Math.round((width  * maxPx) / height); height = maxPx; }
           }
           const canvas = document.createElement('canvas');
           canvas.width = width;
@@ -136,7 +190,7 @@ export class CreativosService {
               if (!blob || blob.size >= file.size) { resolve(file); return; }
               resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }));
             },
-            'image/jpeg', calidad
+            'image/jpeg', calidad,
           );
         } catch { resolve(file); }
       };

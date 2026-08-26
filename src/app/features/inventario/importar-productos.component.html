@@ -98,7 +98,7 @@
             <div class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4">
               <p class="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">Columnas del archivo</p>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
-                @for (col of [
+                @for (col of (auth.esAdmin() ? [
                   {campo:'Title',            mapea:'Nombre',              req:true},
                   {campo:'Pricing 1',        mapea:'Precio proveedor',    req:true},
                   {campo:'Description',      mapea:'Descripción',         req:false},
@@ -108,8 +108,26 @@
                   {campo:'Stock',            mapea:'Stock disponible',    req:false},
                   {campo:'Active',           mapea:'Activo (filtro)',     req:false},
                   {campo:'Image URL',        mapea:'Imagen principal',    req:false},
-                  {campo:'Creativos Drive',  mapea:'Link creativos Drive',req:false}
-                ]; track col.campo) {
+                  {campo:'Creativos Drive',  mapea:'Link creativos Drive',req:false},
+                  {campo:'Height (cm)',      mapea:'Alto del paquete',    req:false},
+                  {campo:'Width (cm)',       mapea:'Ancho del paquete',   req:false},
+                  {campo:'Length (cm)',      mapea:'Largo del paquete',   req:false},
+                  {campo:'Weight (kg)',      mapea:'Peso del paquete',    req:false}
+                ] : [
+                  {campo:'Title',            mapea:'Nombre',              req:true},
+                  {campo:'Pricing 1',        mapea:'Mi precio',           req:true},
+                  {campo:'Description',      mapea:'Descripción',         req:false},
+                  {campo:'Category',         mapea:'Categoría',           req:false},
+                  {campo:'SKU',              mapea:'Referencia SKU',      req:false},
+                  {campo:'Stock',            mapea:'Stock disponible',    req:false},
+                  {campo:'Active',           mapea:'Activo (filtro)',     req:false},
+                  {campo:'Image URL',        mapea:'Imagen principal',    req:false},
+                  {campo:'Creativos Drive',  mapea:'Link creativos Drive',req:false},
+                  {campo:'Height (cm)',      mapea:'Alto del paquete',    req:false},
+                  {campo:'Width (cm)',       mapea:'Ancho del paquete',   req:false},
+                  {campo:'Length (cm)',      mapea:'Largo del paquete',   req:false},
+                  {campo:'Weight (kg)',      mapea:'Peso del paquete',    req:false}
+                ]); track col.campo) {
                   <div class="flex items-center gap-2">
                     <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-700 shrink-0 whitespace-nowrap">{{ col.campo }}</span>
                     <span class="text-xs text-slate-600 truncate">→ {{ col.mapea }}
@@ -118,7 +136,8 @@
                   </div>
                 }
               </div>
-              <p class="text-xs text-slate-500 mt-3">El resto de columnas se descartan automáticamente.</p>
+              <p class="text-xs text-slate-500 mt-3">Las dimensiones son opcionales. Si las dejas vacías se aplican defaults por categoría: <strong>calzado</strong> 18×21×29 cm, 0.8 kg · <strong>billeteras</strong> 5×15×18 cm, 0.2 kg · <strong>resto</strong> 18×29×30 cm, 1 kg.</p>
+              <p class="text-xs text-slate-500 mt-1">El resto de columnas se descartan automáticamente.</p>
             </div>
 
             @if (error()) {
@@ -221,21 +240,23 @@
                       </div>
 
                       <!-- Precios + stock -->
-                      <div class="grid grid-cols-3 gap-1.5">
+                      <div class="grid gap-1.5" [class]="auth.esAdmin() ? 'grid-cols-3' : 'grid-cols-2'">
                         <div class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5">
-                          <p class="text-[8px] font-black uppercase tracking-widest text-slate-500 leading-none">Costo</p>
+                          <p class="text-[8px] font-black uppercase tracking-widest text-slate-500 leading-none">{{ auth.esAdmin() ? 'Costo' : 'Mi precio' }}</p>
                           <p class="text-sm font-black text-slate-800 mt-1 truncate">${{ fila.precio_base | number:'1.0-0' }}</p>
                         </div>
-                        @if (fila.precio_sugerido) {
-                          <div class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5">
-                            <p class="text-[8px] font-black uppercase tracking-widest text-slate-500 leading-none">Sugerido</p>
-                            <p class="text-sm font-black text-slate-700 mt-1 truncate">${{ fila.precio_sugerido | number:'1.0-0' }}</p>
-                          </div>
-                        } @else {
-                          <div class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5">
-                            <p class="text-[8px] font-black uppercase tracking-widest text-slate-500 leading-none">Sugerido</p>
-                            <p class="text-sm text-slate-400 mt-1">—</p>
-                          </div>
+                        @if (auth.esAdmin()) {
+                          @if (fila.precio_sugerido) {
+                            <div class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5">
+                              <p class="text-[8px] font-black uppercase tracking-widest text-slate-500 leading-none">Sugerido</p>
+                              <p class="text-sm font-black text-slate-700 mt-1 truncate">${{ fila.precio_sugerido | number:'1.0-0' }}</p>
+                            </div>
+                          } @else {
+                            <div class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5">
+                              <p class="text-[8px] font-black uppercase tracking-widest text-slate-500 leading-none">Sugerido</p>
+                              <p class="text-sm text-slate-400 mt-1">—</p>
+                            </div>
+                          }
                         }
                         <div class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5">
                           <p class="text-[8px] font-black uppercase tracking-widest text-slate-500 leading-none">Stock</p>
@@ -279,8 +300,10 @@
                   <th class="px-3 py-3 text-left text-[10px] font-black uppercase tracking-widest text-slate-500">Nombre</th>
                   <th class="px-3 py-3 text-left text-[10px] font-black uppercase tracking-widest text-slate-500">Categoría</th>
                   <th class="px-3 py-3 text-left text-[10px] font-black uppercase tracking-widest text-slate-500 hidden lg:table-cell">SKU</th>
-                  <th class="px-3 py-3 text-right text-[10px] font-black uppercase tracking-widest text-slate-500">Precio prov.</th>
-                  <th class="px-3 py-3 text-right text-[10px] font-black uppercase tracking-widest text-slate-500">P. sugerido</th>
+                  <th class="px-3 py-3 text-right text-[10px] font-black uppercase tracking-widest text-slate-500">{{ auth.esAdmin() ? 'Precio prov.' : 'Mi precio' }}</th>
+                  @if (auth.esAdmin()) {
+                    <th class="px-3 py-3 text-right text-[10px] font-black uppercase tracking-widest text-slate-500">P. sugerido</th>
+                  }
                   <th class="px-3 py-3 text-right text-[10px] font-black uppercase tracking-widest text-slate-500">Stock</th>
                   <th class="px-3 py-3 text-center text-[10px] font-black uppercase tracking-widest text-slate-500 hidden lg:table-cell">Imagen</th>
                   <th class="px-3 py-3 text-center text-[10px] font-black uppercase tracking-widest text-slate-500 hidden lg:table-cell">Creativos</th>
@@ -322,10 +345,12 @@
                     <td class="px-3 py-2.5 text-right font-bold text-slate-900">
                       ${{ fila.precio_base | number:'1.0-0' }}
                     </td>
-                    <td class="px-3 py-2.5 text-right text-slate-600">
-                      @if (fila.precio_sugerido) { ${{ fila.precio_sugerido | number:'1.0-0' }} }
-                      @else { <span class="text-slate-400">—</span> }
-                    </td>
+                    @if (auth.esAdmin()) {
+                      <td class="px-3 py-2.5 text-right text-slate-600">
+                        @if (fila.precio_sugerido) { ${{ fila.precio_sugerido | number:'1.0-0' }} }
+                        @else { <span class="text-slate-400">—</span> }
+                      </td>
+                    }
                     <td class="px-3 py-2.5 text-right">
                       @if (fila.stock) {
                         <span class="text-slate-700 font-semibold">{{ fila.stock | number:'1.0-0' }}</span>
@@ -434,6 +459,14 @@
                 </div>
               }
             </div>
+
+            @if (resultado()!.mensajeError) {
+              <div class="w-full max-w-md px-4 py-3 bg-red-50 border-2 border-red-200 rounded-2xl">
+                <p class="text-[10px] font-black uppercase tracking-widest text-red-700 mb-1">Detalle del error</p>
+                <p class="text-xs text-red-800 break-words font-mono">{{ resultado()!.mensajeError }}</p>
+                <p class="text-[10px] text-red-600 mt-2">Abre la consola del navegador (F12) para ver el error completo.</p>
+              </div>
+            }
 
             <div class="flex flex-col sm:flex-row gap-2.5 w-full max-w-xs">
               <button (click)="volver()"

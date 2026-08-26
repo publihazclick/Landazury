@@ -20,5 +20,9 @@ export interface Perfil {
   telefono?: string;
   plataforma?: string;
   avatar_url?: string;
+  saldo?: number;
+  test_user?: boolean;
+  referral_code?: string;
+  referido_por?: string | null;
   creado_en: string;
 }

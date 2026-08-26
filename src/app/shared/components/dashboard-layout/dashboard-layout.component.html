@@ -1,4 +1,4 @@
-<div class="flex min-h-screen bg-[#f8f8f8]">
+<div class="flex min-h-screen bg-[#f8f8f8] overflow-x-hidden w-full max-w-full">
 
   <!-- Mobile overlay -->
   @if (menuAbierto()) {
@@ -16,105 +16,153 @@
   }
 
   <!-- ───── SIDEBAR ───── -->
-  <aside class="fixed top-0 left-0 h-full w-80 lg:w-72 flex flex-col z-40 transition-transform duration-300 bg-white border-r border-slate-200 shadow-xl"
+  <aside class="fixed top-0 left-0 h-full w-[85vw] max-w-xs sm:w-72 lg:w-72 flex flex-col z-40 transition-transform duration-300 bg-white border-r border-slate-200 shadow-xl"
          [class.-translate-x-full]="!menuAbierto()"
          [class.translate-x-0]="menuAbierto()">
 
     <!-- Sidebar header -->
-    <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-      <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-xl border-2 flex items-center justify-center shrink-0"
+    <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-10 h-10 rounded-xl border-2 flex items-center justify-center shrink-0"
              [class]="auth.esAdmin() ? 'bg-red-50 border-red-200' : auth.esInventario() ? 'bg-amber-50 border-amber-200' : 'bg-amber-50 border-amber-300'">
-          <span class="material-symbols-outlined text-2xl"
+          <span class="material-symbols-outlined text-xl"
                 [class]="auth.esAdmin() ? 'text-red-600' : auth.esInventario() ? 'text-amber-600' : 'text-amber-700'">
             {{ auth.esAdmin() ? 'shield_person' : auth.esInventario() ? 'inventory_2' : 'storefront' }}
           </span>
         </div>
-        <div class="leading-tight">
-          <p class="text-sm font-black uppercase tracking-widest text-slate-400">Landazury</p>
-          <p class="text-lg font-bold text-slate-800">
+        <div class="leading-tight min-w-0">
+          <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Landazury</p>
+          <p class="text-sm font-bold text-slate-800 truncate">
             {{ auth.esAdmin() ? 'Administración' : auth.esInventario() ? 'Operaciones' : 'Dropshipping' }}
           </p>
         </div>
       </div>
-      <button class="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-all"
+      <button class="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all shrink-0"
               aria-label="Cerrar menú"
               (click)="menuAbierto.set(false)">
-        <span class="material-symbols-outlined text-3xl" aria-hidden="true">close</span>
+        <span class="material-symbols-outlined text-2xl" aria-hidden="true">close</span>
       </button>
     </div>
 
     <!-- Role badge -->
-    <div class="px-5 pt-4 pb-2">
+    <div class="px-4 pt-3 pb-1.5">
       <span [class]="badgeRolClass()"
-            class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold uppercase tracking-widest">
-        <span class="material-symbols-outlined text-lg">{{ iconoRol() }}</span>
+            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest">
+        <span class="material-symbols-outlined text-sm">{{ iconoRol() }}</span>
         {{ auth.perfil()?.rol ?? '...' }}
       </span>
     </div>
 
     <!-- Navigation -->
-    <nav class="flex-1 px-4 py-4 overflow-y-auto space-y-1">
+    <nav class="flex-1 px-3 py-3 overflow-y-auto space-y-0.5">
+
+      <!-- ══ MENTORÍA (todos los roles) ══ -->
+      <a [href]="mentoriaUrl()"
+         target="_blank" rel="noopener noreferrer"
+         (click)="menuAbierto.set(false)"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-black text-primary-dark bg-amber-50 border border-primary/30 hover:bg-amber-100 transition-all mb-2">
+        <span class="material-symbols-outlined text-xl">school</span>
+        Mentoría
+      </a>
 
       <!-- ══ ROL: ADMIN ══ -->
       @if (auth.esAdmin()) {
-        <p class="text-sm font-bold uppercase tracking-widest text-slate-400 px-4 pt-3 pb-2">Administración</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 px-3 pt-2 pb-1">Administración</p>
         <a [routerLink]="['/admin']" [queryParams]="{}"
            [class.bg-amber-50]="esRutaActiva('/admin') && !esRutaActiva('/admin','estadisticas') && !esRutaActiva('/admin','productos')"
            [class.text-amber-800]="esRutaActiva('/admin') && !esRutaActiva('/admin','estadisticas') && !esRutaActiva('/admin','productos')"
            [class.border-amber-200]="esRutaActiva('/admin') && !esRutaActiva('/admin','estadisticas') && !esRutaActiva('/admin','productos')"
-           class="flex items-center gap-4 px-4 py-4 rounded-xl text-2xl font-bold text-slate-600 border border-transparent hover:bg-slate-50 hover:text-slate-800 transition-all">
-          <span class="material-symbols-outlined text-3xl">group</span>
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-600 border border-transparent hover:bg-slate-50 hover:text-slate-800 transition-all">
+          <span class="material-symbols-outlined text-xl">group</span>
           Usuarios
         </a>
         <a [routerLink]="['/admin']" [queryParams]="{tab:'productos'}"
            [class.bg-amber-50]="esRutaActiva('/admin','productos')"
            [class.text-amber-800]="esRutaActiva('/admin','productos')"
            [class.border-amber-200]="esRutaActiva('/admin','productos')"
-           class="flex items-center gap-4 px-4 py-4 rounded-xl text-2xl font-bold text-slate-600 border border-transparent hover:bg-slate-50 hover:text-slate-800 transition-all">
-          <span class="material-symbols-outlined text-3xl">inventory</span>
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-600 border border-transparent hover:bg-slate-50 hover:text-slate-800 transition-all">
+          <span class="material-symbols-outlined text-xl">inventory</span>
           Productos
         </a>
         <a [routerLink]="['/inventario']"
            [class.bg-amber-50]="esRutaActiva('/inventario')"
            [class.text-amber-800]="esRutaActiva('/inventario')"
            [class.border-amber-200]="esRutaActiva('/inventario')"
-           class="flex items-center gap-4 px-4 py-4 rounded-xl text-2xl font-bold text-slate-600 border border-transparent hover:bg-slate-50 hover:text-slate-800 transition-all">
-          <span class="material-symbols-outlined text-3xl">add_box</span>
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-600 border border-transparent hover:bg-slate-50 hover:text-slate-800 transition-all">
+          <span class="material-symbols-outlined text-xl">add_box</span>
           Crear Producto
         </a>
         <a [routerLink]="['/admin']" [queryParams]="{tab:'estadisticas'}"
            [class.bg-amber-50]="esRutaActiva('/admin','estadisticas')"
            [class.text-amber-800]="esRutaActiva('/admin','estadisticas')"
            [class.border-amber-200]="esRutaActiva('/admin','estadisticas')"
-           class="flex items-center gap-4 px-4 py-4 rounded-xl text-2xl font-bold text-slate-600 border border-transparent hover:bg-slate-50 hover:text-slate-800 transition-all">
-          <span class="material-symbols-outlined text-3xl">bar_chart</span>
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-600 border border-transparent hover:bg-slate-50 hover:text-slate-800 transition-all">
+          <span class="material-symbols-outlined text-xl">bar_chart</span>
           Estadísticas
         </a>
       }
 
       <!-- ══ ROL: INVENTARIO ══ -->
       @if (auth.esInventario()) {
-        <p class="text-sm font-bold uppercase tracking-widest text-slate-400 px-4 pt-3 pb-2">Operaciones</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 px-3 pt-2 pb-1">Operaciones</p>
         <a routerLink="/inventario" routerLinkActive="bg-amber-50 text-amber-800 border-amber-200"
-           class="flex items-center gap-4 px-4 py-4 rounded-xl text-2xl font-bold text-slate-600 border border-transparent hover:bg-slate-50 hover:text-slate-800 transition-all">
-          <span class="material-symbols-outlined text-3xl">inventory_2</span>
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-600 border border-transparent hover:bg-slate-50 hover:text-slate-800 transition-all">
+          <span class="material-symbols-outlined text-xl">inventory_2</span>
           Inventario
+        </a>
+        <a routerLink="/admin-pedidos" routerLinkActive="bg-amber-50 text-amber-800 border-amber-200"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-600 border border-transparent hover:bg-slate-50 hover:text-slate-800 transition-all">
+          <span class="material-symbols-outlined text-xl">point_of_sale</span>
+          Mis ventas
+        </a>
+      }
+
+      <!-- ══ ROL: ADMIN — Pedidos ══ -->
+      @if (auth.esAdmin()) {
+        <a routerLink="/admin-pedidos" routerLinkActive="bg-amber-50 text-amber-800 border-amber-200"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-600 border border-transparent hover:bg-slate-50 hover:text-slate-800 transition-all">
+          <span class="material-symbols-outlined text-xl">inventory</span>
+          Pedidos
         </a>
       }
 
       <!-- ══ ROL: USUARIO ══ -->
       @if (!auth.esAdmin() && !auth.esInventario()) {
-        <p class="text-sm font-bold uppercase tracking-widest text-slate-400 px-4 pt-3 pb-2">Dropshipping</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 px-3 pt-2 pb-1">Dropshipping</p>
         <a routerLink="/catalogo" routerLinkActive="bg-amber-50 text-amber-800 border-amber-200"
-           class="flex items-center gap-4 px-4 py-4 rounded-xl text-2xl font-bold text-slate-600 border border-transparent hover:bg-slate-50 hover:text-slate-800 transition-all">
-          <span class="material-symbols-outlined text-3xl">shopping_bag</span>
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-600 border border-transparent hover:bg-slate-50 hover:text-slate-800 transition-all">
+          <span class="material-symbols-outlined text-xl">shopping_bag</span>
           Catálogo
+        </a>
+        <a routerLink="/wallet" routerLinkActive="bg-amber-50 text-amber-800 border-amber-200"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-600 border border-transparent hover:bg-slate-50 hover:text-slate-800 transition-all">
+          <span class="material-symbols-outlined text-xl">account_balance_wallet</span>
+          Wallet
+        </a>
+        <a routerLink="/mis-ganancias" routerLinkActive="bg-emerald-50 text-emerald-800 border-emerald-200"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-black text-slate-600 border border-transparent hover:bg-emerald-50 hover:text-emerald-800 transition-all">
+          <span class="material-symbols-outlined text-xl">savings</span>
+          Mis Ganancias
+        </a>
+        <a routerLink="/mis-pedidos" routerLinkActive="bg-amber-50 text-amber-800 border-amber-200"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-600 border border-transparent hover:bg-slate-50 hover:text-slate-800 transition-all">
+          <span class="material-symbols-outlined text-xl">receipt_long</span>
+          Mis pedidos
+        </a>
+        <a routerLink="/mi-whatsapp" routerLinkActive="bg-amber-50 text-amber-800 border-amber-200"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-600 border border-transparent hover:bg-slate-50 hover:text-slate-800 transition-all">
+          <span class="material-symbols-outlined text-xl">smartphone</span>
+          Mi WhatsApp
+        </a>
+        <a routerLink="/integraciones" routerLinkActive="bg-amber-50 text-amber-800 border-amber-200"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-600 border border-transparent hover:bg-slate-50 hover:text-slate-800 transition-all">
+          <span class="material-symbols-outlined text-xl">extension</span>
+          Integraciones
         </a>
 
         <!-- Filtros de activos -->
         @if (esRutaActiva('/catalogo')) {
-          <div class="mt-2 space-y-1">
+          <div class="mt-1.5 space-y-0.5">
             @for (f of [
               {v:'todos',   ico:'dashboard',      label:'Todos'},
               {v:'video',   ico:'play_circle',    label:'Video Ads'},
@@ -123,13 +171,13 @@
               {v:'ganador', ico:'verified',       label:'Ganadores'}
             ]; track f.v) {
               <button (click)="filtros.filtroAsset.set($any(f.v))"
-                      class="w-full flex items-center gap-3 pl-14 pr-4 py-3 rounded-xl text-xl font-semibold transition-all"
+                      class="w-full flex items-center gap-2.5 pl-10 pr-3 py-2 rounded-lg text-sm font-semibold transition-all"
                       [class.text-amber-800]="filtros.filtroAsset() === f.v"
                       [class.bg-amber-50]="filtros.filtroAsset() === f.v"
                       [class.text-slate-500]="filtros.filtroAsset() !== f.v"
                       [class.hover\:text-slate-700]="filtros.filtroAsset() !== f.v"
                       [class.hover\:bg-slate-50]="filtros.filtroAsset() !== f.v">
-                <span class="material-symbols-outlined text-2xl">{{ f.ico }}</span>
+                <span class="material-symbols-outlined text-lg">{{ f.ico }}</span>
                 {{ f.label }}
               </button>
             }
@@ -137,10 +185,10 @@
 
           <!-- Categorías (solo las que tienen productos) -->
           @if (filtros.categoriasConProductos().length > 0) {
-            <div class="mt-4">
-              <p class="text-sm font-bold uppercase tracking-widest text-slate-400 px-4 pb-2">Categorías</p>
+            <div class="mt-3">
+              <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 px-3 pb-1">Categorías</p>
               <button (click)="filtros.categoriaSeleccionada.set('')"
-                      class="w-full text-left pl-14 pr-4 py-3 rounded-xl text-xl font-semibold transition-colors"
+                      class="w-full text-left pl-10 pr-3 py-2 rounded-lg text-sm font-semibold transition-colors"
                       [class.text-amber-800]="filtros.categoriaSeleccionada() === ''"
                       [class.bg-amber-50]="filtros.categoriaSeleccionada() === ''"
                       [class.text-slate-500]="filtros.categoriaSeleccionada() !== ''"
@@ -149,7 +197,7 @@
               </button>
               @for (cat of filtros.categoriasConProductos(); track cat.id) {
                 <button (click)="filtros.categoriaSeleccionada.set(cat.id)"
-                        class="w-full text-left pl-14 pr-4 py-3 rounded-xl text-xl font-semibold transition-colors"
+                        class="w-full text-left pl-10 pr-3 py-2 rounded-lg text-sm font-semibold transition-colors truncate"
                         [class.text-amber-800]="filtros.categoriaSeleccionada() === cat.id"
                         [class.bg-amber-50]="filtros.categoriaSeleccionada() === cat.id"
                         [class.text-slate-500]="filtros.categoriaSeleccionada() !== cat.id"
@@ -163,29 +211,73 @@
       }
 
       <!-- ══ CUENTA (todos) ══ -->
-      <p class="text-sm font-bold uppercase tracking-widest text-slate-400 px-4 pt-4 pb-2">Cuenta</p>
+      <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 px-3 pt-3 pb-1">Cuenta</p>
+      <a routerLink="/recomienda" routerLinkActive="bg-emerald-50 text-emerald-800 border-emerald-200"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-black border border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-800 hover:from-emerald-100 hover:to-teal-100 transition-all shadow-sm">
+        <span class="material-symbols-outlined text-xl text-emerald-600">campaign</span>
+        Recomienda y gana
+      </a>
       <a routerLink="/perfil" routerLinkActive="bg-amber-50 text-amber-800 border-amber-200"
-         class="flex items-center gap-4 px-4 py-4 rounded-xl text-2xl font-bold text-slate-600 border border-transparent hover:bg-slate-50 hover:text-slate-800 transition-all">
-        <span class="material-symbols-outlined text-3xl">manage_accounts</span>
+         class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-600 border border-transparent hover:bg-slate-50 hover:text-slate-800 transition-all">
+        <span class="material-symbols-outlined text-xl">manage_accounts</span>
         Mi Perfil
       </a>
 
     </nav>
 
     <!-- User footer -->
-    <div class="p-5 border-t border-slate-200 space-y-3">
-      <div class="flex items-center gap-4 px-3 py-3 rounded-xl bg-slate-50">
-        <div class="w-12 h-12 rounded-full gold-gradient flex items-center justify-center text-lg font-extrabold text-[#0a0a08] shrink-0">
+    <div class="p-3 border-t border-slate-200 space-y-2 relative" data-campana>
+
+      @if (!auth.esAdmin() && !auth.esInventario()) {
+        <button (click)="irAGanancias()" type="button"
+                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500
+                       hover:from-emerald-600 hover:to-teal-600 active:scale-[.98] text-white transition-all shadow-sm">
+          <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-xl">savings</span>
+          </div>
+          <div class="flex-1 text-left min-w-0">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-emerald-100 leading-none">Mis ganancias</p>
+            <p class="text-base font-black tabular-nums leading-tight mt-0.5">${{ saldoGanancias() | number:'1.0-0' }} COP</p>
+          </div>
+          <span class="material-symbols-outlined text-lg text-white/70 shrink-0">
+            {{ tieneMetodoPago() ? 'payments' : 'add_card' }}
+          </span>
+        </button>
+      }
+
+      <div class="flex items-center gap-3 px-2.5 py-2 rounded-xl bg-slate-50">
+        <div class="w-9 h-9 rounded-full gold-gradient flex items-center justify-center text-sm font-extrabold text-[#0a0a08] shrink-0">
           {{ auth.usuario()?.email?.[0]?.toUpperCase() }}
         </div>
         <div class="flex-1 min-w-0">
-          <p class="text-base font-bold text-slate-800 truncate">{{ auth.perfil()?.nombre || 'Usuario' }}</p>
-          <p class="text-sm text-slate-500 truncate">{{ auth.usuario()?.email }}</p>
+          <p class="text-sm font-bold text-slate-800 truncate">{{ auth.perfil()?.nombre || 'Usuario' }}</p>
+          <p class="text-xs text-slate-500 truncate">{{ auth.usuario()?.email }}</p>
         </div>
       </div>
+      <!-- Panel notificaciones desktop (encima del footer) -->
+      @if (campanaPanelAbierto()) {
+        <div class="absolute left-full bottom-0 ml-2 w-80 bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden z-50"
+             data-campana (click)="$event.stopPropagation()">
+          <ng-container *ngTemplateOutlet="panelAvisos"></ng-container>
+        </div>
+      }
+
+      <!-- Campanita sidebar -->
+      <button (click)="toggleCampana(); $event.stopPropagation()"
+              data-campana
+              class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors relative">
+        <span class="material-symbols-outlined text-lg">notifications</span>
+        Notificaciones
+        @if (avisos.noLeidos() > 0) {
+          <span class="ml-auto min-w-[20px] h-5 px-1.5 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-black">
+            {{ avisos.noLeidos() > 9 ? '9+' : avisos.noLeidos() }}
+          </span>
+        }
+      </button>
+
       <button (click)="auth.cerrarSesion()"
-              class="w-full flex items-center gap-3 px-4 py-4 rounded-xl text-2xl text-red-600 hover:bg-red-50 transition-colors font-bold">
-        <span class="material-symbols-outlined text-2xl">logout</span>
+              class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-red-600 hover:bg-red-50 transition-colors font-bold">
+        <span class="material-symbols-outlined text-lg">logout</span>
         Cerrar sesión
       </button>
     </div>
@@ -193,24 +285,54 @@
   </aside>
 
   <!-- ───── MAIN AREA ───── -->
-  <div class="flex-1 flex flex-col min-h-screen transition-[margin] duration-300"
+  <div class="flex-1 min-w-0 max-w-full flex flex-col min-h-screen transition-[margin] duration-300"
        [class.lg:ml-72]="menuAbierto()">
 
     <!-- Mobile topbar -->
-    <header class="lg:hidden sticky top-0 z-20 flex items-center px-4 py-3 border-b border-slate-200 bg-white/90 backdrop-blur-xl shadow-sm">
-      <button (click)="menuAbierto.set(true)"
-              aria-label="Abrir menú"
-              class="w-14 h-14 flex items-center justify-center rounded-xl border-2 border-slate-300 bg-white text-slate-800 hover:bg-slate-50 transition-all shadow-sm shrink-0">
-        <span class="material-symbols-outlined text-[36px]" aria-hidden="true">menu</span>
-      </button>
-      <div class="flex-1 flex justify-center">
-        <span class="text-lg font-black text-slate-700 uppercase tracking-widest">
-          {{ auth.esAdmin() ? 'Admin' : auth.esInventario() ? 'Operaciones' : 'Landazury' }}
-        </span>
+    <header class="lg:hidden sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur-xl shadow-sm">
+      <div class="flex items-center gap-2 px-3 py-2.5">
+        <!-- Hamburguesa -->
+        <button (click)="menuAbierto.set(true)"
+                aria-label="Abrir menú"
+                class="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-all shrink-0">
+          <span class="material-symbols-outlined text-[22px]" aria-hidden="true">menu</span>
+        </button>
+
+        <!-- Centro: saldo (usuarios) o vacío (admin/inventario) -->
+        <div class="flex-1 flex items-center justify-center">
+          @if (!auth.esAdmin() && !auth.esInventario()) {
+            <button (click)="irAGanancias()" type="button"
+                    class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-all active:scale-95">
+              <span class="material-symbols-outlined text-[16px] text-slate-400">account_balance_wallet</span>
+              <div class="flex flex-col items-start leading-none">
+                <span class="text-[9px] font-medium text-slate-400 uppercase tracking-wide">Billetera de comisiones</span>
+                <span class="text-sm font-semibold tabular-nums text-slate-700">${{ saldoGanancias() | number:'1.0-0' }} <span class="text-[10px] font-normal text-slate-400">COP</span></span>
+              </div>
+            </button>
+          }
+        </div>
+
+        <!-- Campanita -->
+        <div class="relative shrink-0" data-campana>
+          <button (click)="toggleCampana(); $event.stopPropagation()"
+                  data-campana
+                  class="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-all relative">
+            <span class="material-symbols-outlined text-[22px]">notifications</span>
+            @if (avisos.noLeidos() > 0) {
+              <span class="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[9px] font-black leading-none">
+                {{ avisos.noLeidos() > 9 ? '9+' : avisos.noLeidos() }}
+              </span>
+            }
+          </button>
+        </div>
       </div>
-      <div class="w-12 h-12 rounded-full gold-gradient flex items-center justify-center text-lg font-extrabold text-[#0a0a08] shrink-0">
-        {{ auth.usuario()?.email?.[0]?.toUpperCase() }}
-      </div>
+      <!-- Panel notificaciones móvil -->
+      @if (campanaPanelAbierto()) {
+        <div class="border-t border-slate-200 bg-white shadow-xl" data-campana
+             (click)="$event.stopPropagation()">
+          <ng-container *ngTemplateOutlet="panelAvisos"></ng-container>
+        </div>
+      }
     </header>
 
     <!-- Page content -->
@@ -220,3 +342,47 @@
 
   </div>
 </div>
+
+<!-- ── Template compartido del panel de avisos ── -->
+<ng-template #panelAvisos>
+  <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+    <p class="text-sm font-black text-slate-800">Notificaciones</p>
+    @if (avisos.noLeidos() > 0) {
+      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+        {{ avisos.noLeidos() }} nueva{{ avisos.noLeidos() !== 1 ? 's' : '' }}
+      </span>
+    }
+  </div>
+  <div class="max-h-72 overflow-y-auto divide-y divide-slate-100">
+    @if (avisos.cargando()) {
+      <div class="px-4 py-6 text-center">
+        <span class="w-5 h-5 border-2 border-slate-200 border-t-primary rounded-full animate-spin inline-block"></span>
+      </div>
+    } @else if (avisos.avisos().length === 0) {
+      <div class="px-4 py-8 text-center">
+        <span class="material-symbols-outlined text-3xl text-slate-300">notifications_off</span>
+        <p class="text-slate-400 text-sm mt-2">Sin notificaciones</p>
+      </div>
+    } @else {
+      @for (a of avisos.avisos(); track a.id) {
+        <div class="px-4 py-3 flex gap-3 items-start transition-colors"
+             [class]="avisos.leidos().has(a.id) ? 'bg-white' : 'bg-blue-50/60'">
+          <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border"
+               [class]="tipoColor(a.tipo)">
+            <span class="material-symbols-outlined text-[16px]">{{ tipoIcono(a.tipo) }}</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-0.5">
+              <p class="text-xs font-black text-slate-800 truncate">{{ a.titulo }}</p>
+              @if (!avisos.leidos().has(a.id)) {
+                <span class="w-2 h-2 rounded-full bg-blue-500 shrink-0"></span>
+              }
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">{{ a.mensaje }}</p>
+            <p class="text-[10px] text-slate-400 mt-1">{{ a.creado_en | date:'d MMM, h:mm a' }}</p>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</ng-template>

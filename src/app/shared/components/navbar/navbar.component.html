@@ -1,9 +1,9 @@
 <header class="fixed top-0 w-full z-50 border-b border-slate-200 bg-white/90 backdrop-blur-xl shadow-sm">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 h-24 sm:h-20 flex items-center justify-between">
+  <div class="max-w-7xl mx-auto px-3 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-3">
 
     <!-- Logo -->
     <a routerLink="/" aria-label="Landazury Importaciones — Ir al inicio" class="shrink-0">
-      <img src="/logo.png" alt="Landazury Importaciones" width="96" height="96" fetchpriority="high" decoding="async" class="h-28 sm:h-24 w-auto object-contain"/>
+      <img src="/logo.png" alt="Landazury Importaciones" width="96" height="96" fetchpriority="high" decoding="async" class="h-12 sm:h-16 w-auto object-contain"/>
     </a>
 
     <!-- Nav desktop -->
@@ -22,7 +22,8 @@
         <a routerLink="/perfil" routerLinkActive="text-primary-dark"
            class="text-sm font-medium text-slate-700 hover:text-primary-dark transition-colors">Mi Perfil</a>
       </nav>
-      <div class="hidden md:flex items-center gap-4">
+
+      <div class="hidden md:flex items-center gap-3">
         @if (auth.perfil()) {
           <span class="text-xs px-2.5 py-1 rounded-full font-semibold"
             [class]="auth.esAdmin() ? 'bg-red-100 text-red-700' :
@@ -31,6 +32,30 @@
             {{ auth.perfil()?.rol }}
           </span>
         }
+
+        <!-- Campanita desktop -->
+        <div class="relative" data-campana>
+          <button (click)="toggleCampana(); $event.stopPropagation()"
+                  data-campana
+                  class="relative w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-primary-dark transition-all">
+            <span class="material-symbols-outlined text-[20px]">notifications</span>
+            @if (avisos.noLeidos() > 0) {
+              <span class="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-black leading-none">
+                {{ avisos.noLeidos() > 9 ? '9+' : avisos.noLeidos() }}
+              </span>
+            }
+          </button>
+
+          <!-- Panel desktop -->
+          @if (campanaPanelAbierto()) {
+            <div data-campana
+                 class="absolute right-0 top-12 w-80 bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden z-50"
+                 (click)="$event.stopPropagation()">
+              <ng-container *ngTemplateOutlet="panelAvisos"></ng-container>
+            </div>
+          }
+        </div>
+
         <button (click)="auth.cerrarSesion()"
                 [disabled]="auth.cerrandoSesion()"
                 class="px-5 py-2 text-sm font-bold text-slate-600 hover:text-primary-dark transition-colors disabled:opacity-40 disabled:cursor-wait">
@@ -52,71 +77,147 @@
       </div>
     }
 
-    <!-- Botón hamburguesa móvil -->
-    <button (click)="toggleMenu()"
-            class="flex md:hidden items-center justify-center w-16 h-16 rounded-2xl border-2 border-slate-300 bg-white text-slate-800 hover:bg-slate-50 active:bg-slate-100 transition-all shadow-sm"
-            aria-label="Abrir menú">
-      <span class="material-symbols-outlined text-[44px]">{{ menuAbierto() ? 'close' : 'menu' }}</span>
-    </button>
+    <!-- Derecha móvil: campanita + hamburguesa -->
+    <div class="flex md:hidden items-center gap-2">
+
+      @if (auth.estaAutenticado()) {
+        <!-- Campanita móvil -->
+        <div class="relative" data-campana>
+          <button (click)="toggleCampana(); $event.stopPropagation()"
+                  data-campana
+                  class="relative w-11 h-11 flex items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition-all shadow-sm">
+            <span class="material-symbols-outlined text-[22px]">notifications</span>
+            @if (avisos.noLeidos() > 0) {
+              <span class="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-black leading-none">
+                {{ avisos.noLeidos() > 9 ? '9+' : avisos.noLeidos() }}
+              </span>
+            }
+          </button>
+        </div>
+      }
+
+      <!-- Hamburguesa -->
+      <button (click)="toggleMenu()"
+              class="flex items-center justify-center w-11 h-11 rounded-xl border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 active:bg-slate-100 transition-all shadow-sm shrink-0"
+              aria-label="Abrir menú">
+        <span class="material-symbols-outlined text-[24px]">{{ menuAbierto() ? 'close' : 'menu' }}</span>
+      </button>
+    </div>
+
   </div>
+
+  <!-- Panel móvil de notificaciones (debajo del header) -->
+  @if (campanaPanelAbierto() && auth.estaAutenticado()) {
+    <div class="md:hidden border-t border-slate-200 bg-white shadow-2xl" data-campana
+         (click)="$event.stopPropagation()">
+      <ng-container *ngTemplateOutlet="panelAvisos"></ng-container>
+    </div>
+  }
 
   <!-- Menú móvil desplegable -->
   @if (menuAbierto()) {
-    <div class="md:hidden border-t-2 border-slate-200 bg-white shadow-2xl">
-      <div class="px-4 py-5 flex flex-col gap-3">
+    <div class="md:hidden border-t border-slate-200 bg-white shadow-2xl max-h-[calc(100vh-4rem)] overflow-y-auto">
+      <div class="px-3 py-3 flex flex-col gap-1">
 
         @if (auth.estaAutenticado()) {
           <a routerLink="/catalogo" (click)="toggleMenu()" routerLinkActive="text-green-700 bg-green-50 border-green-200"
-             class="flex items-center gap-5 px-6 py-5 rounded-2xl text-slate-800 hover:bg-slate-50 transition-all border border-transparent">
-            <span class="material-symbols-outlined text-[44px]">grid_view</span>
-            <span class="text-2xl font-black">Catálogo</span>
+             class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-800 hover:bg-slate-50 transition-all border border-transparent">
+            <span class="material-symbols-outlined text-[22px]">grid_view</span>
+            <span class="text-base font-bold">Catálogo</span>
           </a>
 
           @if (auth.esInventario()) {
             <a routerLink="/inventario" (click)="toggleMenu()" routerLinkActive="text-green-700 bg-green-50 border-green-200"
-               class="flex items-center gap-5 px-6 py-5 rounded-2xl text-slate-800 hover:bg-slate-50 transition-all border border-transparent">
-              <span class="material-symbols-outlined text-[44px]">inventory_2</span>
-              <span class="text-2xl font-black">Inventario</span>
+               class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-800 hover:bg-slate-50 transition-all border border-transparent">
+              <span class="material-symbols-outlined text-[22px]">inventory_2</span>
+              <span class="text-base font-bold">Inventario</span>
             </a>
           }
 
           @if (auth.esAdmin()) {
             <a routerLink="/admin" (click)="toggleMenu()" routerLinkActive="text-green-700 bg-green-50 border-green-200"
-               class="flex items-center gap-5 px-6 py-5 rounded-2xl text-slate-800 hover:bg-slate-50 transition-all border border-transparent">
-              <span class="material-symbols-outlined text-[44px]">admin_panel_settings</span>
-              <span class="text-2xl font-black">Administración</span>
+               class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-800 hover:bg-slate-50 transition-all border border-transparent">
+              <span class="material-symbols-outlined text-[22px]">admin_panel_settings</span>
+              <span class="text-base font-bold">Administración</span>
             </a>
           }
 
           <a routerLink="/perfil" (click)="toggleMenu()" routerLinkActive="text-green-700 bg-green-50 border-green-200"
-             class="flex items-center gap-5 px-6 py-5 rounded-2xl text-slate-800 hover:bg-slate-50 transition-all border border-transparent">
-            <span class="material-symbols-outlined text-[44px]">person</span>
-            <span class="text-2xl font-black">Mi Perfil</span>
+             class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-800 hover:bg-slate-50 transition-all border border-transparent">
+            <span class="material-symbols-outlined text-[22px]">person</span>
+            <span class="text-base font-bold">Mi Perfil</span>
           </a>
 
-          <div class="border-t-2 border-slate-100 my-2"></div>
+          <div class="border-t border-slate-100 my-1.5"></div>
 
           <button (click)="auth.cerrarSesion(); toggleMenu()"
                   [disabled]="auth.cerrandoSesion()"
-                  class="flex items-center gap-5 px-6 py-5 rounded-2xl text-red-600 hover:bg-red-50 transition-all w-full disabled:opacity-40 border border-transparent">
-            <span class="material-symbols-outlined text-[44px]">logout</span>
-            <span class="text-2xl font-black">{{ auth.cerrandoSesion() ? 'Saliendo…' : 'Cerrar Sesión' }}</span>
+                  class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-all w-full disabled:opacity-40 border border-transparent">
+            <span class="material-symbols-outlined text-[22px]">logout</span>
+            <span class="text-base font-bold">{{ auth.cerrandoSesion() ? 'Saliendo…' : 'Cerrar Sesión' }}</span>
           </button>
 
         } @else {
           <a routerLink="/auth/login" (click)="toggleMenu()"
-             class="flex items-center gap-5 px-6 py-5 rounded-2xl text-slate-800 hover:bg-slate-50 transition-all border border-transparent">
-            <span class="material-symbols-outlined text-[44px]">login</span>
-            <span class="text-2xl font-black">Ingresar</span>
+             class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-800 hover:bg-slate-50 transition-all border border-transparent">
+            <span class="material-symbols-outlined text-[22px]">login</span>
+            <span class="text-base font-bold">Ingresar</span>
           </a>
 
           <a routerLink="/auth/registro" (click)="toggleMenu()"
-             class="flex items-center justify-center gap-4 px-6 py-5 rounded-2xl gold-gradient text-[#0F0F0F] transition-all">
-            <span class="text-2xl font-black">Únete Ahora</span>
-            <span class="material-symbols-outlined text-[36px]">arrow_forward</span>
+             class="flex items-center justify-center gap-2 px-4 py-3 rounded-xl gold-gradient text-[#0F0F0F] transition-all">
+            <span class="text-base font-extrabold">Únete Ahora</span>
+            <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
           </a>
         }
       </div>
     </div>
   }
 </header>
+
+<!-- ── Template compartido del panel de avisos ── -->
+<ng-template #panelAvisos>
+  <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+    <p class="text-sm font-black text-slate-800">Notificaciones</p>
+    @if (avisos.noLeidos() > 0) {
+      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+        {{ avisos.noLeidos() }} nueva{{ avisos.noLeidos() !== 1 ? 's' : '' }}
+      </span>
+    }
+  </div>
+
+  <div class="max-h-72 overflow-y-auto divide-y divide-slate-100">
+    @if (avisos.cargando()) {
+      <div class="px-4 py-6 text-center">
+        <span class="w-5 h-5 border-2 border-slate-200 border-t-primary rounded-full animate-spin inline-block"></span>
+      </div>
+    } @else if (avisos.avisos().length === 0) {
+      <div class="px-4 py-8 text-center">
+        <span class="material-symbols-outlined text-3xl text-slate-300">notifications_off</span>
+        <p class="text-slate-400 text-sm mt-2">Sin notificaciones</p>
+      </div>
+    } @else {
+      @for (a of avisos.avisos(); track a.id) {
+        <div class="px-4 py-3 flex gap-3 items-start transition-colors"
+             [class]="avisos.leidos().has(a.id) ? 'bg-white' : 'bg-blue-50/60'">
+          <!-- Icono tipo -->
+          <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border"
+               [class]="tipoColor(a.tipo)">
+            <span class="material-symbols-outlined text-[16px]">{{ tipoIcono(a.tipo) }}</span>
+          </div>
+          <!-- Contenido -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-0.5">
+              <p class="text-xs font-black text-slate-800 truncate">{{ a.titulo }}</p>
+              @if (!avisos.leidos().has(a.id)) {
+                <span class="w-2 h-2 rounded-full bg-blue-500 shrink-0"></span>
+              }
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">{{ a.mensaje }}</p>
+            <p class="text-[10px] text-slate-400 mt-1">{{ a.creado_en | date:'d MMM, h:mm a' }}</p>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</ng-template>

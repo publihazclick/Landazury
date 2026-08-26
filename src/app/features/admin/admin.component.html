@@ -1,5 +1,5 @@
 <div class="min-h-screen bg-white text-slate-900">
-  <div class="max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-6">
+  <div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-8 py-4 sm:py-8 space-y-4 sm:space-y-6">
 
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -37,9 +37,9 @@
     }
 
     <!-- ── TABS ── -->
-    <div class="flex flex-wrap gap-1 p-1 bg-white border border-slate-200 rounded-xl w-fit">
+    <div class="flex gap-1 p-1 bg-white border border-slate-200 rounded-xl overflow-x-auto max-w-full scrollbar-none">
       <button (click)="setTab('usuarios')"
-         class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all"
+         class="flex items-center gap-1.5 px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0"
          [class.bg-primary]="tabActivo() === 'usuarios'"
          [class.text-\[#0a0a08\]]="tabActivo() === 'usuarios'"
          [class.text-slate-400]="tabActivo() !== 'usuarios'"
@@ -48,7 +48,7 @@
         Usuarios
       </button>
       <button (click)="setTab('productos')"
-         class="relative flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all"
+         class="relative flex items-center gap-1.5 px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0"
          [class.bg-primary]="tabActivo() === 'productos'"
          [class.text-\[#0a0a08\]]="tabActivo() === 'productos'"
          [class.text-slate-400]="tabActivo() !== 'productos'"
@@ -62,7 +62,7 @@
         }
       </button>
       <button (click)="setTab('estadisticas')"
-         class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all"
+         class="flex items-center gap-1.5 px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0"
          [class.bg-primary]="tabActivo() === 'estadisticas'"
          [class.text-\[#0a0a08\]]="tabActivo() === 'estadisticas'"
          [class.text-slate-400]="tabActivo() !== 'estadisticas'"
@@ -70,7 +70,493 @@
         <span class="material-symbols-outlined text-base">bar_chart</span>
         Estadísticas
       </button>
+      <button (click)="setTab('config')"
+         class="flex items-center gap-1.5 px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0"
+         [class.bg-primary]="tabActivo() === 'config'"
+         [class.text-\[#0a0a08\]]="tabActivo() === 'config'"
+         [class.text-slate-400]="tabActivo() !== 'config'"
+         [class.hover\:text-slate-800]="tabActivo() !== 'config'">
+        <span class="material-symbols-outlined text-base">settings</span>
+        Config
+      </button>
+      <button (click)="setTab('retiros')"
+         class="flex items-center gap-1.5 px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0"
+         [class.bg-primary]="tabActivo() === 'retiros'"
+         [class.text-\[#0a0a08\]]="tabActivo() === 'retiros'"
+         [class.text-slate-400]="tabActivo() !== 'retiros'"
+         [class.hover\:text-slate-800]="tabActivo() !== 'retiros'">
+        <span class="material-symbols-outlined text-base">payments</span>
+        Retiros
+      </button>
+      <button (click)="setTab('avisos')"
+         class="flex items-center gap-1.5 px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0"
+         [class.bg-primary]="tabActivo() === 'avisos'"
+         [class.text-\[#0a0a08\]]="tabActivo() === 'avisos'"
+         [class.text-slate-400]="tabActivo() !== 'avisos'"
+         [class.hover\:text-slate-800]="tabActivo() !== 'avisos'">
+        <span class="material-symbols-outlined text-base">campaign</span>
+        Avisos
+      </button>
     </div>
+
+    <!-- ══════════════════════════════════
+         TAB: CONFIGURACIÓN
+    ══════════════════════════════════ -->
+    @if (tabActivo() === 'config') {
+      <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+        <div class="p-5 border-b border-slate-200 flex items-center gap-3">
+          <span class="material-symbols-outlined text-emerald-600 text-2xl">campaign</span>
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Programa de referidos</h2>
+            <p class="text-xs text-slate-500">Define la comisión que ganan los usuarios cuando alguien que ellos refirieron tiene un pedido entregado.</p>
+          </div>
+        </div>
+
+        @if (cargandoConfig()) {
+          <div class="p-8 text-center text-slate-500 text-sm">Cargando…</div>
+        } @else {
+          <div class="p-5 space-y-6">
+
+            <!-- Stats actuales -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="rounded-xl border border-slate-200 p-4">
+                <p class="text-xs font-bold uppercase tracking-widest text-slate-400">Usuarios referidos</p>
+                <p class="text-2xl font-black text-slate-900 mt-1">{{ totalReferidores() }}</p>
+                <p class="text-[11px] text-slate-500">cuentas asociadas a un referidor</p>
+              </div>
+              <div class="rounded-xl border border-slate-200 p-4">
+                <p class="text-xs font-bold uppercase tracking-widest text-slate-400">Comisiones pagadas</p>
+                <p class="text-2xl font-black text-emerald-600 mt-1">\${{ totalComisionesPagadas() | number:'1.0-0' }}</p>
+                <p class="text-[11px] text-slate-500">total acreditado a referidores</p>
+              </div>
+            </div>
+
+            <!-- Toggle modo -->
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">Tipo de comisión</label>
+              <div class="grid grid-cols-2 gap-2 max-w-md">
+                <button type="button"
+                        (click)="configReferidoMode.set('flat')"
+                        class="px-4 py-3 rounded-xl border-2 text-sm font-bold transition-all"
+                        [class.border-emerald-500]="configReferidoMode() === 'flat'"
+                        [class.bg-emerald-50]="configReferidoMode() === 'flat'"
+                        [class.text-emerald-800]="configReferidoMode() === 'flat'"
+                        [class.border-slate-200]="configReferidoMode() !== 'flat'"
+                        [class.text-slate-600]="configReferidoMode() !== 'flat'">
+                  <span class="material-symbols-outlined text-base align-middle mr-1">paid</span>
+                  Monto fijo
+                </button>
+                <button type="button"
+                        (click)="configReferidoMode.set('pct')"
+                        class="px-4 py-3 rounded-xl border-2 text-sm font-bold transition-all"
+                        [class.border-emerald-500]="configReferidoMode() === 'pct'"
+                        [class.bg-emerald-50]="configReferidoMode() === 'pct'"
+                        [class.text-emerald-800]="configReferidoMode() === 'pct'"
+                        [class.border-slate-200]="configReferidoMode() !== 'pct'"
+                        [class.text-slate-600]="configReferidoMode() !== 'pct'">
+                  <span class="material-symbols-outlined text-base align-middle mr-1">percent</span>
+                  Porcentaje
+                </button>
+              </div>
+            </div>
+
+            @if (configReferidoMode() === 'flat') {
+              <!-- Monto fijo -->
+              <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">Monto fijo por entrega exitosa</label>
+                <div class="flex items-stretch gap-2 max-w-xs">
+                  <span class="px-4 py-2.5 rounded-lg bg-slate-100 text-slate-700 font-black flex items-center">$</span>
+                  <input type="number" min="0" step="100"
+                         [ngModel]="configReferidoFlat()"
+                         (ngModelChange)="configReferidoFlat.set($event)"
+                         class="flex-1 px-3 py-2.5 rounded-lg border-2 border-slate-200 text-base font-mono focus:border-primary outline-none">
+                  <span class="px-4 py-2.5 rounded-lg bg-slate-100 text-slate-700 font-black flex items-center">COP</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-2">
+                  El referidor recibirá <span class="font-bold">${{ configReferidoFlat() | number:'1.0-0' }} COP</span> en su wallet por cada pedido entregado de un referido directo.
+                  Pon <span class="font-bold">0</span> para desactivar.
+                </p>
+              </div>
+            } @else {
+              <!-- Porcentaje -->
+              <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">% de comisión por entrega exitosa</label>
+                <div class="flex items-stretch gap-2 max-w-xs">
+                  <input type="number" min="0" max="100" step="0.5"
+                         [ngModel]="configReferidoPct()"
+                         (ngModelChange)="configReferidoPct.set($event)"
+                         class="flex-1 px-3 py-2.5 rounded-lg border-2 border-slate-200 text-base font-mono focus:border-primary outline-none">
+                  <span class="px-4 py-2.5 rounded-lg bg-slate-100 text-slate-700 font-black flex items-center">%</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-2">
+                  Pon <span class="font-bold">0</span> para desactivar.
+                  Solo se aplica a referidos directos (1 nivel) y solo cuando el pedido pasa a estado <span class="font-bold">entregado</span>.
+                </p>
+              </div>
+
+              <!-- Base de cálculo -->
+              <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">Base sobre la que se calcula</label>
+                <div class="space-y-2">
+                  @for (op of opcionesBaseComision; track op.valor) {
+                    <label class="flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all"
+                           [class.border-emerald-500]="configReferidoBase() === op.valor"
+                           [class.bg-emerald-50]="configReferidoBase() === op.valor"
+                           [class.border-slate-200]="configReferidoBase() !== op.valor"
+                           [class.hover\:border-slate-300]="configReferidoBase() !== op.valor">
+                      <input type="radio" name="baseComision"
+                             [value]="op.valor"
+                             [checked]="configReferidoBase() === op.valor"
+                             (change)="configReferidoBase.set(op.valor)"
+                             class="mt-1 accent-emerald-600 shrink-0">
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-bold text-slate-900">{{ op.etiqueta }}</p>
+                        <p class="text-xs text-slate-500 mt-0.5">{{ op.descripcion }}</p>
+                      </div>
+                    </label>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Acciones -->
+            <div class="flex justify-end pt-2">
+              <button type="button"
+                      (click)="guardarConfigReferidos()"
+                      [disabled]="guardandoConfig()"
+                      class="px-5 py-2.5 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 active:scale-95 transition disabled:opacity-50 inline-flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">save</span>
+                {{ guardandoConfig() ? 'Guardando…' : 'Guardar configuración' }}
+              </button>
+            </div>
+
+          </div>
+        }
+      </div>
+
+      <!-- ──────────────────────────────────
+           Notificaciones automáticas WhatsApp
+      ────────────────────────────────── -->
+      <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden mt-6">
+        <div class="p-5 border-b border-slate-200 flex items-center gap-3">
+          <span class="material-symbols-outlined text-emerald-600 text-2xl">forum</span>
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Notificaciones WhatsApp por pedido</h2>
+            <p class="text-xs text-slate-500">Cada cambio de estado de un pedido envía un WhatsApp automático al vendedor y al cliente final, vía Evolution API.</p>
+          </div>
+        </div>
+
+        <div class="p-5 space-y-5">
+          <!-- Toggle -->
+          <label class="flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all"
+                 [class.border-emerald-500]="notifWhatsappActivas()"
+                 [class.bg-emerald-50]="notifWhatsappActivas()"
+                 [class.border-slate-200]="!notifWhatsappActivas()">
+            <input type="checkbox"
+                   [checked]="notifWhatsappActivas()"
+                   (change)="notifWhatsappActivas.set(!notifWhatsappActivas())"
+                   class="mt-1 accent-emerald-600">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold text-slate-900">Notificaciones activas</p>
+              <p class="text-xs text-slate-500 mt-0.5">Cuando esté apagado, las notificaciones se siguen registrando pero no se envían por WhatsApp.</p>
+            </div>
+          </label>
+
+          <!-- Instancia Evolution -->
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">Nombre de la instancia Evolution API</label>
+            <input type="text"
+                   placeholder="Ej: landazury_main"
+                   [ngModel]="evolutionInstanceName()"
+                   (ngModelChange)="evolutionInstanceName.set($event)"
+                   class="w-full px-3 py-2.5 rounded-lg border-2 border-slate-200 text-sm font-mono focus:border-primary outline-none">
+            <p class="text-xs text-slate-500 mt-2">
+              Es el nombre de la conexión WhatsApp en Evolution API (la que escaneaste el QR). Sin este valor, las notificaciones no se pueden enviar y quedan como "fallidas" para reenviar después.
+            </p>
+          </div>
+
+          <!-- Aviso anti-block -->
+          <div class="rounded-xl bg-amber-50 border border-amber-200 p-4 text-xs text-amber-800">
+            <p class="font-bold mb-1 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-base">shield_with_heart</span>
+              Anti-bloqueo
+            </p>
+            Estas son notificaciones <span class="font-bold">transaccionales</span> (cambio de estado), no marketing — son consideradas seguras por WhatsApp. Aún así el sistema añade una pausa de 800 ms entre envíos.
+          </div>
+
+          <!-- Acciones -->
+          <div class="flex justify-end pt-1">
+            <button type="button"
+                    (click)="guardarConfigNotificaciones()"
+                    [disabled]="guardandoNotif()"
+                    class="px-5 py-2.5 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 active:scale-95 transition disabled:opacity-50 inline-flex items-center gap-2">
+              <span class="material-symbols-outlined text-[18px]">save</span>
+              {{ guardandoNotif() ? 'Guardando…' : 'Guardar notificaciones' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ──────────────────────────────────
+           Botón Mentoría (sidebar)
+      ────────────────────────────────── -->
+      <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden mt-6">
+        <div class="p-5 border-b border-slate-200 flex items-center gap-3">
+          <span class="material-symbols-outlined text-amber-600 text-2xl">school</span>
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Botón "Mentoría" del menú</h2>
+            <p class="text-xs text-slate-500">Define a qué número de WhatsApp y con qué mensaje redirige el botón "Mentoría" en la barra lateral. Escribe el mensaje tal cual quieres que llegue — el sistema lo codifica automáticamente.</p>
+          </div>
+        </div>
+
+        <div class="p-5 space-y-5">
+          <!-- Teléfono -->
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">Número de WhatsApp destino</label>
+            <div class="flex items-stretch gap-2 max-w-md">
+              <span class="px-4 py-2.5 rounded-lg bg-slate-100 text-slate-700 font-black flex items-center">+</span>
+              <input type="tel"
+                     inputmode="numeric"
+                     placeholder="573202241463"
+                     [ngModel]="mentoriaTelefono()"
+                     (ngModelChange)="mentoriaTelefono.set($event)"
+                     class="flex-1 px-3 py-2.5 rounded-lg border-2 border-slate-200 text-base font-mono focus:border-primary outline-none">
+            </div>
+            <p class="text-xs text-slate-500 mt-2">
+              Formato internacional sin <span class="font-bold">+</span> ni espacios. Ejemplo Colombia: <span class="font-mono">573202241463</span>.
+            </p>
+          </div>
+
+          <!-- Mensaje -->
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">Mensaje que se enviará</label>
+            <textarea rows="5"
+                      placeholder="Escribe aquí el mensaje tal cual quieres que llegue…"
+                      [ngModel]="mentoriaMensaje()"
+                      (ngModelChange)="mentoriaMensaje.set($event)"
+                      class="w-full px-3 py-2.5 rounded-lg border-2 border-slate-200 text-sm focus:border-primary outline-none resize-y"></textarea>
+            <p class="text-xs text-slate-500 mt-2">
+              Puedes usar <span class="font-bold">*texto*</span> para negrita en WhatsApp, emojis, saltos de línea y caracteres especiales (ñ, tildes). El sistema codifica el mensaje internamente para que llegue exactamente como lo escribes.
+            </p>
+          </div>
+
+          <!-- Preview -->
+          @if (mentoriaPreviewUrl()) {
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Vista previa del enlace</p>
+              <a [href]="mentoriaPreviewUrl()" target="_blank" rel="noopener noreferrer"
+                 class="inline-flex items-center gap-2 text-emerald-700 hover:text-emerald-900 text-xs font-mono break-all">
+                <span class="material-symbols-outlined text-base">open_in_new</span>
+                {{ mentoriaPreviewUrl() }}
+              </a>
+              <p class="text-[11px] text-slate-500 mt-2">Haz clic para probar el enlace antes de guardar.</p>
+            </div>
+          }
+
+          <!-- Acciones -->
+          <div class="flex justify-end pt-1">
+            <button type="button"
+                    (click)="guardarConfigMentoria()"
+                    [disabled]="guardandoMentoria()"
+                    class="px-5 py-2.5 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 active:scale-95 transition disabled:opacity-50 inline-flex items-center gap-2">
+              <span class="material-symbols-outlined text-[18px]">save</span>
+              {{ guardandoMentoria() ? 'Guardando…' : 'Guardar botón Mentoría' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ══════════════════════════════════
+         TAB: RETIROS DE GANANCIAS
+    ══════════════════════════════════ -->
+    @if (tabActivo() === 'retiros') {
+      <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+        <div class="p-5 border-b border-slate-200 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-emerald-600 text-2xl">payments</span>
+            <div>
+              <h2 class="text-base font-bold text-slate-900">Retiros de ganancias</h2>
+              <p class="text-xs text-slate-500">Solicitudes de retiro de los vendedores. Plazo máximo 24 horas.</p>
+            </div>
+          </div>
+          <button (click)="cargarRetiros()" type="button"
+                  class="text-xs font-bold text-slate-500 hover:text-slate-800 inline-flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">refresh</span>
+          </button>
+        </div>
+
+        @if (cargandoRetiros()) {
+          <div class="p-8 text-center text-slate-500 text-sm">Cargando retiros…</div>
+        } @else if (retiros().length === 0) {
+          <div class="p-12 text-center">
+            <span class="material-symbols-outlined text-4xl text-slate-300 block mb-2">inbox</span>
+            <p class="text-sm text-slate-500">No hay solicitudes de retiro.</p>
+          </div>
+        } @else {
+          <!-- Filtro rápido pendientes -->
+          <div class="px-5 py-3 border-b border-slate-100 flex items-center gap-2 text-xs font-bold text-slate-500">
+            <span>Total: {{ retiros().length }}</span>
+            <span class="text-slate-300">·</span>
+            <span class="text-amber-600">Pendientes: {{ retiros().length - retiros().filter(r => r.estado !== 'pendiente').length }}</span>
+          </div>
+          <div class="divide-y divide-slate-100">
+            @for (r of retiros(); track r.id) {
+              <div class="px-5 py-4 space-y-3">
+                <!-- Cabecera -->
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="text-base font-black text-slate-900">\${{ r.monto | number:'1.0-0' }} COP</span>
+                      <span class="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
+                            [class]="r.estado === 'procesado' ? 'bg-emerald-100 text-emerald-700'
+                                   : r.estado === 'rechazado' ? 'bg-red-100 text-red-700'
+                                   : 'bg-amber-100 text-amber-700'">
+                        {{ r.estado === 'procesado' ? 'Pagado' : r.estado === 'rechazado' ? 'Rechazado' : 'Pendiente' }}
+                      </span>
+                    </div>
+                    <p class="text-sm font-bold text-slate-700 mt-0.5">{{ r.vendedor_nombre }}</p>
+                    <p class="text-xs text-slate-500">{{ r.vendedor_email }} · {{ r.vendedor_telefono }}</p>
+                    <p class="text-xs text-slate-400 mt-0.5">{{ r.creado_en | date:'dd/MM/yyyy HH:mm' }}</p>
+                  </div>
+                  <!-- Método de pago -->
+                  <div class="text-right shrink-0">
+                    <p class="text-xs font-black text-slate-700 uppercase">{{ r.metodo_tipo }}</p>
+                    <p class="text-sm font-bold text-slate-900">{{ r.numero }}</p>
+                    <p class="text-xs text-slate-500">{{ r.titular }}</p>
+                    @if (r.banco) { <p class="text-xs text-slate-400">{{ r.banco }} · {{ r.tipo_cuenta }}</p> }
+                  </div>
+                </div>
+
+                @if (r.estado === 'pendiente') {
+                  <!-- Notas opcionales -->
+                  <input type="text" [(ngModel)]="notasRetiro[r.id]" placeholder="Notas (opcional)"
+                         class="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg text-slate-700"/>
+                  <!-- Acciones -->
+                  <div class="flex gap-2">
+                    <button type="button" (click)="procesarRetiro(r.id)" [disabled]="procesandoRetiroId() === r.id"
+                            class="flex-1 py-2.5 rounded-xl bg-emerald-500 text-white text-sm font-black
+                                   hover:bg-emerald-600 disabled:opacity-50 inline-flex items-center justify-center gap-2">
+                      <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                      {{ procesandoRetiroId() === r.id ? 'Procesando…' : 'Marcar pagado' }}
+                    </button>
+                    <button type="button" (click)="rechazarRetiro(r.id)" [disabled]="procesandoRetiroId() === r.id"
+                            class="flex-1 py-2.5 rounded-xl bg-red-50 text-red-600 border border-red-200
+                                   text-sm font-bold hover:bg-red-100 disabled:opacity-50 inline-flex items-center justify-center gap-2">
+                      <span class="material-symbols-outlined text-[18px]">cancel</span>
+                      Rechazar
+                    </button>
+                  </div>
+                } @else if (r.notas_admin) {
+                  <p class="text-xs text-slate-500 italic">{{ r.notas_admin }}</p>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ══════════════════════════════════
+         TAB: AVISOS DE PLATAFORMA
+    ══════════════════════════════════ -->
+    @if (tabActivo() === 'avisos') {
+      <div class="space-y-4">
+
+        <!-- Formulario nuevo aviso -->
+        <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+          <div class="p-5 border-b border-slate-200 flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary text-xl">campaign</span>
+            <h2 class="text-sm font-bold text-slate-700 uppercase tracking-widest">Enviar aviso a todos los usuarios</h2>
+          </div>
+          <div class="p-5 space-y-4">
+            <!-- Tipo -->
+            <div class="flex gap-2 flex-wrap">
+              @for (t of [['info','info','Información'],['promo','local_offer','Promoción'],['alerta','warning','Alerta'],['novedad','auto_awesome','Novedad']]; track t[0]) {
+                <button type="button" (click)="avisoTipo.set($any(t[0]))"
+                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all"
+                        [class]="avisoTipo() === t[0]
+                          ? (t[0] === 'info' ? 'bg-sky-100 text-sky-700 border-sky-300' :
+                             t[0] === 'promo' ? 'bg-amber-100 text-amber-700 border-amber-300' :
+                             t[0] === 'alerta' ? 'bg-red-100 text-red-700 border-red-300' :
+                             'bg-emerald-100 text-emerald-700 border-emerald-300')
+                          : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'">
+                  <span class="material-symbols-outlined text-sm">{{ t[1] }}</span>
+                  {{ t[2] }}
+                </button>
+              }
+            </div>
+            <!-- Título -->
+            <input type="text" [ngModel]="avisoTitulo()" (ngModelChange)="avisoTitulo.set($event)"
+                   placeholder="Título del aviso"
+                   class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-primary transition-all"/>
+            <!-- Mensaje -->
+            <textarea [ngModel]="avisoMensaje()" (ngModelChange)="avisoMensaje.set($event)"
+                      placeholder="Escribe el mensaje para tus usuarios…"
+                      rows="4"
+                      class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-primary transition-all resize-none"></textarea>
+            <!-- Botón enviar -->
+            <button type="button" (click)="enviarAviso()"
+                    [disabled]="enviandoAviso() || !avisoTitulo().trim() || !avisoMensaje().trim()"
+                    class="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-[#0a0a08] font-black text-sm uppercase tracking-wider hover:brightness-110 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+              @if (enviandoAviso()) {
+                <span class="w-4 h-4 border-2 border-[#0a0a08]/30 border-t-[#0a0a08] rounded-full animate-spin"></span>
+                Enviando…
+              } @else {
+                <span class="material-symbols-outlined text-base">send</span>
+                Enviar a todos los usuarios
+              }
+            </button>
+          </div>
+        </div>
+
+        <!-- Lista de avisos activos -->
+        <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+          <div class="p-5 border-b border-slate-200 flex items-center justify-between">
+            <h2 class="text-sm font-bold text-slate-700 uppercase tracking-widest">Avisos activos</h2>
+            <span class="text-xs text-slate-400">{{ avisosService.avisos().length }} aviso{{ avisosService.avisos().length !== 1 ? 's' : '' }}</span>
+          </div>
+
+          @if (avisosService.cargando()) {
+            <div class="p-8 text-center">
+              <span class="w-6 h-6 border-2 border-slate-200 border-t-primary rounded-full animate-spin inline-block"></span>
+            </div>
+          } @else if (avisosService.avisos().length === 0) {
+            <div class="p-10 text-center">
+              <span class="material-symbols-outlined text-4xl text-slate-300">notifications_off</span>
+              <p class="text-slate-400 text-sm mt-2">No hay avisos activos</p>
+            </div>
+          } @else {
+            <div class="divide-y divide-slate-100">
+              @for (a of avisosService.avisos(); track a.id) {
+                <div class="flex items-start gap-4 px-5 py-4">
+                  <!-- Tipo badge -->
+                  <span class="text-[10px] font-black px-2 py-1 rounded-full border shrink-0 mt-0.5"
+                        [class]="a.tipo === 'info' ? 'bg-sky-100 text-sky-700 border-sky-200' :
+                                 a.tipo === 'promo' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                                 a.tipo === 'alerta' ? 'bg-red-100 text-red-700 border-red-200' :
+                                 'bg-emerald-100 text-emerald-700 border-emerald-200'">
+                    {{ a.tipo | titlecase }}
+                  </span>
+                  <!-- Contenido -->
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-bold text-slate-800">{{ a.titulo }}</p>
+                    <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">{{ a.mensaje }}</p>
+                    <p class="text-[10px] text-slate-400 mt-1">{{ a.creado_en | date:'d MMM yyyy, h:mm a' }}</p>
+                  </div>
+                  <!-- Eliminar -->
+                  <button (click)="eliminarAviso(a.id)"
+                          class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all shrink-0">
+                    <span class="material-symbols-outlined text-base">delete</span>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+      </div>
+    }
 
     <!-- ══════════════════════════════════
          TAB: GESTIÓN DE USUARIOS
@@ -463,30 +949,42 @@
 
                 }
 
-                <!-- Acciones de aprobación -->
-                <div class="flex items-center gap-2 pt-1 border-t border-slate-200">
-                  @if (producto.estado === 'pendiente') {
-                    <button (click)="abrirRevision(producto)"
-                            class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold bg-amber-500/10 border border-amber-500/20 text-amber-300 hover:bg-amber-500/20 transition-all">
-                      <span class="material-symbols-outlined text-[14px]">rate_review</span>
-                      Aprobar / Rechazar
+                <!-- Acciones -->
+                <div class="space-y-2 pt-1 border-t border-slate-200">
+
+                  <!-- Editar completo -->
+                  <a [routerLink]="['/inventario']" [queryParams]="{editar: producto.id}"
+                     class="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl text-xs font-bold bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 transition-all">
+                    <span class="material-symbols-outlined text-[14px]">edit_note</span>
+                    Editar completo
+                  </a>
+
+                  <!-- Aprobación + eliminar -->
+                  <div class="flex items-center gap-2">
+                    @if (producto.estado === 'pendiente') {
+                      <button (click)="abrirRevision(producto)"
+                              class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold bg-amber-500/10 border border-amber-500/20 text-amber-300 hover:bg-amber-500/20 transition-all">
+                        <span class="material-symbols-outlined text-[14px]">rate_review</span>
+                        Aprobar / Rechazar
+                      </button>
+                    } @else if (producto.estado === 'aprobado') {
+                      <span class="flex items-center gap-1.5 text-xs text-green-400 flex-1">
+                        <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                        Aprobado y publicado
+                      </span>
+                    } @else {
+                      <button (click)="abrirRevision(producto)"
+                              class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold text-amber-300 border border-amber-500/20 hover:bg-amber-500/10 transition-all">
+                        <span class="material-symbols-outlined text-[14px]">replay</span>
+                        Re-revisar
+                      </button>
+                    }
+                    <button (click)="confirmarEliminarProducto(producto)"
+                            class="w-8 h-8 flex items-center justify-center rounded-xl text-slate-600 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all">
+                      <span class="material-symbols-outlined text-base">delete</span>
                     </button>
-                  } @else if (producto.estado === 'aprobado') {
-                    <span class="flex items-center gap-1.5 text-xs text-green-400 flex-1">
-                      <span class="material-symbols-outlined text-[14px]">check_circle</span>
-                      Aprobado y publicado
-                    </span>
-                  } @else {
-                    <button (click)="abrirRevision(producto)"
-                            class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold text-amber-300 border border-amber-500/20 hover:bg-amber-500/10 transition-all">
-                      <span class="material-symbols-outlined text-[14px]">replay</span>
-                      Re-revisar
-                    </button>
-                  }
-                  <button (click)="confirmarEliminarProducto(producto)"
-                          class="w-8 h-8 flex items-center justify-center rounded-xl text-slate-600 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all">
-                    <span class="material-symbols-outlined text-base">delete</span>
-                  </button>
+                  </div>
+
                 </div>
               </div>
 
@@ -498,192 +996,496 @@
     }
 
     <!-- ══════════════════════════════════
-         TAB: ESTADÍSTICAS
+         TAB: ESTADÍSTICAS (Dashboard real)
     ══════════════════════════════════ -->
     @if (tabActivo() === 'estadisticas') {
 
-      <!-- KPI usuarios -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white border border-slate-200 rounded-2xl p-5">
-          <div class="flex items-center justify-between mb-3">
-            <span class="material-symbols-outlined text-slate-500 text-2xl">group</span>
-            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Total</span>
-          </div>
-          <p class="text-3xl font-black text-slate-900">{{ totalUsuarios() }}</p>
-          <p class="text-xs text-slate-500 mt-1">Usuarios registrados</p>
-        </div>
-        <div class="bg-white border border-slate-200 rounded-2xl p-5">
-          <div class="flex items-center justify-between mb-3">
-            <span class="material-symbols-outlined text-red-400 text-2xl">shield_person</span>
-            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Admin</span>
-          </div>
-          <p class="text-3xl font-black text-red-300">{{ contarRol('admin') }}</p>
-          <p class="text-xs text-slate-500 mt-1">Administradores</p>
-        </div>
-        <div class="bg-white border border-slate-200 rounded-2xl p-5">
-          <div class="flex items-center justify-between mb-3">
-            <span class="material-symbols-outlined text-amber-400 text-2xl">inventory_2</span>
-            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Inventario</span>
-          </div>
-          <p class="text-3xl font-black text-amber-300">{{ contarRol('inventario') }}</p>
-          <p class="text-xs text-slate-500 mt-1">Bodegas activas</p>
-        </div>
-        <div class="bg-white border border-slate-200 rounded-2xl p-5">
-          <div class="flex items-center justify-between mb-3">
-            <span class="material-symbols-outlined text-slate-400 text-2xl">person</span>
-            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Usuarios</span>
-          </div>
-          <p class="text-3xl font-black text-slate-800">{{ contarRol('usuario') }}</p>
-          <p class="text-xs text-slate-500 mt-1">Dropshippers activos</p>
-        </div>
-      </div>
-
-      <!-- KPI productos -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white border border-slate-200 rounded-2xl p-5">
-          <div class="flex items-center justify-between mb-3">
-            <span class="material-symbols-outlined text-primary text-2xl">inventory</span>
-            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Productos</span>
-          </div>
-          <p class="text-3xl font-black text-primary">{{ productos().length }}</p>
-          <p class="text-xs text-slate-500 mt-1">Total en catálogo</p>
-        </div>
-        <div class="bg-white border border-slate-200 rounded-2xl p-5">
-          <div class="flex items-center justify-between mb-3">
-            <span class="material-symbols-outlined text-amber-400 text-2xl">schedule</span>
-            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Pendientes</span>
-          </div>
-          <p class="text-3xl font-black text-amber-300">{{ contarEstado('pendiente') }}</p>
-          <p class="text-xs text-slate-500 mt-1">Esperando revisión</p>
-        </div>
-        <div class="bg-white border border-slate-200 rounded-2xl p-5">
-          <div class="flex items-center justify-between mb-3">
-            <span class="material-symbols-outlined text-green-400 text-2xl">check_circle</span>
-            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Aprobados</span>
-          </div>
-          <p class="text-3xl font-black text-green-300">{{ contarEstado('aprobado') }}</p>
-          <p class="text-xs text-slate-500 mt-1">Visibles a usuarios</p>
-        </div>
-        <div class="bg-white border border-slate-200 rounded-2xl p-5">
-          <div class="flex items-center justify-between mb-3">
-            <span class="material-symbols-outlined text-red-400 text-2xl">cancel</span>
-            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Rechazados</span>
-          </div>
-          <p class="text-3xl font-black text-red-300">{{ contarEstado('rechazado') }}</p>
-          <p class="text-xs text-slate-500 mt-1">No publicados</p>
-        </div>
-      </div>
-
-      <!-- Top productos -->
-      @if (cargandoStats()) {
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          @for (_ of [1,2,3]; track $index) {
-            <div class="bg-white border border-slate-200 rounded-2xl p-5 h-48 animate-pulse"></div>
+      <!-- Header con refresh y timestamp -->
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <h2 class="text-lg font-black text-slate-900">Panel del administrador</h2>
+          @if (dashboardActualizado()) {
+            <p class="text-[11px] text-slate-500">Actualizado a las {{ formatearHora(dashboardActualizado()) }} · datos en vivo</p>
+          } @else {
+            <p class="text-[11px] text-slate-500">Datos en vivo desde Supabase</p>
           }
         </div>
-      } @else {
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <button type="button"
+                (click)="cargarDashboardAdmin()"
+                [disabled]="cargandoDashboard()"
+                class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-50 inline-flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-base" [class.animate-spin]="cargandoDashboard()">refresh</span>
+          {{ cargandoDashboard() ? 'Cargando…' : 'Refrescar' }}
+        </button>
+      </div>
 
-          <!-- Top vistas -->
-          <div class="bg-white border border-slate-200 rounded-2xl p-5">
-            <h3 class="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
-              <span class="material-symbols-outlined text-base text-sky-400">visibility</span>
-              Más Vistos
-            </h3>
-            @if (topVistas().length === 0) {
-              <p class="text-slate-600 text-xs text-center py-4">Sin datos todavía</p>
-            }
-            @for (p of topVistas(); track p.id; let i = $index) {
-              <div class="flex items-center gap-3 py-2 border-b border-slate-200/50 last:border-0">
-                <span class="w-5 text-[11px] font-black text-slate-600">{{ i + 1 }}</span>
-                <div class="flex-1 min-w-0">
-                  <p class="text-xs font-semibold text-slate-800 truncate">{{ p.nombre }}</p>
-                </div>
-                <span class="text-xs font-bold text-sky-400">{{ p.vistas }}</span>
-              </div>
-            }
-          </div>
-
-          <!-- Top descargas -->
-          <div class="bg-white border border-slate-200 rounded-2xl p-5">
-            <h3 class="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
-              <span class="material-symbols-outlined text-base text-purple-400">download</span>
-              Más Descargados
-            </h3>
-            @if (topDescargas().length === 0) {
-              <p class="text-slate-600 text-xs text-center py-4">Sin datos todavía</p>
-            }
-            @for (p of topDescargas(); track p.id; let i = $index) {
-              <div class="flex items-center gap-3 py-2 border-b border-slate-200/50 last:border-0">
-                <span class="w-5 text-[11px] font-black text-slate-600">{{ i + 1 }}</span>
-                <div class="flex-1 min-w-0">
-                  <p class="text-xs font-semibold text-slate-800 truncate">{{ p.nombre }}</p>
-                </div>
-                <span class="text-xs font-bold text-purple-400">{{ p.descargas }}</span>
-              </div>
-            }
-          </div>
-
-          <!-- Top me gusta -->
-          <div class="bg-white border border-slate-200 rounded-2xl p-5">
-            <h3 class="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
-              <span class="material-symbols-outlined text-base text-red-400">favorite</span>
-              Más Me Gusta
-            </h3>
-            @if (topFavoritos().length === 0) {
-              <p class="text-slate-600 text-xs text-center py-4">Sin datos todavía</p>
-            }
-            @for (f of topFavoritos(); track f.producto_id; let i = $index) {
-              <div class="flex items-center gap-3 py-2 border-b border-slate-200/50 last:border-0">
-                <span class="w-5 text-[11px] font-black text-slate-600">{{ i + 1 }}</span>
-                <div class="flex-1 min-w-0">
-                  <p class="text-xs font-semibold text-slate-400 truncate font-mono">{{ f.producto_id.substring(0, 8) }}…</p>
-                </div>
-                <span class="text-xs font-bold text-red-400">{{ f.total }}</span>
-              </div>
-            }
-          </div>
-
+      @if (dashboardError()) {
+        <div class="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
+          <span class="material-symbols-outlined text-base align-middle mr-1">error</span>
+          {{ dashboardError() }}
         </div>
       }
 
-      <!-- Distribución por rol -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-6">
-        <h2 class="text-sm font-bold uppercase tracking-widest text-slate-400 mb-5 flex items-center gap-2">
-          <span class="material-symbols-outlined text-base text-primary">pie_chart</span>
-          Distribución de roles
-        </h2>
-        <div class="space-y-4">
-          @for (item of distribucion(); track item.valor) {
-            <div>
-              <div class="flex items-center justify-between mb-1.5">
-                <div class="flex items-center gap-2">
-                  <span class="material-symbols-outlined text-base"
-                        [class.text-red-400]="item.valor === 'admin'"
-                        [class.text-amber-400]="item.valor === 'inventario'"
-                        [class.text-slate-400]="item.valor === 'usuario'">{{ item.icono }}</span>
-                  <span class="text-sm font-semibold text-slate-800">{{ item.etiqueta }}</span>
-                </div>
-                <div class="flex items-center gap-3">
-                  <span class="text-xs text-slate-500">{{ item.porcentaje }}%</span>
-                  <span class="text-sm font-bold"
-                        [class.text-red-300]="item.valor === 'admin'"
-                        [class.text-amber-300]="item.valor === 'inventario'"
-                        [class.text-slate-700]="item.valor === 'usuario'">{{ item.cantidad }}</span>
-                </div>
-              </div>
-              <div class="h-2 rounded-full bg-slate-50 overflow-hidden">
-                <div class="h-full rounded-full transition-all duration-700"
-                     [style.width.%]="item.porcentaje"
-                     [class.bg-red-400]="item.valor === 'admin'"
-                     [class.bg-amber-400]="item.valor === 'inventario'"
-                     [class.bg-primary]="item.valor === 'usuario'">
-                </div>
-              </div>
-            </div>
+      @if (cargandoDashboard() && !resumen()) {
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          @for (_ of [1,2,3,4,5,6,7,8]; track $index) {
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 h-28 animate-pulse"></div>
           }
         </div>
-      </div>
+      }
+
+      @if (resumen(); as r) {
+
+        <!-- ═══════ KPI: VENTAS / INGRESOS ═══════ -->
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-base text-emerald-600">payments</span>
+            Ventas e ingresos
+          </h3>
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-gradient-to-br from-emerald-50 to-white border border-emerald-200 rounded-2xl p-5">
+              <div class="flex items-center justify-between mb-3">
+                <span class="material-symbols-outlined text-emerald-600 text-2xl">paid</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-700">Tu margen</span>
+              </div>
+              <p class="text-2xl font-black text-emerald-700">${{ r.ingreso_margen_flete | number:'1.0-0' }}</p>
+              <p class="text-xs text-slate-500 mt-1">Ganancia flete acumulada</p>
+              <p class="text-[10px] text-emerald-600 font-bold mt-2">${{ r.ingreso_margen_flete_entregado | number:'1.0-0' }} ya entregado</p>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-2xl p-5">
+              <div class="flex items-center justify-between mb-3">
+                <span class="material-symbols-outlined text-slate-700 text-2xl">trending_up</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">GMV</span>
+              </div>
+              <p class="text-2xl font-black text-slate-900">${{ r.gmv_total | number:'1.0-0' }}</p>
+              <p class="text-xs text-slate-500 mt-1">Total transado (excl. cancelados)</p>
+              <p class="text-[10px] text-slate-600 font-bold mt-2">${{ r.gmv_entregado | number:'1.0-0' }} entregado</p>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-2xl p-5">
+              <div class="flex items-center justify-between mb-3">
+                <span class="material-symbols-outlined text-sky-600 text-2xl">shopping_bag</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Pedidos</span>
+              </div>
+              <p class="text-2xl font-black text-slate-900">{{ r.total_pedidos | number }}</p>
+              <p class="text-xs text-slate-500 mt-1">Hoy: <span class="font-bold text-sky-600">{{ r.pedidos_hoy }}</span> · 7d: {{ r.pedidos_7d }} · 30d: {{ r.pedidos_30d }}</p>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-2xl p-5">
+              <div class="flex items-center justify-between mb-3">
+                <span class="material-symbols-outlined text-emerald-600 text-2xl">check_circle</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Tasa entrega</span>
+              </div>
+              <p class="text-2xl font-black text-emerald-600">{{ tasaConversion() }}%</p>
+              <p class="text-xs text-slate-500 mt-1">{{ r.pedidos_entregados }} entregados / {{ r.pedidos_perdidos }} perdidos</p>
+              <p class="text-[10px] text-red-600 font-bold mt-2">{{ tasaPerdida() }}% devueltos o cancelados</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════ KPI: USUARIOS / PRODUCTOS ═══════ -->
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-base text-primary">groups</span>
+            Usuarios y catálogo
+          </h3>
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white border border-slate-200 rounded-2xl p-5">
+              <div class="flex items-center justify-between mb-3">
+                <span class="material-symbols-outlined text-slate-700 text-2xl">group</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Usuarios</span>
+              </div>
+              <p class="text-2xl font-black text-slate-900">{{ r.total_usuarios | number }}</p>
+              <p class="text-xs text-slate-500 mt-1">+{{ r.usuarios_nuevos_7d }} en 7d · +{{ r.usuarios_nuevos_30d }} en 30d</p>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-2xl p-5">
+              <div class="flex items-center justify-between mb-3">
+                <span class="material-symbols-outlined text-amber-600 text-2xl">inventory_2</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Equipo</span>
+              </div>
+              <p class="text-2xl font-black text-slate-900">{{ r.usuarios_admin + r.usuarios_inventario }}</p>
+              <p class="text-xs text-slate-500 mt-1">{{ r.usuarios_admin }} admin · {{ r.usuarios_inventario }} bodega</p>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-2xl p-5">
+              <div class="flex items-center justify-between mb-3">
+                <span class="material-symbols-outlined text-primary text-2xl">inventory</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Productos</span>
+              </div>
+              <p class="text-2xl font-black text-primary">{{ r.total_productos | number }}</p>
+              <p class="text-xs text-slate-500 mt-1">{{ r.productos_aprobados }} aprobados · {{ r.productos_pendientes }} en cola</p>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-2xl p-5">
+              <div class="flex items-center justify-between mb-3">
+                <span class="material-symbols-outlined text-amber-600 text-2xl">hourglass_top</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Por revisar</span>
+              </div>
+              <p class="text-2xl font-black text-amber-600">{{ r.productos_pendientes }}</p>
+              <p class="text-xs text-slate-500 mt-1">Esperan tu aprobación</p>
+              @if (r.productos_pendientes > 0) {
+                <button (click)="setTab('productos')" class="text-[10px] text-amber-700 font-bold hover:underline mt-2">
+                  Revisar ahora →
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════ Pedidos por estado ═══════ -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-6">
+          <div class="flex items-center justify-between mb-5">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base text-slate-700">pending_actions</span>
+              Pedidos por estado
+            </h3>
+            <a routerLink="/admin-pedidos" class="text-xs font-bold text-emerald-700 hover:underline">Ir a gestión →</a>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
+            @for (e of conteoEstadosPedidos(); track e.key) {
+              <div class="rounded-xl border p-3" [class]="e.bg">
+                <div class="flex items-center gap-2 mb-1.5">
+                  <span class="material-symbols-outlined text-base" [class]="e.color">{{ e.icono }}</span>
+                  <span class="text-[10px] font-bold uppercase tracking-widest text-slate-600">{{ e.etiqueta }}</span>
+                </div>
+                <p class="text-xl font-black" [class]="e.color">{{ e.cantidad }}</p>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- ═══════ Tendencia 30 días ═══════ -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-6">
+          <h3 class="text-sm font-bold text-slate-900 mb-5 flex items-center gap-2">
+            <span class="material-symbols-outlined text-base text-sky-600">show_chart</span>
+            Pedidos últimos 30 días
+          </h3>
+          @if (tendencia30d().length > 0) {
+            <div class="flex items-end gap-1 h-32">
+              @for (d of tendencia30d(); track d.dia) {
+                <div class="flex-1 flex flex-col items-center gap-1 group relative">
+                  <div class="w-full rounded-t bg-sky-500/70 hover:bg-sky-600 transition-all relative"
+                       [style.height.%]="porcentajeBarra(d.pedidos, maxTendenciaPedidos())">
+                    @if (d.pedidos > 0) {
+                      <div class="absolute -top-7 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-10">
+                        {{ d.pedidos }} pedidos · ${{ d.gmv | number:'1.0-0' }}
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+            <div class="flex justify-between mt-2 text-[9px] text-slate-500 font-mono">
+              <span>{{ formatearDiaCorto(tendencia30d()[0].dia) }}</span>
+              <span>{{ formatearDiaCorto(tendencia30d()[tendencia30d().length - 1].dia) }}</span>
+            </div>
+          } @else {
+            <p class="text-center text-sm text-slate-500 py-6">Sin pedidos todavía. Cuando lleguen, verás la tendencia aquí.</p>
+          }
+        </div>
+
+        <!-- ═══════ Wallet & flujo de dinero ═══════ -->
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-base text-primary">account_balance_wallet</span>
+            Flujo de dinero
+          </h3>
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white border border-slate-200 rounded-2xl p-5">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Saldo en wallets</span>
+              <p class="text-2xl font-black text-slate-900 mt-2">${{ r.saldo_total_wallets | number:'1.0-0' }}</p>
+              <p class="text-xs text-slate-500 mt-1">Plata de los vendedores en plataforma</p>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-2xl p-5">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-600">Recargado</span>
+              <p class="text-2xl font-black text-emerald-600 mt-2">${{ r.total_recargado | number:'1.0-0' }}</p>
+              <p class="text-xs text-slate-500 mt-1">Total recargas vía ePayco</p>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-2xl p-5">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-orange-600">Debitado</span>
+              <p class="text-2xl font-black text-orange-600 mt-2">${{ r.total_debitado | number:'1.0-0' }}</p>
+              <p class="text-xs text-slate-500 mt-1">Cobrado por fletes y anticipados</p>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-2xl p-5">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-red-600">Reembolsos</span>
+              <p class="text-2xl font-black text-red-600 mt-2">${{ r.total_reembolsado | number:'1.0-0' }}</p>
+              <p class="text-xs text-slate-500 mt-1">Devueltos a wallets</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════ Logística de Envíos ═══════ -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-6">
+          <h3 class="text-sm font-bold text-slate-900 mb-5 flex items-center gap-2">
+            <span class="material-symbols-outlined text-base text-indigo-600">local_shipping</span>
+            Logística de Envíos
+          </h3>
+          <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-700">Con guía generada</span>
+              <p class="text-2xl font-black text-emerald-700 mt-2">{{ r.pedidos_con_guia }}</p>
+            </div>
+            <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-amber-700">Pendientes de guía</span>
+              <p class="text-2xl font-black text-amber-700 mt-2">{{ r.pedidos_sin_guia }}</p>
+              <p class="text-[10px] text-amber-700 mt-1">Confirmados sin guía de envío</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-slate-600">Margen acumulado</span>
+              <p class="text-2xl font-black text-slate-900 mt-2">${{ r.ingreso_margen_flete | number:'1.0-0' }}</p>
+              <p class="text-[10px] text-slate-600 mt-1">$3.000 sobre cada flete</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════ Rankings ═══════ -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+          <!-- Top vendedores -->
+          <div class="bg-white border border-slate-200 rounded-2xl p-5">
+            <h3 class="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base text-emerald-600">workspace_premium</span>
+              Top vendedores
+            </h3>
+            @if (topVendedores().length === 0) {
+              <p class="text-xs text-slate-500 text-center py-6">Sin pedidos todavía.</p>
+            } @else {
+              <div class="space-y-2">
+                @for (v of topVendedores(); track v.id; let i = $index) {
+                  <div class="flex items-center gap-3 py-2 border-b border-slate-100 last:border-0">
+                    <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-black flex items-center justify-center">{{ i + 1 }}</span>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-bold text-slate-800 truncate">{{ v.nombre }}</p>
+                      <p class="text-[10px] text-slate-500 truncate">{{ v.email }}</p>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-xs font-black text-slate-900">{{ v.pedidos }} <span class="text-[10px] font-normal text-slate-500">pedidos</span></p>
+                      <p class="text-[10px] font-bold text-emerald-700">${{ v.gmv | number:'1.0-0' }}</p>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Top productos vendidos -->
+          <div class="bg-white border border-slate-200 rounded-2xl p-5">
+            <h3 class="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base text-primary">whatshot</span>
+              Productos más vendidos
+            </h3>
+            @if (topProductosVendidos().length === 0) {
+              <p class="text-xs text-slate-500 text-center py-6">Aún no hay ventas.</p>
+            } @else {
+              <div class="space-y-2">
+                @for (p of topProductosVendidos(); track p.id; let i = $index) {
+                  <div class="flex items-center gap-3 py-2 border-b border-slate-100 last:border-0">
+                    <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-700 text-[11px] font-black flex items-center justify-center">{{ i + 1 }}</span>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-bold text-slate-800 truncate">{{ p.nombre }}</p>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-xs font-black text-slate-900">{{ p.unidades }} <span class="text-[10px] font-normal text-slate-500">u.</span></p>
+                      <p class="text-[10px] font-bold text-primary">${{ p.gmv | number:'1.0-0' }}</p>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Top ciudades destino -->
+          <div class="bg-white border border-slate-200 rounded-2xl p-5">
+            <h3 class="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base text-sky-600">location_on</span>
+              Top ciudades destino
+            </h3>
+            @if (topCiudades().length === 0) {
+              <p class="text-xs text-slate-500 text-center py-6">Sin envíos todavía.</p>
+            } @else {
+              <div class="space-y-2">
+                @for (c of topCiudades(); track $index; let i = $index) {
+                  <div class="flex items-center gap-3 py-2 border-b border-slate-100 last:border-0">
+                    <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-700 text-[11px] font-black flex items-center justify-center">{{ i + 1 }}</span>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-bold text-slate-800 truncate">{{ c.ciudad }}</p>
+                      <p class="text-[10px] text-slate-500 truncate">{{ c.depto }}</p>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-xs font-black text-slate-900">{{ c.pedidos }} <span class="text-[10px] font-normal text-slate-500">pedidos</span></p>
+                      <p class="text-[10px] font-bold text-sky-700">${{ c.gmv | number:'1.0-0' }}</p>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Top recargadores -->
+          <div class="bg-white border border-slate-200 rounded-2xl p-5">
+            <h3 class="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base text-emerald-600">savings</span>
+              Top recargadores de wallet
+            </h3>
+            @if (topRecargadores().length === 0) {
+              <p class="text-xs text-slate-500 text-center py-6">Sin recargas todavía.</p>
+            } @else {
+              <div class="space-y-2">
+                @for (rc of topRecargadores(); track rc.id; let i = $index) {
+                  <div class="flex items-center gap-3 py-2 border-b border-slate-100 last:border-0">
+                    <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-black flex items-center justify-center">{{ i + 1 }}</span>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-bold text-slate-800 truncate">{{ rc.nombre }}</p>
+                      <p class="text-[10px] text-slate-500 truncate">{{ rc.email }}</p>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-xs font-black text-emerald-700">${{ rc.total_recargado | number:'1.0-0' }}</p>
+                      <p class="text-[10px] text-slate-500">{{ rc.recargas }} recargas</p>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Top referidores -->
+          <div class="bg-white border border-slate-200 rounded-2xl p-5 lg:col-span-2">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <span class="material-symbols-outlined text-base text-purple-600">share</span>
+                Top referidores
+              </h3>
+              <div class="text-right">
+                <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Comisiones pagadas</p>
+                <p class="text-sm font-black text-purple-700">${{ r.total_comisiones_referidos | number:'1.0-0' }}</p>
+              </div>
+            </div>
+            @if (topReferidoresRanking().length === 0) {
+              <p class="text-xs text-slate-500 text-center py-6">Aún nadie ha referido a otro usuario.</p>
+            } @else {
+              <div class="space-y-2">
+                @for (rf of topReferidoresRanking(); track rf.id; let i = $index) {
+                  <div class="flex items-center gap-3 py-2 border-b border-slate-100 last:border-0">
+                    <span class="w-6 h-6 rounded-full bg-purple-100 text-purple-700 text-[11px] font-black flex items-center justify-center">{{ i + 1 }}</span>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-bold text-slate-800 truncate">{{ rf.nombre }}</p>
+                      <p class="text-[10px] text-slate-500 truncate">{{ rf.email }} · <span class="font-mono uppercase">{{ rf.referral_code }}</span></p>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-xs font-black text-slate-900">{{ rf.referidos_directos }} <span class="text-[10px] font-normal text-slate-500">referidos</span></p>
+                      <p class="text-[10px] font-bold text-purple-700">${{ rf.comisiones | number:'1.0-0' }}</p>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- ═══════ Engagement de catálogo (top vistas/descargas/likes) ═══════ -->
+        @if (cargandoStats()) {
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            @for (_ of [1,2,3]; track $index) {
+              <div class="bg-white border border-slate-200 rounded-2xl p-5 h-48 animate-pulse"></div>
+            }
+          </div>
+        } @else {
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-3 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base text-slate-700">analytics</span>
+              Engagement del catálogo
+            </h3>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div class="bg-white border border-slate-200 rounded-2xl p-5">
+                <h4 class="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-base text-sky-500">visibility</span>
+                  Más vistos
+                </h4>
+                @if (topVistas().length === 0) {
+                  <p class="text-slate-500 text-xs text-center py-4">Sin datos todavía</p>
+                }
+                @for (p of topVistas(); track p.id; let i = $index) {
+                  <div class="flex items-center gap-3 py-2 border-b border-slate-100 last:border-0">
+                    <span class="w-5 text-[11px] font-black text-slate-600">{{ i + 1 }}</span>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-semibold text-slate-800 truncate">{{ p.nombre }}</p>
+                    </div>
+                    <span class="text-xs font-bold text-sky-600">{{ p.vistas }}</span>
+                  </div>
+                }
+              </div>
+              <div class="bg-white border border-slate-200 rounded-2xl p-5">
+                <h4 class="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-base text-purple-500">download</span>
+                  Más descargados
+                </h4>
+                @if (topDescargas().length === 0) {
+                  <p class="text-slate-500 text-xs text-center py-4">Sin datos todavía</p>
+                }
+                @for (p of topDescargas(); track p.id; let i = $index) {
+                  <div class="flex items-center gap-3 py-2 border-b border-slate-100 last:border-0">
+                    <span class="w-5 text-[11px] font-black text-slate-600">{{ i + 1 }}</span>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-semibold text-slate-800 truncate">{{ p.nombre }}</p>
+                    </div>
+                    <span class="text-xs font-bold text-purple-600">{{ p.descargas }}</span>
+                  </div>
+                }
+              </div>
+              <div class="bg-white border border-slate-200 rounded-2xl p-5">
+                <h4 class="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-base text-red-500">favorite</span>
+                  Más me gusta
+                </h4>
+                @if (topFavoritos().length === 0) {
+                  <p class="text-slate-500 text-xs text-center py-4">Sin datos todavía</p>
+                }
+                @for (f of topFavoritos(); track f.producto_id; let i = $index) {
+                  <div class="flex items-center gap-3 py-2 border-b border-slate-100 last:border-0">
+                    <span class="w-5 text-[11px] font-black text-slate-600">{{ i + 1 }}</span>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-semibold text-slate-500 truncate font-mono">{{ f.producto_id.substring(0, 8) }}…</p>
+                    </div>
+                    <span class="text-xs font-bold text-red-500">{{ f.total }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- ═══════ Distribución por rol ═══════ -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-6">
+          <h3 class="text-sm font-bold text-slate-900 mb-5 flex items-center gap-2">
+            <span class="material-symbols-outlined text-base text-primary">pie_chart</span>
+            Distribución de roles
+          </h3>
+          <div class="space-y-4">
+            @for (item of distribucion(); track item.valor) {
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-base"
+                          [class.text-red-500]="item.valor === 'admin'"
+                          [class.text-amber-500]="item.valor === 'inventario'"
+                          [class.text-slate-500]="item.valor === 'usuario'">{{ item.icono }}</span>
+                    <span class="text-sm font-semibold text-slate-800">{{ item.etiqueta }}</span>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="text-xs text-slate-500">{{ item.porcentaje }}%</span>
+                    <span class="text-sm font-bold text-slate-900">{{ item.cantidad }}</span>
+                  </div>
+                </div>
+                <div class="h-2 rounded-full bg-slate-100 overflow-hidden">
+                  <div class="h-full rounded-full transition-all duration-700"
+                       [style.width.%]="item.porcentaje"
+                       [class.bg-red-500]="item.valor === 'admin'"
+                       [class.bg-amber-500]="item.valor === 'inventario'"
+                       [class.bg-primary]="item.valor === 'usuario'">
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+      }
 
     }
 
@@ -871,6 +1673,38 @@
       <!-- TAB: ACCESO Y ROL -->
       @if (tabEdicion() === 'acceso') {
         <div class="px-6 py-5 space-y-5">
+
+          <!-- Toggle Usuario de prueba -->
+          <div class="space-y-2">
+            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm">science</span>
+              Usuario de prueba
+            </label>
+            <button type="button" (click)="toggleTestUser()"
+                    class="w-full flex items-center justify-between p-4 rounded-xl border transition-all text-left"
+                    [class.border-purple-400]="usuarioEditando()?.test_user"
+                    [class.bg-purple-50]="usuarioEditando()?.test_user"
+                    [class.border-slate-200]="!usuarioEditando()?.test_user"
+                    [class.bg-white]="!usuarioEditando()?.test_user">
+              <div class="flex-1 pr-3">
+                <p class="font-bold text-sm" [class.text-purple-900]="usuarioEditando()?.test_user" [class.text-slate-700]="!usuarioEditando()?.test_user">
+                  {{ usuarioEditando()?.test_user ? 'Modo prueba activado' : 'Usuario normal' }}
+                </p>
+                <p class="text-[11px] mt-0.5" [class.text-purple-700]="usuarioEditando()?.test_user" [class.text-slate-500]="!usuarioEditando()?.test_user">
+                  {{ usuarioEditando()?.test_user
+                     ? 'Puede generar pedidos sin saldo en el wallet.'
+                     : 'Debe tener saldo en wallet para hacer pedidos.' }}
+                </p>
+              </div>
+              <div class="relative w-12 h-6 rounded-full transition-colors shrink-0"
+                   [class.bg-purple-500]="usuarioEditando()?.test_user"
+                   [class.bg-slate-300]="!usuarioEditando()?.test_user">
+                <div class="absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform"
+                     [class.translate-x-6]="usuarioEditando()?.test_user"
+                     [class.translate-x-0.5]="!usuarioEditando()?.test_user"></div>
+              </div>
+            </button>
+          </div>
 
           <!-- Rol -->
           <div class="space-y-2">

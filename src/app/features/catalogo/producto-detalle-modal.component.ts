@@ -1,24 +1,29 @@
 import { Component, Input, Output, EventEmitter, OnInit, inject, signal, PLATFORM_ID, HostListener } from '@angular/core';
 import { isPlatformBrowser, DecimalPipe } from '@angular/common';
+import { TrustedUrlPipe } from '../../core/pipes/trusted-url.pipe';
 import { CreativosService } from '../../core/services/creativos.service';
+import { AuthService } from '../../core/services/auth.service';
 import type { Producto, Creativo } from '../../core/models/producto.model';
 
 @Component({
   selector: 'app-producto-detalle-modal',
   standalone: true,
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, TrustedUrlPipe],
   templateUrl: './producto-detalle-modal.component.html',
 })
 export class ProductoDetalleModalComponent implements OnInit {
   @Input() producto!: Producto;
   @Output() cerrar = new EventEmitter<void>();
+  @Output() hacerPedido = new EventEmitter<Producto>();
 
   private readonly creativosService = inject(CreativosService);
   private readonly platformId = inject(PLATFORM_ID);
+  readonly auth = inject(AuthService);
 
   readonly descargando = signal<string[]>([]);
   readonly descargandoLote = signal<'imagenes' | 'videos' | null>(null);
   readonly copiado = signal<'nombre' | 'descripcion' | null>(null);
+  readonly toastMsg = signal<{ texto: string; ok: boolean } | null>(null);
   // signed URLs: se cargan al vuelo cuando la URL pública falla
   readonly urlsSigned = signal<Record<string, string>>({});
   readonly urlsFailed = new Set<string>();
@@ -129,7 +134,8 @@ export class ProductoDetalleModalComponent implements OnInit {
 
   // Llamado desde (error) en <img> y <video> cuando la URL pública falla
   async onMediaError(creativo: Creativo, el: HTMLImageElement | HTMLVideoElement) {
-    if (this.urlsFailed.has(creativo.id)) return; // ya intentamos, evitar bucle
+    if (this.urlsFailed.has(creativo.id)) return;
+    if (!creativo.archivo_path) return; // externo: URL pública ya es directa
     this.urlsFailed.add(creativo.id);
     try {
       const url = await this.creativosService.obtenerUrlDescarga(creativo.archivo_path);
@@ -175,11 +181,7 @@ export class ProductoDetalleModalComponent implements OnInit {
   }
 
   get precioSugerido(): number {
-    const slug = (this.producto.categoria?.slug ?? '').toLowerCase();
-    if (slug === 'calzado') {
-      return (this.producto.precio_base ?? 0) + 68000;
-    }
-    return (this.producto.precio_final ?? 0) * 1.5;
+    return this.producto.precio_sugerido ?? this.producto.precio_final ?? 0;
   }
 
   get stockAparente(): number {
@@ -193,8 +195,8 @@ export class ProductoDetalleModalComponent implements OnInit {
       hash |= 0;
     }
     if (esCalzado) {
-      // Rango 3006 - 4507 inclusive (1502 valores posibles)
-      return 3006 + Math.abs(hash) % 1502;
+      // Rango 4002 - 4999 inclusive (998 valores posibles)
+      return 4002 + Math.abs(hash) % 998;
     }
     return 180 + Math.abs(hash) % 221;
   }
@@ -203,14 +205,39 @@ export class ProductoDetalleModalComponent implements OnInit {
     return this.creativosService.formatearTamano(bytes);
   }
 
+  esYoutube(creativo: Creativo): boolean {
+    return creativo.extension === 'youtube';
+  }
+
+  videoThumb(creativo: Creativo): string {
+    const desc = creativo.descripcion ?? '';
+    if (desc.includes('||')) return desc.split('||')[0];
+    const match = creativo.archivo_url?.match(/[?&]v=([^&]+)/);
+    return match ? `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg` : '';
+  }
+
+  ytEmbedUrl(creativo: Creativo): string {
+    const match = creativo.archivo_url?.match(/[?&]v=([^&]+)/);
+    const videoId = match?.[1] ?? '';
+    return `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+  }
+
+  private mostrarToast(texto: string, ok = true) {
+    this.toastMsg.set({ texto, ok });
+    setTimeout(() => this.toastMsg.set(null), 3500);
+  }
+
   estaDescargando(id: string) { return this.descargando().includes(id); }
 
   async descargar(creativo: Creativo) {
     if (this.estaDescargando(creativo.id)) return;
     this.descargando.update(ids => [...ids, creativo.id]);
+    this.mostrarToast('Descargando…', true);
     try {
       await this.ejecutarDescarga(creativo);
-    } catch { /* silencioso */ } finally {
+    } catch (e: any) {
+      this.mostrarToast('Error al descargar', false);
+    } finally {
       this.descargando.update(ids => ids.filter(id => id !== creativo.id));
     }
   }
@@ -220,29 +247,59 @@ export class ProductoDetalleModalComponent implements OnInit {
     const lista = tipo === 'imagenes' ? this.imagenes : this.videos;
     if (lista.length === 0) return;
     this.descargandoLote.set(tipo);
-    try {
-      for (const creativo of lista) {
+    let completados = 0;
+    let errores = 0;
+    for (const creativo of lista) {
+      this.mostrarToast(`Descargando ${completados + 1} de ${lista.length}…`, true);
+      try {
         await this.ejecutarDescarga(creativo);
-        await new Promise(r => setTimeout(r, 300));
+        completados++;
+      } catch {
+        errores++;
       }
-    } catch { /* silencioso */ } finally {
-      this.descargandoLote.set(null);
+      await new Promise(r => setTimeout(r, 400));
+    }
+    this.descargandoLote.set(null);
+    if (errores === 0) {
+      this.mostrarToast(`¡${completados} ${tipo} descargadas!`, true);
+    } else {
+      this.mostrarToast(`${completados} descargadas, ${errores} fallaron`, false);
     }
   }
 
   private async ejecutarDescarga(creativo: Creativo) {
-    const url = await this.creativosService.obtenerUrlDescarga(creativo.archivo_path);
-    const res = await fetch(url);
-    const blob = await res.blob();
+    const ext = creativo.extension || 'jpg';
+    const nombreArchivo = `${creativo.nombre.replace(/[^\w\-. ]/g, '_')}.${ext}`;
+
+    // Videos YouTube y videos web externos: abrir en nueva pestaña
+    if (this.esYoutube(creativo) || (creativo.tipo === 'video' && creativo.fuente === 'web')) {
+      window.open(creativo.archivo_url, '_blank', 'noopener,noreferrer');
+      this.mostrarToast('Video abierto en nueva pestaña', true);
+      return;
+    }
+
+    let blob: Blob;
+
+    if (creativo.archivo_path) {
+      // Imagen/video subido a Supabase Storage → URL firmada, mismo origen
+      const url = await this.creativosService.obtenerUrlDescarga(creativo.archivo_path);
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      blob = await res.blob();
+    } else {
+      // Imagen externa (Google, e-commerce, etc.) → proxy server-side para evitar CORS
+      blob = await this.creativosService.descargarExterno(creativo.archivo_url, nombreArchivo);
+    }
+
     const blobUrl = URL.createObjectURL(blob);
-    const nombreArchivo = creativo.extension
-      ? `${creativo.nombre}.${creativo.extension}`
-      : creativo.nombre;
     const a = document.createElement('a');
     a.href = blobUrl;
     a.download = nombreArchivo;
+    document.body.appendChild(a);
     a.click();
-    setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 15000);
+    this.mostrarToast('¡Descarga completa!', true);
   }
 
   async copiar(campo: 'nombre' | 'descripcion') {

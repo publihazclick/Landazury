@@ -88,8 +88,8 @@ export class AccesoRapidoComponent {
   readonly error = signal<string | null>(null);
 
   readonly cuentas: CuentaAcceso[] = [
-    { rol: 'Admin',      icono: 'shield_person', color: 'bg-red-100 text-red-700',     email: 'admin@landazury.com',      contrasena: 'Admin2024!', ruta: '/admin' },
-    { rol: 'Inventario', icono: 'inventory_2',   color: 'bg-amber-100 text-amber-700', email: 'inventario@landazury.com', contrasena: 'Inv2024!',   ruta: '/inventario' },
+    { rol: 'Admin',      icono: 'shield_person', color: 'bg-red-100 text-red-700',     email: 'admin@landazury.com',      contrasena: 'Admin2024!', ruta: '/catalogo' },
+    { rol: 'Inventario', icono: 'inventory_2',   color: 'bg-amber-100 text-amber-700', email: 'inventario@landazury.com', contrasena: 'Inv2024!',   ruta: '/catalogo' },
     { rol: 'Usuario',    icono: 'person',        color: 'bg-slate-100 text-slate-700', email: 'usuario@landazury.com',    contrasena: 'User2024!',  ruta: '/catalogo' },
   ];
 

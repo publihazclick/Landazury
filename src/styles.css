@@ -15,6 +15,16 @@
   box-sizing: border-box;
 }
 
+/*
+  Bloqueo global de overflow horizontal. Si un componente futuro accidentalmente
+  excede el viewport (nombre largo, imagen ancha, emoji raro, etc.), el html/body
+  CLIPPAN en lugar de permitir scroll lateral que rompe todo el layout en móvil.
+*/
+html, body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
 body {
   font-family: "Manrope", sans-serif;
   background-color: #f8f8f8;
@@ -56,6 +66,14 @@ input, select, textarea, button, a {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out forwards;
 }
 
 @keyframes bgDrift {

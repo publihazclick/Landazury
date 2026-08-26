@@ -1,27 +1,36 @@
 import { Component, inject, signal, computed, OnInit, HostListener, PLATFORM_ID } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CurrencyPipe, isPlatformBrowser } from '@angular/common';
+import { CurrencyPipe, DecimalPipe, isPlatformBrowser } from '@angular/common';
 import { CatalogoService } from '../../core/services/catalogo.service';
 import { CreativosService } from '../../core/services/creativos.service';
 import { AuthService } from '../../core/services/auth.service';
 import { CatalogoFiltrosService } from '../../core/services/catalogo-filtros.service';
 import { ProductoDetalleModalComponent } from './producto-detalle-modal.component';
+import { PedidoModalComponent } from '../dropshipping/pedido-modal.component';
 import type { Producto, Creativo, TipoCreativo } from '../../core/models/producto.model';
 
 export type BodegaId = 'importaciones' | 'moda';
 
+// Oculta temporalmente la bodega "Landazury Importaciones" (selector + productos) de la vista de usuarios.
+// Poner en `true` para volver a habilitarla.
+const BODEGA_IMPORTACIONES_VISIBLE = false;
+
+const SLUGS_MODA_LANDAZURY = new Set(['moda-ropa', 'calzado', 'billeteras']);
+
 export function bodegaDeProducto(producto: Producto): BodegaId {
   const slug = (producto.categoria?.slug ?? '').toLowerCase();
-  return slug === 'moda-ropa' ? 'moda' : 'importaciones';
+  return SLUGS_MODA_LANDAZURY.has(slug) ? 'moda' : 'importaciones';
 }
 
 @Component({
   selector: 'app-catalogo',
   standalone: true,
-  imports: [FormsModule, CurrencyPipe, ProductoDetalleModalComponent],
+  imports: [FormsModule, CurrencyPipe, DecimalPipe, ProductoDetalleModalComponent, PedidoModalComponent],
   templateUrl: './catalogo.component.html',
 })
 export class CatalogoComponent implements OnInit {
+  readonly bodegaImportacionesVisible = BODEGA_IMPORTACIONES_VISIBLE;
+
   private readonly catalogoService = inject(CatalogoService);
   private readonly creativosService = inject(CreativosService);
   readonly auth = inject(AuthService);
@@ -34,6 +43,16 @@ export class CatalogoComponent implements OnInit {
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
   readonly productoModal = signal<Producto | null>(null);
+  readonly productoPedido = signal<Producto | null>(null);
+
+  abrirPedido(producto: Producto) {
+    this.productoModal.set(null);
+    this.productoPedido.set(producto);
+  }
+
+  cerrarPedido() {
+    this.productoPedido.set(null);
+  }
 
   // Búsqueda reactiva: se actualiza en cada tecla del input
   readonly busquedaSignal = signal('');
@@ -144,8 +163,14 @@ export class CatalogoComponent implements OnInit {
       // Siempre cargamos todos los productos; la búsqueda se hace en cliente
       // para que al borrar el query vuelva a la vista normal al instante.
       const data = await this.catalogoService.obtenerProductos();
-      this.productos.set(data);
-      this.filtros.productosCatalogo.set(data);
+      const visibles = BODEGA_IMPORTACIONES_VISIBLE
+        ? data
+        : data.filter(p => bodegaDeProducto(p) !== 'importaciones');
+      // Mezclar el orden en cada carga para que no siempre aparezca primero
+      // el último producto subido (aplica a todas las bodegas).
+      const mezclados = this.mezclar(visibles);
+      this.productos.set(mezclados);
+      this.filtros.productosCatalogo.set(mezclados);
       // Al entrar al catálogo, siempre seleccionar "Ver todas" por defecto
       this.filtros.bodegaFiltro.set('todas');
     } catch {
@@ -153,6 +178,16 @@ export class CatalogoComponent implements OnInit {
     } finally {
       this.cargando.set(false);
     }
+  }
+
+  /** Fisher-Yates shuffle: devuelve una copia barajada sin mutar el original. */
+  private mezclar<T>(arr: T[]): T[] {
+    const out = [...arr];
+    for (let i = out.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [out[i], out[j]] = [out[j], out[i]];
+    }
+    return out;
   }
 
   async cargarCategorias() {
@@ -186,25 +221,23 @@ export class CatalogoComponent implements OnInit {
 
   esFavorito(id: string) { return this.favoritos().has(id); }
 
-  stockAparente(productoId: string): number {
+  stockAparente(producto: Producto): number {
+    const esCalzado = (producto.categoria?.slug ?? '').toLowerCase() === 'calzado';
     const hoy = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-    const seed = productoId + hoy;
+    const seed = producto.id + hoy;
     let hash = 0;
     for (let i = 0; i < seed.length; i++) {
       hash = ((hash << 5) - hash) + seed.charCodeAt(i);
       hash |= 0;
     }
-    return 180 + Math.abs(hash) % 221; // rango 180–400
+    if (esCalzado) return 4002 + Math.abs(hash) % 998; // rango 4002–4999
+    return 180 + Math.abs(hash) % 221;                 // rango 180–400
   }
 
   calcularMargen(producto: Producto): number { return calcularMargen(producto); }
 
   precioSugerido(producto: Producto): number {
-    const slug = (producto.categoria?.slug ?? '').toLowerCase();
-    if (slug === 'calzado') {
-      return (producto.precio_base ?? 0) + 68000;
-    }
-    return (producto.precio_final ?? 0) * 1.5;
+    return producto.precio_sugerido ?? producto.precio_final ?? 0;
   }
 
   async descargarCreativo(creativo: Creativo) {
@@ -238,5 +271,8 @@ export class CatalogoComponent implements OnInit {
 }
 
 function calcularMargen(producto: Producto): number {
-  return producto.precio_final ? 50 : 0; // Sugerido = precio_final * 1.5, margen siempre 50%
+  const base = producto.precio_final ?? 0;
+  const sugerido = producto.precio_sugerido ?? base;
+  if (base <= 0) return 0;
+  return Math.max(0, Math.round(((sugerido - base) / base) * 100));
 }

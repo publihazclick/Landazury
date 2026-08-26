@@ -13,13 +13,16 @@ export interface Creativo {
   descripcion?: string;
   tipo: TipoCreativo;
   archivo_url: string;
-  archivo_path: string;
+  archivo_path: string | null;
   tamano?: number;
   extension?: string;
   producto_id?: string;
   subido_por?: string;
   publico: boolean;
   creado_en: string;
+  fuente?: 'upload' | 'web';
+  estado_revision?: 'sugerido' | 'aprobado' | 'rechazado';
+  fuente_nombre?: string;
 }
 
 export type EstadoProducto = 'pendiente' | 'aprobado' | 'rechazado';
@@ -45,13 +48,20 @@ export interface Producto {
   ganador: boolean;
   exclusivo: boolean;
   atributos?: AtributoProducto[];
-  link_creativos?: string;
+  link_creativos?: string | null;
   estado: EstadoProducto;
   bodega_id?: string;
   vistas: number;
   descargas: number;
   creado_en: string;
   creativos?: Creativo[];
+  // Dimensiones físicas del paquete — internas, usadas para cotizar Mipaquete.
+  // Defaults por categoría se aplican en el backfill de la migración cuando
+  // el subidor no las llena.
+  alto_cm?: number;
+  ancho_cm?: number;
+  largo_cm?: number;
+  peso_kg?: number;
 }
 
 export interface Favorito {

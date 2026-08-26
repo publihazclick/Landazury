@@ -13,6 +13,13 @@ export interface FilaImport {
   // Imagen y creativos
   imagen_url?: string;       // URL imagen principal
   link_creativos?: string;   // URL carpeta de creativos en Drive
+  // Dimensiones (uso interno Mipaquete; opcionales — si vienen vacías se aplican
+  // defaults por categoría al insertar). Acepta tanto Height/Width/Length/Weight (kg)
+  // como Alto/Ancho/Largo/Peso (kg) en español.
+  alto_cm?: number;
+  ancho_cm?: number;
+  largo_cm?: number;
+  peso_kg?: number;
   // Categoría
   categoria_id?: string;
   categoriaTexto: string;
@@ -39,6 +46,11 @@ const COL_STOCK       = 'Stock';
 const COL_ACTIVE      = 'Active';
 const COL_IMAGEN_URL  = 'Image URL';   // URL imagen principal
 const COL_CREATIVOS   = 'Creativos Drive'; // URL carpeta Drive de creativos
+// Dimensiones del paquete — opcional. Acepta nombres en inglés y en español.
+const COLS_ALTO   = ['Height (cm)', 'Height', 'Alto (cm)', 'Alto'];
+const COLS_ANCHO  = ['Width (cm)',  'Width',  'Ancho (cm)', 'Ancho'];
+const COLS_LARGO  = ['Length (cm)', 'Length', 'Largo (cm)', 'Largo'];
+const COLS_PESO   = ['Weight (kg)', 'Weight', 'Peso (kg)',  'Peso'];
 
 @Injectable({ providedIn: 'root' })
 export class ExcelProductosService {
@@ -87,6 +99,12 @@ export class ExcelProductosService {
       const imagen_url     = this.texto(row[COL_IMAGEN_URL]) || undefined;
       const link_creativos = this.texto(row[COL_CREATIVOS]) || undefined;
 
+      // ── Dimensiones (opcionales) ────────────────────────────────────
+      const alto_cm  = this.primerNumero(row, COLS_ALTO);
+      const ancho_cm = this.primerNumero(row, COLS_ANCHO);
+      const largo_cm = this.primerNumero(row, COLS_LARGO);
+      const peso_kg  = this.primerNumero(row, COLS_PESO);
+
       // ── Categoría ────────────────────────────────────────────────────
       const categoriaTexto = this.texto(row[COL_CATEGORY]);
       const cat = this.buscarCategoria(categoriaTexto, categorias);
@@ -101,6 +119,10 @@ export class ExcelProductosService {
         activo,
         imagen_url,
         link_creativos,
+        alto_cm:  alto_cm  > 0 ? alto_cm  : undefined,
+        ancho_cm: ancho_cm > 0 ? ancho_cm : undefined,
+        largo_cm: largo_cm > 0 ? largo_cm : undefined,
+        peso_kg:  peso_kg  > 0 ? peso_kg  : undefined,
         categoria_id:    cat?.id,
         categoriaTexto,
         categoriaMatch:  !!cat,
@@ -123,8 +145,23 @@ export class ExcelProductosService {
   }
 
   private numero(val: unknown): number {
-    const n = Number(val);
+    if (val == null) return 0;
+    if (typeof val === 'number') return isNaN(val) ? 0 : val;
+    // Tolerar textos con comas decimales o sufijos como "0,8 kg" / "20cm"
+    const limpio = String(val).replace(/,/g, '.').replace(/[^0-9.\-]/g, '');
+    const n = Number(limpio);
     return isNaN(n) ? 0 : n;
+  }
+
+  /** Devuelve el primer valor numérico encontrado entre los nombres alternativos. */
+  private primerNumero(row: Record<string, any>, keys: string[]): number {
+    for (const k of keys) {
+      if (k in row) {
+        const n = this.numero(row[k]);
+        if (n > 0) return n;
+      }
+    }
+    return 0;
   }
 
   private buscarCategoria(texto: string, categorias: Categoria[]): Categoria | undefined {
